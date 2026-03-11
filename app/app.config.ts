@@ -1,8 +1,12 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'green',
-      neutral: 'slate'
+      primary: 'turquoise',
+      secondary: 'mauve',
+      neutral: 'carbon',
     }
+  },
+  api: {
+    url: 'https://myforebears.ru.tuna.am/api',
   }
 })
