@@ -7,6 +7,6 @@ export default defineAppConfig({
     }
   },
   api: {
-    url: 'https://myforebears.ru.tuna.am/api',
+    url: 'https://rooots.ru.tuna.am/api',
   }
 })
