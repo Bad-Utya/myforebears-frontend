@@ -1,11 +1,59 @@
 <script setup lang="ts">
+import {ref} from 'vue';
+import {sendRegisterRequest} from '~/composables/scripts/auth/register';
+import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
+import EmailInput from "~/components/auth/EmailInput.vue";
 
+const code = ref('WAITING...');
+const email = ref('');
+const password = ref('');
+
+const isEmailCorrect = ref(false);
+
+const notification = ref("");
+
+function sendRequest() {
+  sendRegisterRequest(email.value, password.value)
+    .then((result) => {
+      code.value = result.code;
+    })
+    .catch((err) => {
+      code.value = 'ERROR';
+      console.error(err);
+    });
+}
 </script>
 
 <template>
+  <UApp>
+    <UMain class="flex">
+      <div class="flex flex-col gap-4 m-auto w-lg h-auto">
+        <UButton color="neutral" variant="link" icon="i-lucide-arrow-left" class="w-fit cursor-pointer" @click="$router.back()">Back
+        </UButton>
+        <div class="flex flex-col gap-4 m-auto w-lg h-auto p-4 rounded-xl shadow-lg shadow-carbon-800">
+          <div>
+            <h1 class="text-left text-3xl font-bold">Register</h1>
+            <p class="text-left text-md text-muted max-w-md">Create a new account</p>
+          </div>
 
+          <div class="flex flex-col gap-2">
+            <EmailInput v-model:data="email" v-model:is-right="isEmailCorrect"></EmailInput>
+          </div>
+
+            <UButton loading-auto
+                     :disabled="!isEmailCorrect" :variant="isEmailCorrect ? 'solid' : 'outline'"
+                     @click="sendRequest()">Submit</UButton>
+        </div>
+
+        <div v-if="notification.length > 0"
+             class="flex flex-row gap-2 px-4 py-2 rounded-lg shadow-lg bg-error-800/50 shadow-carbon-800 w-fit">
+          <UIcon name="i-lucide-triangle-alert" class="size-8 text-error"/>
+          <p v-text="notification" class="text-error text-md font-bold my-auto"></p>
+        </div>
+      </div>
+    </UMain>
+  </UApp>
 </template>
 
 <style scoped>
-
 </style>

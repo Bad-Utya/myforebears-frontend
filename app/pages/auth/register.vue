@@ -31,7 +31,7 @@ function sendRequest() {
   <UApp>
     <UMain class="flex">
       <div class="flex flex-col gap-4 m-auto w-lg h-auto">
-        <UButton color="neutral" variant="link" icon="i-lucide-arrow-left" to="../../home" class="w-fit">To home
+        <UButton color="neutral" variant="link" icon="i-lucide-arrow-left" class="w-fit cursor-pointer" @click="$router.back()">Back
         </UButton>
         <div class="flex flex-col gap-4 m-auto w-lg h-auto p-4 rounded-xl shadow-lg shadow-carbon-800">
           <div>
@@ -48,7 +48,7 @@ function sendRequest() {
             <UButton class="w-min" loading-auto
                      :disabled="!isDataRight" :variant="isDataRight ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
-            <UButton class="ml-auto" variant="link" color="neutral" to="./forget">Forgot password</UButton>
+            <UButton class="ml-auto" variant="link" color="neutral" to="./login">Already have an account, login instead</UButton>
           </div>
         </div>
 
