@@ -10,8 +10,8 @@
           <UButton color="primary" variant="solid" to="/auth/register">Register</UButton>
         </template>
       </UHeader>
-      <UMain class="flex">
-        <h1 class="m-auto text-center text-9xl font-bold">Whole new world of genealogical trees</h1>
+      <UMain>
+        <UPageHero title="Whole worlds described by genealogical trees" description="Unique project about genealogical trees"></UPageHero>
       </UMain>
       <UFooter>
         <template #left>

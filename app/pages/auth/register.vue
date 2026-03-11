@@ -29,6 +29,8 @@ function checkEmail(email: string): boolean {
 <template>
   <UApp>
     <UMain class="flex">
+      <div class="flex flex-col gap-4 m-auto w-lg h-auto">
+        <UButton color="neutral" variant="link" icon="i-lucide-arrow-left" to="../../home">To home</UButton>
       <div class="flex flex-col gap-4 m-auto w-lg h-auto p-4 rounded-xl shadow-lg shadow-carbon-800">
         <div>
         <h1 class="text-left text-3xl font-bold">Register</h1>
@@ -44,6 +46,7 @@ function checkEmail(email: string): boolean {
         <UButton class="w-min">Submit</UButton>
         <UButton class="ml-auto" variant="link" color="neutral">Forgot password</UButton>
         </div>
+      </div>
       </div>
     </UMain>
   </UApp>
