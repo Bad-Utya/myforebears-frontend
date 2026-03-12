@@ -9,10 +9,7 @@ const code = ref('WAITING...');
 const email = ref('');
 const password = ref('');
 
-const isPasswordCorrect = ref(false);
 const isEmailCorrect = ref(false);
-
-const isDataRight = computed(() => isPasswordCorrect.value && isEmailCorrect.value);
 
 const notification = ref("");
 
@@ -37,7 +34,7 @@ function sendRequest() {
         <div class="flex flex-col gap-4 m-auto w-lg h-auto p-4 rounded-xl shadow-lg shadow-carbon-800">
           <div>
             <h1 class="text-left text-3xl font-bold">Login</h1>
-            <p class="text-left text-md text-muted max-w-md">Create a new account</p>
+            <p class="text-left text-md text-muted max-w-md">Welcome back</p>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -47,7 +44,7 @@ function sendRequest() {
 
           <div class="flex flex-row">
             <UButton class="w-min" loading-auto
-                     :disabled="!isDataRight" :variant="isDataRight ? 'solid' : 'outline'"
+                     :disabled="!isEmailCorrect" :variant="isEmailCorrect ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
             <UButton class="ml-auto" variant="link" color="neutral" to="./forgot">Forgot password</UButton>
           </div>

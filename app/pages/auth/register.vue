@@ -11,13 +11,14 @@ const password = ref('');
 const isPasswordCorrect = ref(false);
 const isEmailCorrect = ref(false);
 
-const isDataRight = computed(() => isPasswordCorrect.value && isEmailCorrect.value);
+const isDataCorrect = computed(() => isPasswordCorrect.value && isEmailCorrect.value);
 
 const notification = ref("");
 
 function sendRequest() {
   sendRegisterRequest(email.value, password.value)
     .then((result) => {
+      console.log(result);
       code.value = result.code;
     })
     .catch((err) => {
@@ -46,7 +47,7 @@ function sendRequest() {
 
           <div class="flex flex-row">
             <UButton class="w-min" loading-auto
-                     :disabled="!isDataRight" :variant="isDataRight ? 'solid' : 'outline'"
+                     :disabled="!isDataCorrect" :variant="isDataCorrect ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
             <UButton class="ml-auto" variant="link" color="neutral" to="./login">Already have an account, login instead</UButton>
           </div>

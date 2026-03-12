@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import {sendRegisterRequest} from '~/composables/scripts/auth/register';
-import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
 import EmailInput from "~/components/auth/EmailInput.vue";
 
 const code = ref('WAITING...');
@@ -32,15 +31,15 @@ function sendRequest() {
         </UButton>
         <div class="flex flex-col gap-4 m-auto w-lg h-auto p-4 rounded-xl shadow-lg shadow-carbon-800">
           <div>
-            <h1 class="text-left text-3xl font-bold">Register</h1>
-            <p class="text-left text-md text-muted max-w-md">Create a new account</p>
+            <h1 class="text-left text-3xl font-bold">Recover password</h1>
+            <p class="text-left text-md text-muted max-w-md">Reset password of the existing account</p>
           </div>
 
           <div class="flex flex-col gap-2">
             <EmailInput v-model:data="email" v-model:is-right="isEmailCorrect"></EmailInput>
           </div>
 
-            <UButton loading-auto
+            <UButton loading-auto class="w-fit"
                      :disabled="!isEmailCorrect" :variant="isEmailCorrect ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
         </div>
