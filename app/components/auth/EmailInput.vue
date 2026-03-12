@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import isEmailCorrect from "~/composables/scripts/auth/isEmailCorrect";
+import isEmailCorrect from "~/composables/scripts/filters/isEmailCorrect";
 
 const email = defineModel<string>('data');
 const isRight = defineModel<boolean>('isRight');

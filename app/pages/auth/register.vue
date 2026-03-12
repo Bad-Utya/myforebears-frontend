@@ -15,7 +15,9 @@ const isDataCorrect = computed(() => isPasswordCorrect.value && isEmailCorrect.v
 
 const notification = ref("");
 
-function sendRequest() {
+const router = useRoute();
+
+async function sendRequest() {
   sendRegisterRequest(email.value, password.value)
     .then((result) => {
       console.log(result);
@@ -25,6 +27,8 @@ function sendRequest() {
       code.value = 'ERROR';
       console.error(err);
     });
+
+  router
 }
 </script>
 

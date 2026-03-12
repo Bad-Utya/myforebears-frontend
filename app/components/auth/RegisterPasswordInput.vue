@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import getPasswordHardnessLevel from "~/composables/scripts/auth/isPasswordEasy";
+import getPasswordHardnessLevel from "~/composables/scripts/filters/isPasswordEasy";
 import PasswordInput from "~/components/auth/PasswordInput.vue";
 
 const password = defineModel<string>('data');
