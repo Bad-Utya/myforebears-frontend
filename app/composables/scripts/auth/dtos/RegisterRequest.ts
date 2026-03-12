@@ -1,3 +1,5 @@
+// TODO: move ts somehere else
+
 export default class RegisterRequest {
   email: string;
   password: string;

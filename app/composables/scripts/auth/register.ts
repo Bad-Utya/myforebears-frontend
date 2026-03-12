@@ -1,8 +1,8 @@
 import getApiUrl from "~/composables/scripts/api/parseUrl";
-import RegisterRequest from "~/utils/templates/auth/RegisterRequest";
-import RegisterResponse from "~/utils/templates/auth/RegisterResponse";
-import StatusDTO from "~/utils/templates/dtos/StatusDTO";
-import type FetchResponse from "~/utils/templates/api/FetchResponse";
+import RegisterRequest from "~/composables/scripts/auth/dtos/RegisterRequest";
+import RegisterResponse from "~/composables/scripts/auth/dtos/RegisterResponse";
+import StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
+import type FetchResponse from "~/composables/scripts/api/dtos/FetchResponse";
 
 export default async function sendRegisterConverted(request: RegisterRequest) {
   let {data, status, error, refresh, clear} = await useFetch<FetchResponse<RegisterResponse>>(getApiUrl('auth/send-code'), {
@@ -13,8 +13,6 @@ export default async function sendRegisterConverted(request: RegisterRequest) {
   if (!data.value || !data.value.data) {
     return new StatusDTO(false, "No connection to the server");
   }
-
-  console.log(data)
 
   let response = data.value.data as RegisterResponse;
 

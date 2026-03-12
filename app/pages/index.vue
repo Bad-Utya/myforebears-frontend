@@ -1,5 +1,5 @@
 <script setup lang="ts">
-navigateTo('/home')
+await navigateTo('/home') //TODO: middleware
 </script>
 
 <template />

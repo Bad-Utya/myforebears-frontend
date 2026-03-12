@@ -50,6 +50,10 @@ function sendCodeRequest() {
   timeRemaining.value = DELAY;
 }
 
+async function openEmailLink() {
+  await navigateTo('/redirect/email', {external: true});
+}
+
 onMounted(() => {
   setInterval(() => {
     if (isTryAgainBusy.value) {
@@ -71,7 +75,8 @@ onMounted(() => {
             <h1 class="text-left text-3xl font-bold">Enter the code</h1>
             <p class="text-left text-md text-muted max-w-md">
               Check
-              <a class="text-primary font-lighter underline hover:text-primary-400" href="/redirect/email" target="_blank" rel="noopener noreferrer" v-text="email"></a>
+              <UButton color="primary" variant="link" class="font-lighter underline text-md cursor-pointer"
+                       @click="openEmailLink()">{{email}}</UButton>
               for the message</p>
           </div>
 
