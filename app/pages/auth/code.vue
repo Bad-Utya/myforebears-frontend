@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import {sendRegisterRequest} from '~/composables/scripts/auth/register';
 
 const MILLISECONDS_IN_MINUTE = 60000;
 const DELAY = MILLISECONDS_IN_MINUTE;
+
+const route = useRoute();
+const email = route.query.email;
 
 const digits = ref<number[]>([]);
 
@@ -30,7 +32,7 @@ async function sendRequest() {
 
   await new Promise(r => setTimeout(r, 2000));
 
-  // sendRegisterRequest(email.value, password.value)
+  // await sendRegisterRequest(email.value, password.value)
   //   .then((result) => {
   //     console.log(result);
   //     code.value = result.code;
@@ -39,7 +41,6 @@ async function sendRequest() {
   //     code.value = 'ERROR';
   //     console.error(err);
   //   });
-
 
   isLoading.value = false;
 }
@@ -69,7 +70,9 @@ onMounted(() => {
           <div>
             <h1 class="text-left text-3xl font-bold">Enter the code</h1>
             <p class="text-left text-md text-muted max-w-md">
-              Check <a class="text-primary font-lighter" href="../../redirect/email" target="_blank" rel="noopener noreferrer">example@yandex.ru</a> for the message</p>
+              Check
+              <a class="text-primary font-lighter underline hover:text-primary-400" href="/redirect/email" target="_blank" rel="noopener noreferrer" v-text="email"></a>
+              for the message</p>
           </div>
 
           <UPinInput v-model="digits" :length="6" class="mx-auto justify-around w-full"

@@ -15,20 +15,22 @@ const isDataCorrect = computed(() => isPasswordCorrect.value && isEmailCorrect.v
 
 const notification = ref("");
 
-const router = useRoute();
-
 async function sendRequest() {
-  sendRegisterRequest(email.value, password.value)
+  await sendRegisterRequest(email.value, password.value)
     .then((result) => {
-      console.log(result);
-      code.value = result.code;
+      // TODO: move
+      notification.value = result.message ?? '';
+
+      if (result.isSuccessful) {
+        navigateTo({path:'/auth/code', query: {email: email.value}});
+      } else {
+        // notification.value = result.message ?? '';
+      }
     })
     .catch((err) => {
       code.value = 'ERROR';
       console.error(err);
     });
-
-  router
 }
 </script>
 

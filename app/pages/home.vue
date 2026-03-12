@@ -6,7 +6,7 @@
     <UApp>
       <UHeader title="Rooots">
         <template #right>
-          <UButton color="neutral" variant="outline" to="/auth/login">Login</UButton>
+          <UButton color="neutral" variant="ghost" to="/auth/login">Login</UButton>
           <UButton color="primary" variant="solid" to="/auth/register">Register</UButton>
         </template>
       </UHeader>
