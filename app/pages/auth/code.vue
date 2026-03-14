@@ -82,7 +82,7 @@ onMounted(() => {
 
           <UPinInput v-model="digits" :length="6" class="mx-auto justify-around w-full"
                      variant="subtle" type="number"
-                     :ui="{base: 'uppercase text-5xl w-[2ch] h-fit py-[0.5ch]'}"
+                     :ui="{base: 'uppercase text-5xl w-[2ch] h-fit py-[0.5ch] caret-transparent'}"
                      @complete="sendRequest()"/>
 
           <div class="flex flex-row">
