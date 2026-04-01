@@ -1,6 +1,6 @@
-// TODO: move ts somehere else
+import type IApiRequest from "~/composables/scripts/api/interfaces/IApiRequest";
 
-export default class RegisterRequest {
+export default class RegisterRequest implements IApiRequest {
   email: string;
   password: string;
 

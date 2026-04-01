@@ -30,17 +30,15 @@ const notification = ref("");
 async function sendRequest() {
   isLoading.value = true;
 
-  await new Promise(r => setTimeout(r, 2000));
-
-  // await sendRegisterRequest(email.value, password.value)
-  //   .then((result) => {
-  //     console.log(result);
-  //     code.value = result.code;
-  //   })
-  //   .catch((err) => {
-  //     code.value = 'ERROR';
-  //     console.error(err);
-  //   });
+  await sendCodeRequest(email, code.value)
+    .then((result) => {
+      console.log(result);
+      code.value = result.code;
+    })
+    .catch((err) => {
+      code.value = 'ERROR';
+      console.error(err);
+    });
 
   isLoading.value = false;
 }
