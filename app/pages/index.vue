@@ -1,5 +1,7 @@
 <script setup lang="ts">
-await navigateTo('/home') //TODO: middleware
+definePageMeta({
+  middleware: 'base'
+})
 </script>
 
 <template />

@@ -1,4 +1,4 @@
-import type IApiRequest from "~/composables/scripts/api/interfaces/IApiRequest";
+import type IApiRequest from "~/composables/scripts/api/interfaces/IApiRequest";  
 
 export default class LoginRequest implements IApiRequest {
   email: string;

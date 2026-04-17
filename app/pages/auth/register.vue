@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import {sendRegisterRequest} from '~/composables/scripts/auth/register';
+import sendRegisterRequest from '~/composables/scripts/auth/register';
 import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
 import EmailInput from "~/components/auth/EmailInput.vue";
+import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 
-const code = ref('WAITING...');
 const email = ref('');
 const password = ref('');
 
@@ -17,7 +17,7 @@ const notification = ref("");
 
 async function sendRequest() {
   await sendRegisterRequest(email.value, password.value)
-    .then((result) => {
+    .then((result: StatusDTO) => {
       // TODO: move
       notification.value = result.message ?? '';
 
@@ -27,8 +27,7 @@ async function sendRequest() {
         // notification.value = result.message ?? '';
       }
     })
-    .catch((err) => {
-      code.value = 'ERROR';
+    .catch((err: any) => {
       console.error(err);
     });
 }

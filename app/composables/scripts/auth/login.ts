@@ -1,16 +1,16 @@
 import getApiUrl from "~/composables/scripts/api/parseUrl";
-import RegisterRequest from "~/composables/scripts/auth/dtos/RegisterRequest";
+import RegisterRequest from "~/composables/scripts/auth/dtos/requests/RegisterRequest";
 import StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 import type FetchResponse from "~/composables/scripts/api/dtos/FetchResponse";
 import StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
-import type LoginRequest from "~/composables/scripts/auth/dtos/LoginRequest";
-import {sendAsyncStatusRequest} from "~/composables/scripts/api/requests/sendStatusRequest";
+import type LoginRequest from "~/composables/scripts/auth/dtos/requests/LoginRequest";
+import {sendAsyncStatusRequest} from "~/composables/scripts/api/fetches/sendStatusRequest";
 import getDependency from "~/composables/di/container";
 
-export default async function sendLoginConverted(request: LoginRequest) {
+export async function sendLoginConverted(request: LoginRequest) {
   return sendAsyncStatusRequest('auth/login', request, getDependency('statusFactory'), 'POST');
 }
 
-export async function sendLoginRequest(email: string, password: string) {
+export default async function sendLoginRequest(email: string, password: string) {
   return sendLoginConverted(new RegisterRequest(email, password));
 }

@@ -1,5 +1,5 @@
-import RegisterRequest from "~/composables/scripts/auth/dtos/RegisterRequest";
-import {sendAsyncStatusRequest} from "~/composables/scripts/api/requests/sendStatusRequest";
+import RegisterRequest from "~/composables/scripts/auth/dtos/requests/RegisterRequest";
+import {sendAsyncStatusRequest} from "~/composables/scripts/api/fetches/sendStatusRequest";
 import getDependency from "~/composables/di/container";
 
 export async function sendResetByLinkConverted(request: RegisterRequest) {

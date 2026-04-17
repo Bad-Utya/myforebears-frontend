@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import {sendRegisterRequest} from '~/composables/scripts/auth/register';
 import EmailInput from "~/components/auth/EmailInput.vue";
+import sendResetLinkRequest from "~/composables/scripts/auth/sendResetLink";
+import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 
-const code = ref('WAITING...');
 const email = ref('');
 const password = ref('');
 
@@ -12,12 +12,11 @@ const isEmailCorrect = ref(false);
 const notification = ref("");
 
 function sendRequest() {
-  sendRegisterRequest(email.value, password.value)
-    .then((result) => {
-      code.value = result.code;
+  sendResetLinkRequest(email.value, password.value)
+    .then((result: StatusDTO) => {
+      // sucksucksuck abbanabnajen
     })
     .catch((err) => {
-      code.value = 'ERROR';
       console.error(err);
     });
 }

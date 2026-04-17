@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import {sendRegisterRequest} from '~/composables/scripts/auth/register';
-import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
 import EmailInput from "~/components/auth/EmailInput.vue";
 import PasswordInput from "~/components/auth/PasswordInput.vue";
+import sendLoginRequest from "~/composables/scripts/auth/login";
+import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 
-const code = ref('WAITING...');
 const email = ref('');
 const password = ref('');
 
@@ -14,12 +13,12 @@ const isEmailCorrect = ref(false);
 const notification = ref("");
 
 function sendRequest() {
-  sendRegisterRequest(email.value, password.value)
-    .then((result) => {
-      code.value = result.code;
+  sendLoginRequest(email.value, password.value)
+    .then((result: StatusDTO) => {
+      // success
     })
     .catch((err) => {
-      code.value = 'ERROR';
+      // no success
       console.error(err);
     });
 }

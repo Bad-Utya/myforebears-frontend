@@ -1,9 +1,9 @@
 import getApiUrl from "~/composables/scripts/api/parseUrl";
-import RegisterRequest from "~/composables/scripts/auth/dtos/RegisterRequest";
+import RegisterRequest from "~/composables/scripts/auth/dtos/requests/RegisterRequest";
 import StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 import type FetchResponse from "~/composables/scripts/api/dtos/FetchResponse";
 import StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
-import {sendAsyncStatusRequest} from "~/composables/scripts/api/requests/sendStatusRequest";
+import {sendAsyncStatusRequest} from "~/composables/scripts/api/fetches/sendStatusRequest";
 import getDependency from "~/composables/di/container";
 
 export async function sendResetLinkConverted(request: RegisterRequest) {
