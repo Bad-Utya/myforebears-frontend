@@ -7,7 +7,7 @@ export type HttpRequestType =
   | "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE"
   | "get" | "head" | "patch" | "post" | "put" | "delete" | "connect" | "options" | "trace";
 
-export async function sendDefaultAsyncRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
+export async function sendAsyncDefaultRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
