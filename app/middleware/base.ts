@@ -7,5 +7,5 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/home');
   }
 
-  return navigateTo('/app');
+  return navigateTo('/main');
 })

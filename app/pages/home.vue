@@ -3,7 +3,6 @@
 </script>
 
 <template>
-    <UApp>
       <UHeader title="Rooots">
         <template #right>
           <UButton color="neutral" variant="ghost" to="/auth/login">Login</UButton>
@@ -22,7 +21,6 @@
           <UButton variant="link">Contact us</UButton>
         </template>
       </UFooter>
-    </UApp>
 </template>
 
 <style scoped>

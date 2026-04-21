@@ -25,7 +25,6 @@ function sendRequest() {
 </script>
 
 <template>
-  <UApp>
     <UMain class="flex">
       <div class="flex flex-col gap-4 m-auto w-lg h-auto">
         <UButton color="neutral" variant="link" icon="i-lucide-arrow-left" class="w-fit cursor-pointer" @click="$router.back()">Back
@@ -56,7 +55,6 @@ function sendRequest() {
         </div>
       </div>
     </UMain>
-  </UApp>
 </template>
 
 <style scoped>
