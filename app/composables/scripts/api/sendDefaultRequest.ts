@@ -7,20 +7,40 @@ export type HttpRequestType =
   | "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE"
   | "get" | "head" | "patch" | "post" | "put" | "delete" | "connect" | "options" | "trace";
 
-export async function sendAsyncDefaultRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
+export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
-  let {data, status, error, refresh, clear} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
+  let data = await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
     body: request.toPayload()
   });
 
-  if (!data.value || !data.value.data) {
+  if (!data || !data.data) {
     return factory.getNoConnectionErrorDTO();
   }
 
-  let dataConverted = data.value.data as TFetchResponse;
+  let dataConverted = data.data as TFetchResponse;
 
   return factory.createDTO(dataConverted);
+}
+
+export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
+  path: string, request: TRequest,
+  factory: IResponseFactory<TReturnDto, TFetchResponse>,
+  type: HttpRequestType = 'POST') {
+  let {data, pending} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
+    method: type,
+    body: request.toPayload()
+  });
+
+  const dto = computed(() => {
+    if (!data.value?.data) {
+      return factory.getNoConnectionErrorDTO()
+    }
+
+    return factory.createDTO(data.value.data)
+  })
+
+  return {data: dto, pending};
 }

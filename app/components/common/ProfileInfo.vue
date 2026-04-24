@@ -10,6 +10,7 @@ function getData() {
 }
 </script>
 
+// https://ui.nuxt.com/docs/components/sidebar
 <template>
   <div class="flex items-center gap-4">
   <template v-if="isLoading">

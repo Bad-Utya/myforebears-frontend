@@ -13,8 +13,10 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.87",
     "@iconify-json/simple-icons": "^1.2.68",
+    "@nuxt/content": "^3.13.0",
     "@nuxt/ui": "^4.4.0",
     "again": "^0.0.1",
+    "better-sqlite3": "^12.9.0",
     "nuxt": "^4.3.0",
     "tailwindcss": "^4.1.18"
   },

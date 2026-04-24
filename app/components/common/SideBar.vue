@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Logo from "~/components/common/Logo.vue";
-import ProfileInfo from "~/components/app/ProfileInfo.vue";
+import ProfileInfo from "~/components/common/ProfileInfo.vue";
 
 let isShown = ref(true);
 
@@ -36,7 +36,7 @@ const items: { key: TabKey; label: string; icon: string, href: string }[] = [
                :to="item.href"
                color="neutral"
                :variant="activeTab === item.key ? 'soft' : 'ghost'"
-               class="w-full font-light py-4"
+               class="w-full font-light px-4 py-4"
                :class="props.activeTab === item.key
                ? 'bg-accented text-highlighted'
                : 'text-neutral hover:bg-muted hover:text-highlighted'

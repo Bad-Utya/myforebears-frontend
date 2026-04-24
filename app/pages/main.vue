@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import SideBar from "~/components/app/SideBar.vue";
-import TreeSearch from "~/components/main/TreeSearch.vue";
-import InlineFeed from "~/components/main/InlineFeed.vue";
+import SideBar from "~/components/common/SideBar.vue";
+import TreeSearchFast from "~/components/main/TreeSearchFast.vue";
+import InlineFeed from "~/components/common/InlineFeed.vue";
 </script>
 
 <template>
@@ -19,7 +19,7 @@ import InlineFeed from "~/components/main/InlineFeed.vue";
               <p class="text-left text-xl font-semibold">BananaBoy76</p>
             </div>
           </div>
-          <TreeSearch class="ml-auto"/>
+          <TreeSearchFast class="ml-auto"/>
         </div>
 
         <InlineFeed/>
