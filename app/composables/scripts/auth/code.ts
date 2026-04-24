@@ -1,16 +1,11 @@
-import CodeRequest from "~/composables/scripts/auth/dtos/requests/CodeRequest";
-import type FetchResponse from "~/composables/scripts/api/dtos/FetchResponse";
-import getApiUrl from "~/composables/scripts/api/parseUrl";
-import StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
-import type StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
-import {sendAsyncStatusRequest} from "~/composables/scripts/api/fetches/sendStatusRequest";
 import getDependency from "~/composables/di/container";
-import type IResponseFactory from "~/composables/scripts/api/interfaces/IResponseFactory";
+import RegisterRequest from "~/composables/scripts/auth/dtos/requests/RegisterRequest";
+import {sendAsyncDefaultFetchRequest} from "~/composables/scripts/api/sendDefaultRequest";
 
-export async function sendCodeConverted(request: CodeRequest) {
-  return sendAsyncStatusRequest('auth/send-code', request, getDependency('statusFactory'), 'POST');
+export async function sendCodeConverted(request: RegisterRequest) {
+  return sendAsyncDefaultFetchRequest('auth/register', request, getDependency('registerFactory'), 'POST');
 }
 
 export default async function sendCodeRequest(email: string, code: string) {
-  return sendCodeConverted(new CodeRequest(email, code));
+  return sendCodeConverted(new RegisterRequest(email, code));
 }

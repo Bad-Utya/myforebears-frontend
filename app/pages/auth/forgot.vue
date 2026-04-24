@@ -5,14 +5,13 @@ import sendResetLinkRequest from "~/composables/scripts/auth/sendResetLink";
 import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 
 const email = ref('');
-const password = ref('');
 
 const isEmailCorrect = ref(false);
 
 const notification = ref("");
 
 function sendRequest() {
-  sendResetLinkRequest(email.value, password.value)
+  sendResetLinkRequest(email.value)
     .then((result: StatusDTO) => {
       // sucksucksuck abbanabnajen
     })

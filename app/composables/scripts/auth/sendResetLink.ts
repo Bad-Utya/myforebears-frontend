@@ -1,15 +1,11 @@
-import getApiUrl from "~/composables/scripts/api/parseUrl";
-import RegisterRequest from "~/composables/scripts/auth/dtos/requests/RegisterRequest";
-import StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
-import type FetchResponse from "~/composables/scripts/api/dtos/FetchResponse";
-import StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
 import {sendAsyncStatusRequest} from "~/composables/scripts/api/fetches/sendStatusRequest";
 import getDependency from "~/composables/di/container";
+import SendResetLinkRequest from "~/composables/scripts/auth/dtos/requests/SendResetLinkRequest";
 
-export async function sendResetLinkConverted(request: RegisterRequest) {
+export async function sendResetLinkConverted(request: SendResetLinkRequest) {
   return sendAsyncStatusRequest('auth/send-link-for-reset-password', request, getDependency('statusFactory'), 'POST');
 }
 
-export default async function sendResetLinkRequest(email: string, password: string) {
-  return sendResetLinkConverted(new RegisterRequest(email, password));
+export default async function sendResetLinkRequest(email: string) {
+  return sendResetLinkConverted(new SendResetLinkRequest(email));
 }

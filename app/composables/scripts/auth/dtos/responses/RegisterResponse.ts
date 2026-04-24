@@ -1,0 +1,8 @@
+import StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
+
+export default class RegisterResponse extends StatusResponse {
+  accessToken?: string;
+  refreshToken?: string;
+  access_token?: string;
+  refresh_token?: string;
+}

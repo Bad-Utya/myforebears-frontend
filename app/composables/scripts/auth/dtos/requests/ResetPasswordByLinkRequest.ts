@@ -1,15 +1,15 @@
 import type IApiRequest from "~/composables/scripts/api/interfaces/IApiRequest";
 
 export default class ResetPasswordByLinkRequest implements IApiRequest {
-  code: string;
-  newPassword: string;
+  link: string;
+  password: string;
 
-  constructor(code: string, newPassword: string) {
-    this.code = code;
-    this.newPassword = newPassword;
+  constructor(link: string, password: string) {
+    this.link = link;
+    this.password = password;
   }
 
-  toPayload(): {} {
-        return {code: this.code, newPassword: this.newPassword};
-    }
+  toPayload() {
+    return {link: this.link, password: this.password};
+  }
 }

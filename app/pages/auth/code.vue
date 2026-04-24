@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
+import sendCodeRequest from "~/composables/scripts/auth/code";
 
 const MILLISECONDS_IN_MINUTE = 60000;
 const DELAY = MILLISECONDS_IN_MINUTE;
 
 const route = useRoute();
-const email = route.query.email;
+const email = computed(() => (Array.isArray(route.query.email) ? route.query.email[0] : route.query.email) ?? '');
 
 const digits = ref<number[]>([]);
+const code = computed(() => digits.value.map(String).join(''));
 
 const tryAgainTimer = ref(Date.now() - DELAY);
 const timeRemaining = ref(0);
@@ -30,20 +32,16 @@ const notification = ref("");
 async function sendRequest() {
   isLoading.value = true;
 
-  await sendCodeRequest(email, code.value)
-    .then((result) => {
-      console.log(result);
-      code.value = result.code;
-    })
-    .catch((err) => {
-      code.value = 'ERROR';
-      console.error(err);
-    });
+  try {
+    await sendCodeRequest(email.value, code.value);
+  } catch (err) {
+    console.error(err);
+  }
 
   isLoading.value = false;
 }
 
-function sendCodeRequest() {
+function sendCodeAgain() {
   tryAgainTimer.value = Date.now();
   timeRemaining.value = DELAY;
 }
@@ -86,7 +84,7 @@ onMounted(() => {
             <UButton class="w-min" :loading="isLoading"
                      :disabled="!isDataCorrect" :variant="isDataCorrect ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
-            <UButton class="ml-auto" variant="link" color="neutral" @click="sendCodeRequest()" :disabled="isTryAgainBusy">Send code again</UButton>
+            <UButton class="ml-auto" variant="link" color="neutral" @click="sendCodeAgain()" :disabled="isTryAgainBusy">Send code again</UButton>
             <p class="text-error my-auto" v-if="isTryAgainBusy" v-text="tryAgainFormatted" />
           </div>
         </div>
