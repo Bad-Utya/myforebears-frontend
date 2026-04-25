@@ -1,1 +1,1 @@
-export type ListTreeAccessEmailsResponse = unknown;
+export type ListTreeAccessEmailsResponse = { email: string }[];

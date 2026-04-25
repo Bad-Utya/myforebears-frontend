@@ -16,7 +16,6 @@ import InlineFeed from "~/components/common/InlineFeed.vue";
         </div>
 
         <InlineFeed/>
-        <InlineFeed/>
       </UContainer>
     </UMain>
   </div>

@@ -27,7 +27,7 @@ async function sendRequest() {
         // notification.value = result.message ?? '';
       }
     })
-    .catch((err: any) => {
+    .catch((err: unknown) => {
       console.error(err);
     });
 }

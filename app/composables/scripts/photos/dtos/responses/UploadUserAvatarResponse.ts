@@ -1,1 +1,1 @@
-export type UploadUserAvatarResponse = unknown;
+export type UploadUserAvatarResponse = {};

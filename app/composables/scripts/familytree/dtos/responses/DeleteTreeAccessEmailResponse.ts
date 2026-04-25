@@ -1,1 +1,1 @@
-export type DeleteTreeAccessEmailResponse = unknown;
+export type DeleteTreeAccessEmailResponse = { email?: string };

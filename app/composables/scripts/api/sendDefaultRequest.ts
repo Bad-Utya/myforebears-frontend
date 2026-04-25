@@ -11,9 +11,13 @@ export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest,
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
+  // TODO refactor
+  const method = String(type).toUpperCase();
+  const shouldSendBody = method !== 'GET' && method !== 'HEAD';
+
   let data = await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
-    body: request.toPayload()
+    ...(shouldSendBody ? {body: request.toPayload()} : {}),
   });
 
   if (!data || !data.data) {
@@ -29,9 +33,13 @@ export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetch
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
+  // TODO refactor
+  const method = String(type).toUpperCase();
+  const shouldSendBody = (method !== 'GET') && method !== 'HEAD';
+
   let {data, pending} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
-    body: request.toPayload()
+    ...(shouldSendBody ? {body: request.toPayload()} : {}),
   });
 
   const dto = computed(() => {

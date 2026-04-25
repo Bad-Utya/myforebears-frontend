@@ -1,1 +1,1 @@
-export type GetTreeContentResponse = unknown;
+export type GetTreeContentResponse = {};

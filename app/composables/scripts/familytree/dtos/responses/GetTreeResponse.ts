@@ -1,1 +1,3 @@
-export type GetTreeResponse = unknown;
+import type TreeDTO from "~/composables/scripts/familytree/dtos/inner/TreeDTO";
+
+export type GetTreeResponse = TreeDTO;

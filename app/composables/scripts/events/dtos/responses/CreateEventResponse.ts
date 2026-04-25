@@ -1,1 +1,3 @@
-export type CreateEventResponse = unknown;
+import type EventDTO from "~/composables/scripts/events/dtos/inner/EventDTO";
+
+export type CreateEventResponse = EventDTO;

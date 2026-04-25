@@ -1,1 +1,3 @@
-export type GetPersonResponse = unknown;
+import type PersonDTO from "~/composables/scripts/familytree/dtos/inner/PersonDTO";
+
+export type GetPersonResponse = PersonDTO;

@@ -1,1 +1,1 @@
-export type DeletePhotoResponse = unknown;
+export type DeletePhotoResponse = { id?: string; photo_id?: string };

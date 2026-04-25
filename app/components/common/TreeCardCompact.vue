@@ -1,9 +1,72 @@
 <script setup lang="ts">
+const props = withDefaults(defineProps<{
+  pending?: boolean;
+  title: string;
+  author?: string;
+  description?: string;
+  avatar: string;
+  comments?: string;
+  href: string;
+}>(), {
+  pending: false,
+});
 
 </script>
 
 <template>
+  <div
+    v-if="props.pending"
+    class="relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40"
+  >
+    <USkeleton class="flex-none w-[92px] h-[92px] rounded-xl" />
 
+    <div class="min-w-0 flex flex-col justify-between py-0.5 w-full">
+      <div class="min-w-0 space-y-2">
+        <USkeleton class="h-4 w-40 rounded" />
+        <USkeleton class="h-3 w-24 rounded" />
+        <div class="space-y-1">
+          <USkeleton class="h-3 w-full rounded" />
+          <USkeleton class="h-3 w-3/4 rounded" />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 mt-2">
+        <USkeleton class="h-4 w-4 rounded" />
+        <USkeleton class="h-3 w-10 rounded" />
+      </div>
+    </div>
+  </div>
+
+  <NuxtLink
+    v-else
+    :to="props.href"
+    class="group relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40 hover:bg-neutral/55 transition-colors"
+  >
+    <div class="relative flex-none w-[92px] h-[92px] rounded-xl overflow-hidden bg-muted">
+      <img
+        v-if="props.avatar"
+        :src="props.avatar"
+        :alt="props.title"
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="min-w-0 flex flex-col justify-between py-0.5">
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-highlighted truncate">{{ props.title }}</p>
+        <p v-if="props.author" class="text-xs text-muted mt-0.5 truncate">By {{ props.author }}</p>
+        <p v-if="props.description" class="text-xs text-toned mt-2 line-clamp-2 max-h-[2.5rem] overflow-hidden">
+          {{ props.description }}
+        </p>
+      </div>
+
+      <div v-if="props.comments" class="flex items-center gap-1.5 text-xs text-muted mt-2">
+        <UIcon name="i-lucide-message-circle" class="size-4" />
+        <span>{{ props.comments }}</span>
+      </div>
+    </div>
+  </NuxtLink>
 </template>
 
 <style scoped>

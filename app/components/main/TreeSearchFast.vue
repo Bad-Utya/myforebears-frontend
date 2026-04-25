@@ -7,8 +7,11 @@ function getMatching() {
 
 <template>
   <div>
-  <UContentSearchButton :collapsed="false" name="HAHAHA"
-          icon="i-lucide-search" variant="soft" :kbds="[]"/>
+    <UContentSearchButton :collapsed="false" label="Search across..."
+                          icon="i-lucide-search"
+                          variant="soft"
+                          :kbds="[]"
+                          :ui="{leadingIcon: 'me-2' }"/>
   </div>
 </template>
 

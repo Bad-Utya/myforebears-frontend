@@ -1,1 +1,1 @@
-export type DeleteEventTypeResponse = unknown;
+export type DeleteEventTypeResponse = { id?: string };
