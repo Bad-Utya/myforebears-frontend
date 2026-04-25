@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
 import sendRegisterRequest from "~/composables/scripts/auth/register";
-import type LoginDTO from "~/composables/scripts/auth/dtos/inner/LoginDTO";
 import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
+import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const MILLISECONDS_IN_MINUTE = 60000;
 const DELAY = MILLISECONDS_IN_MINUTE;
@@ -29,18 +29,16 @@ const isTryAgainBusy = computed(() => timeRemaining.value > 0);
 
 const isDataCorrect = computed(() => (digits.value.length === 6 && !digits.value.includes(undefined!)));
 
-const notification = ref("");
-
 async function sendRequest() {
   if (isLoading.value) {
     return;
   }
 
-  // todo refactor notifications
-  notification.value = '';
-
   if (!email.value) {
-    notification.value = 'Email is missing';
+    showApiErrorToast({
+      code: 'email_missing',
+      message: 'Email is missing',
+    });
     return;
   }
 
@@ -51,20 +49,16 @@ async function sendRequest() {
   isLoading.value = true;
 
   try {
-    const result: LoginDTO = await sendRegisterRequest(email.value, code.value);
-    notification.value = result.message ?? '';
+    const result = await sendRegisterRequest(email.value, code.value);
 
-    if (result.isSuccessful) {
-      persistAuthTokens({
-        accessToken: result.accessToken ?? null,
-        refreshToken: result.refreshToken ?? null,
-      });
+    persistAuthTokens({
+      accessToken: result.accessToken ?? null,
+      refreshToken: result.refreshToken ?? null,
+    });
 
-      await navigateTo({path: '/main'});
-    }
+    await navigateTo({path: '/main'});
   } catch (err) {
-    console.error(err);
-    notification.value = 'Failed to send code';
+    showApiErrorToast(err);
   }
 
   isLoading.value = false;
@@ -118,11 +112,6 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-if="notification.length > 0"
-             class="flex flex-row gap-2 px-4 py-2 rounded-lg shadow-lg bg-error-800/50 shadow-carbon-800 w-fit">
-          <UIcon name="i-lucide-triangle-alert" class="size-8 text-error"/>
-          <p v-text="notification" class="text-error text-md font-bold my-auto"></p>
-        </div>
       </div>
     </UMain>
 </template>

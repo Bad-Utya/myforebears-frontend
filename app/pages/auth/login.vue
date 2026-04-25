@@ -3,36 +3,27 @@ import {ref} from 'vue';
 import EmailInput from "~/components/auth/EmailInput.vue";
 import PasswordInput from "~/components/auth/PasswordInput.vue";
 import sendLoginRequest from "~/composables/scripts/auth/login";
-import type LoginDTO from "~/composables/scripts/auth/dtos/inner/LoginDTO";
 import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
+import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const email = ref('');
 const password = ref('');
 
 const isEmailCorrect = ref(false);
 
-const notification = ref("");
+async function sendRequest() {
+  try {
+    const result = await sendLoginRequest(email.value, password.value);
 
-function sendRequest() {
-  sendLoginRequest(email.value, password.value)
-    .then((result: LoginDTO) => {
-      notification.value = result.message ?? '';
-
-      if (result.isSuccessful) {
-        persistAuthTokens({
-          accessToken: result.accessToken ?? null,
-          refreshToken: result.refreshToken ?? null,
-        });
-
-        navigateTo({path:'/main'});
-      } else {
-        // notification.value = result.message ?? '';
-      }
-    })
-    .catch((err) => {
-      // no success
-      console.error(err);
+    persistAuthTokens({
+      accessToken: result.accessToken ?? null,
+      refreshToken: result.refreshToken ?? null,
     });
+
+    await navigateTo({path:'/main'});
+  } catch (err) {
+    showApiErrorToast(err);
+  }
 }
 </script>
 
@@ -63,11 +54,6 @@ function sendRequest() {
           </div>
         </div>
 
-        <div v-if="notification.length > 0"
-             class="flex flex-row gap-2 px-4 py-2 rounded-lg shadow-lg bg-error-800/50 shadow-carbon-800 w-fit">
-          <UIcon name="i-lucide-triangle-alert" class="size-8 text-error"/>
-          <p v-text="notification" class="text-error text-md font-bold my-auto"></p>
-        </div>
       </div>
     </UMain>
 </template>

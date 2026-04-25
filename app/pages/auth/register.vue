@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import sendCodeRequest from '~/composables/scripts/auth/sendCode';
 import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
 import EmailInput from "~/components/auth/EmailInput.vue";
-import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
+import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const email = ref('');
 const password = ref('');
@@ -13,23 +13,13 @@ const isEmailCorrect = ref(false);
 
 const isDataCorrect = computed(() => isPasswordCorrect.value && isEmailCorrect.value);
 
-const notification = ref("");
-
 async function sendRequest() {
-  await sendCodeRequest(email.value, password.value)
-    .then((result: StatusDTO) => {
-      // TODO: move
-      notification.value = result.message ?? '';
-
-      if (result.isSuccessful) {
-        navigateTo({path:'/auth/code', query: {email: email.value}});
-      } else {
-        // notification.value = result.message ?? '';
-      }
-    })
-    .catch((err: unknown) => {
-      console.error(err);
-    });
+  try {
+    await sendCodeRequest(email.value, password.value);
+    await navigateTo({path:'/auth/code', query: {email: email.value}});
+  } catch (err: unknown) {
+    showApiErrorToast(err);
+  }
 }
 </script>
 
@@ -57,11 +47,6 @@ async function sendRequest() {
           </div>
         </div>
 
-        <div v-if="notification.length > 0"
-             class="flex flex-row gap-2 px-4 py-2 rounded-lg shadow-lg bg-error-800/50 shadow-carbon-800 w-fit">
-          <UIcon name="i-lucide-triangle-alert" class="size-8 text-error"/>
-          <p v-text="notification" class="text-error text-md font-bold my-auto"></p>
-        </div>
       </div>
     </UMain>
 </template>

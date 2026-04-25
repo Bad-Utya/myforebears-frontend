@@ -56,7 +56,7 @@ export async function getAccessTokenRefreshed() {
 
   try {
     const refreshed = await sendRefreshRequest();
-    if (!refreshed.isSuccessful || !refreshed.accessToken) {
+    if (!refreshed.accessToken) {
       await navigateTo('/auth/login');
       return null;
     }

@@ -3,6 +3,8 @@ import type FetchResponse from "~/composables/scripts/api/dtos/FetchResponse";
 import type IApiRequest from "~/composables/scripts/api/interfaces/IApiRequest";
 import type IResponseFactory from "~/composables/scripts/api/interfaces/IResponseFactory";
 import getAuthorizationHeaders from "~/composables/scripts/api/getAuthorizationHeaders";
+import ApiRequestError, {type FetchErrorData} from "~/composables/scripts/api/ApiRequestError";
+import type {IFetchError} from "ofetch";
 
 export type HttpRequestType =
   | "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE"
@@ -29,26 +31,53 @@ function getBodyOptions<TRequest extends IApiRequest>(method: string, request: T
   return {body: payload};
 }
 
+function ensureSuccessDto(
+  dto: unknown,
+  fetchResponse?: {error?: string; message?: string}
+) {
+  const maybeStatusDto = dto as {isSuccessful?: boolean; message?: string};
+
+  if (maybeStatusDto.isSuccessful === false) {
+    throw new ApiRequestError(
+      fetchResponse?.error ?? 'request_failed',
+      maybeStatusDto.message ?? fetchResponse?.message ?? 'Request failed'
+    );
+  }
+}
+
 export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
   // TODO refactor
   const method = String(type).toUpperCase();
+  try {
+    let data = await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
+      method: type,
+      headers: getAuthorizationHeaders(),
+      ...getBodyOptions(method, request),
+    });
 
-  let data = await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
-    method: type,
-    headers: getAuthorizationHeaders(),
-    ...getBodyOptions(method, request),
-  });
+    if (!data?.data) {
+      throw new ApiRequestError(
+        data?.error ?? 'no_connection',
+        data?.message ?? 'No connection to the server'
+      );
+    }
 
-  if (!data || !data.data) {
-    return factory.getNoConnectionErrorDTO();
+    let dataConverted = data.data as TFetchResponse;
+    const dto = factory.createDTO(dataConverted);
+
+    ensureSuccessDto(dto, data);
+
+    return dto;
+  } catch (error) {
+    if (error instanceof ApiRequestError) {
+      throw error;
+    }
+
+    throw ApiRequestError.createFromFetchError(error as IFetchError<FetchErrorData>);
   }
-
-  let dataConverted = data.data as TFetchResponse;
-
-  return factory.createDTO(dataConverted);
 }
 
 export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
@@ -58,18 +87,26 @@ export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetch
   // TODO refactor
   const method = String(type).toUpperCase();
 
-  let {data, pending} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
+  let {data, pending, error} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
     headers: getAuthorizationHeaders(),
     ...getBodyOptions(method, request),
   });
 
   const dto = computed(() => {
-    if (!data.value?.data) {
-      return factory.getNoConnectionErrorDTO()
+    if (error.value) {
+      throw ApiRequestError.createFromFetchError(error.value as IFetchError<FetchErrorData>);
     }
 
-    return factory.createDTO(data.value.data)
+    if (!data.value?.data) {
+      throw new ApiRequestError('no_connection', 'No connection to the server');
+    }
+
+    const responseDto = factory.createDTO(data.value.data);
+
+    ensureSuccessDto(responseDto, data.value);
+
+    return responseDto;
   })
 
   return {data: dto, pending};

@@ -2,8 +2,8 @@
 import TreeCardCompact from "~/components/common/TreeCardCompact.vue";
 import sendListTreesRequest from "~/composables/scripts/familytree/listTrees";
 import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
-import type TreeDTO from "~/composables/scripts/familytree/dtos/inner/TreeDTO";
 import type {ListTreesResponse} from "~/composables/scripts/familytree/dtos/responses/ListTreesResponse";
+import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 type InlineFeedItem = {
   id: number | string;
@@ -33,10 +33,6 @@ onMounted(async () => {
   pending.value = true;
   try {
     const response = await sendListTreesRequest() as DataDTO<ListTreesResponse>;
-    if (!response.isSuccessful) {
-      return;
-    }
-
     const trees = Array.isArray(response.data?.trees) ? response.data.trees : [];
     if (!trees.length) {
       return;
@@ -53,7 +49,7 @@ onMounted(async () => {
       } satisfies InlineFeedItem;
     });
   } catch (err) {
-    console.error(err);
+    showApiErrorToast(err);
     items.value = [];
   } finally {
     pending.value = false;

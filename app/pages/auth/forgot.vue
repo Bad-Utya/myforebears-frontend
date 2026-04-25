@@ -2,22 +2,18 @@
 import {ref} from 'vue';
 import EmailInput from "~/components/auth/EmailInput.vue";
 import sendResetLinkRequest from "~/composables/scripts/auth/sendResetLink";
-import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
+import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const email = ref('');
 
 const isEmailCorrect = ref(false);
 
-const notification = ref("");
-
-function sendRequest() {
-  sendResetLinkRequest(email.value)
-    .then((result: StatusDTO) => {
-      // sucksucksuck abbanabnajen
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+async function sendRequest() {
+  try {
+    await sendResetLinkRequest(email.value);
+  } catch (err) {
+    showApiErrorToast(err);
+  }
 }
 </script>
 
@@ -41,11 +37,6 @@ function sendRequest() {
                      @click="sendRequest()">Submit</UButton>
         </div>
 
-        <div v-if="notification.length > 0"
-             class="flex flex-row gap-2 px-4 py-2 rounded-lg shadow-lg bg-error-800/50 shadow-carbon-800 w-fit">
-          <UIcon name="i-lucide-triangle-alert" class="size-8 text-error"/>
-          <p v-text="notification" class="text-error text-md font-bold my-auto"></p>
-        </div>
       </div>
     </UMain>
 </template>
