@@ -1,1 +1,3 @@
-export type DeleteEventResponse = { id?: string; event_id?: string };
+import type StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
+
+export type DeleteEventResponse = StatusResponse;

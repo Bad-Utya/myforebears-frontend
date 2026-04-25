@@ -1,9 +1,8 @@
-import {getAccessToken, getAccessTokenRefreshed} from "~/composables/scripts/cookies/getAccessToken";
+import {getAccessTokenRefreshed} from "~/composables/scripts/cookies/getAccessToken";
 
-export default defineNuxtRouteMiddleware((to) => {
-  const token = getAccessTokenRefreshed();
-
-  if (!token.value) {
+export default defineNuxtRouteMiddleware(async () => {
+  const token = await getAccessTokenRefreshed();
+  if (!token) {
     return navigateTo('/auth/login');
   }
-})
+});

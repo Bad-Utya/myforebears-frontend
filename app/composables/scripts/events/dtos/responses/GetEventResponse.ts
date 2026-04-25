@@ -1,3 +1,5 @@
 import type EventDTO from "~/composables/scripts/events/dtos/inner/EventDTO";
 
-export type GetEventResponse = EventDTO;
+export type GetEventResponse = {
+  event?: EventDTO;
+};

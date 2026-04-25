@@ -1,1 +1,3 @@
-export type DeletePhotoResponse = { id?: string; photo_id?: string };
+import type StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
+
+export type DeletePhotoResponse = StatusResponse;

@@ -1,1 +1,3 @@
-export type ListTreeAccessEmailsResponse = { email: string }[];
+export type ListTreeAccessEmailsResponse = {
+  emails?: string[];
+};

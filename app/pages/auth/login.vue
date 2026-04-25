@@ -3,7 +3,8 @@ import {ref} from 'vue';
 import EmailInput from "~/components/auth/EmailInput.vue";
 import PasswordInput from "~/components/auth/PasswordInput.vue";
 import sendLoginRequest from "~/composables/scripts/auth/login";
-import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
+import type LoginDTO from "~/composables/scripts/auth/dtos/inner/LoginDTO";
+import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
 
 const email = ref('');
 const password = ref('');
@@ -14,8 +15,19 @@ const notification = ref("");
 
 function sendRequest() {
   sendLoginRequest(email.value, password.value)
-    .then((result: StatusDTO) => {
-      // success
+    .then((result: LoginDTO) => {
+      notification.value = result.message ?? '';
+
+      if (result.isSuccessful) {
+        persistAuthTokens({
+          accessToken: result.accessToken ?? null,
+          refreshToken: result.refreshToken ?? null,
+        });
+
+        navigateTo({path:'/main'});
+      } else {
+        // notification.value = result.message ?? '';
+      }
     })
     .catch((err) => {
       // no success
@@ -44,7 +56,10 @@ function sendRequest() {
             <UButton class="w-min" loading-auto
                      :disabled="!isEmailCorrect" :variant="isEmailCorrect ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
-            <UButton class="ml-auto" variant="link" color="neutral" to="./forgot">Forgot password</UButton>
+            <div class="flex ml-auto gap-0">
+            <UButton class="" variant="link" color="neutral" to="./forgot">I don't have an account</UButton>
+            <UButton class="" variant="link" color="neutral" to="./forgot">Forgot password</UButton>
+            </div>
           </div>
         </div>
 

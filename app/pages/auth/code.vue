@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import sendCodeRequest from "~/composables/scripts/auth/code";
+import sendRegisterRequest from "~/composables/scripts/auth/register";
+import type LoginDTO from "~/composables/scripts/auth/dtos/inner/LoginDTO";
+import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
 
 const MILLISECONDS_IN_MINUTE = 60000;
 const DELAY = MILLISECONDS_IN_MINUTE;
@@ -30,12 +32,39 @@ const isDataCorrect = computed(() => (digits.value.length === 6 && !digits.value
 const notification = ref("");
 
 async function sendRequest() {
+  if (isLoading.value) {
+    return;
+  }
+
+  // todo refactor notifications
+  notification.value = '';
+
+  if (!email.value) {
+    notification.value = 'Email is missing';
+    return;
+  }
+
+  if (!isDataCorrect.value) {
+    return;
+  }
+
   isLoading.value = true;
 
   try {
-    await sendCodeRequest(email.value, code.value);
+    const result: LoginDTO = await sendRegisterRequest(email.value, code.value);
+    notification.value = result.message ?? '';
+
+    if (result.isSuccessful) {
+      persistAuthTokens({
+        accessToken: result.accessToken ?? null,
+        refreshToken: result.refreshToken ?? null,
+      });
+
+      await navigateTo({path: '/main'});
+    }
   } catch (err) {
     console.error(err);
+    notification.value = 'Failed to send code';
   }
 
   isLoading.value = false;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import sendRegisterRequest from '~/composables/scripts/auth/register';
+import sendCodeRequest from '~/composables/scripts/auth/sendCode';
 import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
 import EmailInput from "~/components/auth/EmailInput.vue";
 import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
@@ -16,7 +16,7 @@ const isDataCorrect = computed(() => isPasswordCorrect.value && isEmailCorrect.v
 const notification = ref("");
 
 async function sendRequest() {
-  await sendRegisterRequest(email.value, password.value)
+  await sendCodeRequest(email.value, password.value)
     .then((result: StatusDTO) => {
       // TODO: move
       notification.value = result.message ?? '';

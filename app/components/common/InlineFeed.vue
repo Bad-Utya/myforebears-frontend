@@ -3,6 +3,7 @@ import TreeCardCompact from "~/components/common/TreeCardCompact.vue";
 import sendListTreesRequest from "~/composables/scripts/familytree/listTrees";
 import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
 import type TreeDTO from "~/composables/scripts/familytree/dtos/inner/TreeDTO";
+import type {ListTreesResponse} from "~/composables/scripts/familytree/dtos/responses/ListTreesResponse";
 
 type InlineFeedItem = {
   id: number | string;
@@ -31,12 +32,12 @@ const carouselItems = computed(() => (pending.value ? skeletonItems.value : item
 onMounted(async () => {
   pending.value = true;
   try {
-    const response = await sendListTreesRequest() as DataDTO<TreeDTO[]>;
+    const response = await sendListTreesRequest() as DataDTO<ListTreesResponse>;
     if (!response.isSuccessful) {
       return;
     }
 
-    const trees = Array.isArray(response.data) ? response.data : [];
+    const trees = Array.isArray(response.data?.trees) ? response.data.trees : [];
     if (!trees.length) {
       return;
     }
@@ -67,7 +68,7 @@ onMounted(async () => {
       <h1 class="text-left text-sm font-semibold text-neutral">For you</h1>
     </div>
 
-    <div class="inline-feed-mask">
+    <div>
       <UCarousel
         :items="carouselItems"
         arrows
@@ -97,20 +98,5 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.inline-feed-mask {
-  position: relative;
-}
 
-.inline-feed-mask::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0) 82%,
-    rgba(0, 0, 0, 0.85) 100%
-  );
-}
 </style>

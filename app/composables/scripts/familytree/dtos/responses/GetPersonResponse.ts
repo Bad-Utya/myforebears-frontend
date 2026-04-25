@@ -1,3 +1,5 @@
 import type PersonDTO from "~/composables/scripts/familytree/dtos/inner/PersonDTO";
 
-export type GetPersonResponse = PersonDTO;
+export type GetPersonResponse = {
+  person?: PersonDTO;
+};

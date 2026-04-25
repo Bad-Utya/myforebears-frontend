@@ -1,4 +1,3 @@
-import DataResponseFactory from "~/composables/scripts/api/factories/DataResponseFactory";
-import type {AddTreeAccessEmailResponse} from "~/composables/scripts/familytree/dtos/responses/AddTreeAccessEmailResponse";
+import StatusResponseFactory from "~/composables/scripts/api/factories/StatusResponseFactory";
 
-export default class AddTreeAccessEmailResponseFactory extends DataResponseFactory<AddTreeAccessEmailResponse> {}
+export default class AddTreeAccessEmailResponseFactory extends StatusResponseFactory {}

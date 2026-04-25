@@ -48,7 +48,7 @@ const props = withDefaults(defineProps<{
       class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
       loading="lazy"
     />
-    <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+    <div class="absolute inset-0 bg-linear-to-t from-black/75 via-black/20 to-transparent" />
 
     <div class="absolute inset-x-0 bottom-0 p-4">
       <div class="min-w-0">

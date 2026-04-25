@@ -1,4 +1,3 @@
-import DataResponseFactory from "~/composables/scripts/api/factories/DataResponseFactory";
-import type {DeletePhotoResponse} from "~/composables/scripts/photos/dtos/responses/DeletePhotoResponse";
+import StatusResponseFactory from "~/composables/scripts/api/factories/StatusResponseFactory";
 
-export default class DeletePhotoResponseFactory extends DataResponseFactory<DeletePhotoResponse> {}
+export default class DeletePhotoResponseFactory extends StatusResponseFactory {}

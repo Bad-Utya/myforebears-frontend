@@ -1,1 +1,3 @@
-export type DeletePersonResponse = { id?: string; person_id?: string };
+import type StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
+
+export type DeletePersonResponse = StatusResponse;

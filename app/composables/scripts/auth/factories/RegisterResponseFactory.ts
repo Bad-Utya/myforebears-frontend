@@ -8,8 +8,8 @@ export default class RegisterResponseFactory implements IResponseFactory<LoginDT
   }
 
   createDTO(fetchResponse: RegisterResponse): LoginDTO {
-    const accessToken = fetchResponse.accessToken ?? fetchResponse.access_token;
-    const refreshToken = fetchResponse.refreshToken ?? fetchResponse.refresh_token;
+    const accessToken = fetchResponse.access_token;
+    const refreshToken = fetchResponse.refresh_token;
     return new LoginDTO(accessToken, refreshToken);
   }
 }

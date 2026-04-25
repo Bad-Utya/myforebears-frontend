@@ -1,4 +1,3 @@
-import DataResponseFactory from "~/composables/scripts/api/factories/DataResponseFactory";
-import type {DeleteEventTypeResponse} from "~/composables/scripts/eventTypes/dtos/responses/DeleteEventTypeResponse";
+import StatusResponseFactory from "~/composables/scripts/api/factories/StatusResponseFactory";
 
-export default class DeleteEventTypeResponseFactory extends DataResponseFactory<DeleteEventTypeResponse> {}
+export default class DeleteEventTypeResponseFactory extends StatusResponseFactory {}

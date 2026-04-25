@@ -6,6 +6,11 @@ export async function sendUpdateTreeSettingsConverted(treeId: string, request: U
   return sendAsyncDefaultFetchRequest(`familytree/${treeId}`, request, new UpdateTreeSettingsResponseFactory(), 'PATCH');
 }
 
-export default async function sendUpdateTreeSettingsRequest(treeId: string, isPublicOnMainPage: boolean, isViewRestricted: boolean) {
-  return sendUpdateTreeSettingsConverted(treeId, new UpdateTreeSettingsRequest(isPublicOnMainPage, isViewRestricted));
+export default async function sendUpdateTreeSettingsRequest(
+  treeId: string,
+  isPublicOnMainPage: boolean,
+  isViewRestricted: boolean,
+  name?: string
+) {
+  return sendUpdateTreeSettingsConverted(treeId, new UpdateTreeSettingsRequest(name, isPublicOnMainPage, isViewRestricted));
 }
