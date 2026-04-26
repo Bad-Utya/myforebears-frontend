@@ -21,21 +21,17 @@ const props = withDefaults(defineProps<{
     v-if="props.pending"
     class="relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40"
   >
-    <USkeleton class="flex-none w-23 h-23 rounded-xl" />
+    <div class="relative flex-none w-23 h-23 rounded-xl overflow-hidden">
+      <USkeleton class="absolute inset-0" />
+    </div>
 
     <div class="min-w-0 flex flex-col justify-between py-0.5 w-full">
       <div class="min-w-0 space-y-2">
         <USkeleton class="h-4 w-40 rounded" />
-        <USkeleton class="h-3 w-24 rounded" />
-        <div class="space-y-1">
-          <USkeleton class="h-3 w-full rounded" />
-          <USkeleton class="h-3 w-3/4 rounded" />
-        </div>
-      </div>
-
-      <div class="flex items-center gap-1.5 mt-2">
-        <USkeleton class="h-4 w-4 rounded" />
-        <USkeleton class="h-3 w-10 rounded" />
+        <p class="text-xs text-muted truncate">
+          By username
+        </p>
+        <USkeleton class="h-3 w-28 rounded" />
       </div>
     </div>
   </div>

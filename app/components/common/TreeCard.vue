@@ -21,19 +21,14 @@ const props = withDefaults(defineProps<{
     class="relative overflow-hidden rounded-3xl border border-default bg-neutral/30 aspect-[3/4]"
   >
     <USkeleton class="absolute inset-0" />
-    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+    <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
     <div class="absolute inset-x-0 bottom-0 p-4 space-y-3">
-      <div class="space-y-2">
+      <div class="space-y-2.5">
         <USkeleton class="h-5 w-40 rounded" />
-        <USkeleton class="h-3 w-24 rounded" />
-        <div class="space-y-1">
-          <USkeleton class="h-3 w-full rounded" />
-          <USkeleton class="h-3 w-2/3 rounded" />
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <USkeleton class="h-4 w-4 rounded" />
-        <USkeleton class="h-3 w-10 rounded" />
+        <p class="text-xs text-white/70 truncate">
+          By username
+        </p>
+        <USkeleton class="h-3 w-28 rounded" />
       </div>
     </div>
   </div>
