@@ -65,6 +65,13 @@ export const useUserDataStore = defineStore('user-data', {
       this.userData = null;
       this.pending = false;
       this.initialized = true;
+    },
+
+    resetUserData() {
+      revokeAvatarUrl(this.userData?.avatarUrl);
+      this.userData = null;
+      this.pending = false;
+      this.initialized = false;
     }
   }
 });

@@ -6,6 +6,21 @@ import type {IFetchError} from "ofetch";
 
 export type BinaryHttpRequestType = "GET" | "HEAD" | "get" | "head";
 
+function getRequestAwareHeaders() {
+  const authorizationHeaders = getAuthorizationHeaders() ?? {};
+
+  if (import.meta.client) {
+    return authorizationHeaders;
+  }
+
+  const requestHeaders = useRequestHeaders(['cookie']);
+
+  return {
+    ...requestHeaders,
+    ...authorizationHeaders
+  };
+}
+
 export async function sendAsyncBinaryFetchRequest(
   path: string,
   type: BinaryHttpRequestType = 'GET'
@@ -14,7 +29,8 @@ export async function sendAsyncBinaryFetchRequest(
     try {
       return await $fetch<Blob>(getApiUrl(path), {
         method: type,
-        headers: getAuthorizationHeaders(),
+        credentials: 'include',
+        headers: getRequestAwareHeaders(),
         responseType: 'blob',
       });
     } catch (error) {
