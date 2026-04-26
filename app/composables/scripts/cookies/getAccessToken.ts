@@ -34,16 +34,6 @@ export function clearAuthTokens() {
 }
 
 export async function refreshAccessToken() {
-  const authTokensStore = useAuthTokensStore();
-
-  console.log('[refreshAccessToken:start]', {
-    client: import.meta.client,
-    server: import.meta.server,
-    hasToken: !!authTokensStore.accessToken,
-    hasRefreshPromise: !!refreshPromise,
-    at: new Date().toISOString()
-  });
-
   if (refreshPromise) {
     return refreshPromise;
   }
@@ -61,12 +51,6 @@ export async function refreshAccessToken() {
 
       return null;
     } finally {
-      console.log('[refreshAccessToken:finally]', {
-        client: import.meta.client,
-        server: import.meta.server,
-        storeTokenBeforeReset: !!useAuthTokensStore().accessToken,
-        at: new Date().toISOString()
-      });
       refreshPromise = null;
     }
   })();
@@ -77,28 +61,11 @@ export async function refreshAccessToken() {
 export async function getAccessTokenRefreshed() {
   const accessToken = getAccessToken();
 
-  console.log('[getAccessTokenRefreshed:start]', {
-    client: import.meta.client,
-    server: import.meta.server,
-    hasComputedToken: !!accessToken.value,
-    hasStoreToken: !!useAuthTokensStore().accessToken,
-    hasRefreshPromise: !!refreshPromise,
-    at: new Date().toISOString()
-  });
-
   if (accessToken.value) {
     return accessToken.value;
   }
 
   const refreshedAccessToken = await refreshAccessToken();
-
-  console.log('[getAccessTokenRefreshed:afterRefresh]', {
-    client: import.meta.client,
-    server: import.meta.server,
-    hasRefreshedToken: !!refreshedAccessToken,
-    hasStoreToken: !!useAuthTokensStore().accessToken,
-    at: new Date().toISOString()
-  });
 
   return refreshedAccessToken ?? null;
 }
