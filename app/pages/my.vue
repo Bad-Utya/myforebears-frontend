@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CreateTreeSuggestion from "~/components/common/CreateTreeSuggestion.vue";
 import SideBar from "~/components/common/SideBar.vue";
 import TreeCardGrid from "~/components/common/TreeCardGrid.vue";
 import sendListTreesRequest from "~/composables/scripts/familytree/listTrees";
@@ -33,13 +34,17 @@ onMounted(async () => {
     <SideBar activeTab="trees"/>
 
     <UMain class="w-full p-4 lg:p-6">
-      <UContainer class="max-w-[1400px]">
+      <UContainer>
         <div class="mb-4 space-y-1">
           <h1 class="text-2xl font-semibold">My Trees</h1>
           <p class="text-sm text-muted">All your family trees in one grid.</p>
         </div>
 
-        <TreeCardGrid title="All Trees" :items="items" :pending="pending" :limit="12" />
+        <TreeCardGrid title="All Trees" :items="items" :pending="pending" :limit="12">
+          <template #fallback>
+            <CreateTreeSuggestion />
+          </template>
+        </TreeCardGrid>
       </UContainer>
     </UMain>
   </div>

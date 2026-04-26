@@ -35,7 +35,13 @@ onMounted(async () => {
     <UMain class="w-full p-4 lg:p-6">
       <UContainer>
         <h1>Feed</h1>
-        <TreeCardGrid title="" :items="items" :pending="pending" :limit="10" />
+        <TreeCardGrid title="" :items="items" :pending="pending" :limit="10">
+          <template #fallback>
+            <p class="py-12 text-center text-sm text-muted">
+              Trees matching the selected parameters were not found.
+            </p>
+          </template>
+        </TreeCardGrid>
       </UContainer>
     </UMain>
   </div>

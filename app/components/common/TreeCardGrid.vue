@@ -24,6 +24,7 @@ const skeletonItems = computed<TreeCardItem[]>(() => {
 });
 
 const cardItems = computed(() => (props.pending ? skeletonItems.value : props.items));
+const hasItems = computed(() => props.items.length > 0);
 </script>
 
 <template>
@@ -32,7 +33,7 @@ const cardItems = computed(() => (props.pending ? skeletonItems.value : props.it
       <h1 class="text-left text-sm font-semibold text-neutral">{{ props.title }}</h1>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <div v-if="props.pending || hasItems" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       <TreeCard
         v-for="item in cardItems"
         :key="item.id"
@@ -46,6 +47,8 @@ const cardItems = computed(() => (props.pending ? skeletonItems.value : props.it
         :href="item.href"
       />
     </div>
+
+    <slot v-else name="fallback" />
   </section>
 </template>
 

@@ -1,11 +1,78 @@
 <script setup lang="ts">
+import sendLogoutAllRequest from "~/composables/scripts/auth/logoutAll";
+import sendLogoutRequest from "~/composables/scripts/auth/logout";
+import {clearAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
 import useUserDataHandler from "~/composables/scripts/storages/get/userDataHandler";
+import {useUserDataStore} from "~/composables/scripts/storages/create/userData";
 import createAvatarPlaceholder from "~/composables/scripts/ui/createAvatarPlaceholder";
+import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
+const userDataStore = useUserDataStore();
 const displayName = computed(() => userData.value?.nickname ?? userData.value?.email ?? 'Unknown user');
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id));
 const isLoading = computed(() => pending.value || !initialized.value);
+const isLogoutModalOpen = ref(false);
+const shouldLogoutAll = ref(false);
+const isLogoutPending = ref(false);
+
+const dropdownItems = computed(() => [[
+  {
+    label: 'My profile',
+    icon: 'i-lucide-user-round',
+    disabled: typeof userData.value?.id !== 'number',
+    onSelect: async () => {
+      if (typeof userData.value?.id !== 'number') {
+        return;
+      }
+
+      await navigateTo(`/users/${userData.value.id}`);
+    }
+  },
+  {
+    label: 'Settings',
+    icon: 'i-lucide-settings-2',
+    onSelect: async () => {
+      await navigateTo('/settings');
+    }
+  }
+], [
+  {
+    label: 'Logout',
+    icon: 'i-lucide-log-out',
+    color: 'error',
+    onSelect: () => {
+      isLogoutModalOpen.value = true;
+    }
+  }
+]]);
+
+async function confirmLogout() {
+  if (isLogoutPending.value) {
+    return;
+  }
+
+  isLogoutPending.value = true;
+
+  try {
+    if (shouldLogoutAll.value) {
+      await sendLogoutAllRequest();
+    } else {
+      await sendLogoutRequest();
+    }
+
+    clearAuthTokens();
+    userDataStore.clearUserData();
+    isLogoutModalOpen.value = false;
+    shouldLogoutAll.value = false;
+
+    await navigateTo('/auth/login');
+  } catch (error) {
+    showApiErrorToast(error);
+  } finally {
+    isLogoutPending.value = false;
+  }
+}
 
 onMounted(async () => {
   await ensureLoaded();
@@ -14,32 +81,69 @@ onMounted(async () => {
 
 // https://ui.nuxt.com/docs/components/sidebar
 <template>
-  <div class="flex items-center gap-4">
-  <template v-if="isLoading">
-    <USkeleton class="size-12 shrink-0 rounded-full"></USkeleton>
-    <div class="w-full flex flex-col gap-y-2">
-      <USkeleton class="h-4 w-full"></USkeleton>
-      <USkeleton class="h-4 w-3/4"></USkeleton>
+  <div class="w-full">
+    <div class="flex items-center gap-4">
+      <template v-if="isLoading">
+        <USkeleton class="size-12 shrink-0 rounded-full"></USkeleton>
+        <div class="w-full flex flex-col gap-y-2">
+          <USkeleton class="h-4 w-full"></USkeleton>
+          <USkeleton class="h-4 w-3/4"></USkeleton>
+        </div>
+      </template>
+      <template v-else>
+        <UDropdownMenu :items="dropdownItems" :content="{ side: 'top', align: 'start' }">
+          <UButton
+            block
+            color="neutral"
+            variant="ghost"
+            class="justify-start rounded-lg px-2 py-2"
+            :ui="{ base: 'w-full', leadingIcon: 'hidden', trailingIcon: 'hidden' }"
+          >
+            <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-12 shrink-0"/>
+            <span
+              v-else
+              :style="avatarPlaceholder.style"
+              class="size-12 shrink-0 rounded-full inline-flex items-center justify-center text-sm font-semibold select-none"
+            >
+              {{ avatarPlaceholder.label }}
+            </span>
+            <span class="min-w-0 flex flex-col items-start">
+              <span class="text-sm font-semibold text-highlighted truncate">
+                {{ displayName }}
+              </span>
+              <span class="text-sm text-muted truncate">
+                {{ userData?.email ?? 'example@gmail.com' }}
+              </span>
+            </span>
+          </UButton>
+        </UDropdownMenu>
+      </template>
     </div>
-  </template>
-  <template v-else>
-    <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-12 shrink-0" />
-    <div
-      v-else
-      :style="avatarPlaceholder.style"
-      class="size-12 shrink-0 rounded-full flex items-center justify-center text-sm font-semibold select-none"
+
+    <UModal
+      v-model:open="isLogoutModalOpen"
+      title="Confirm logout"
+      description="Choose how you want to end the session."
     >
-      {{ avatarPlaceholder.label }}
-    </div>
-    <div class="min-w-0 flex flex-col">
-      <p class="text-sm font-semibold text-highlighted truncate">
-        {{ displayName }}
-      </p>
-      <p class="text-xs text-muted truncate">
-        {{ userData?.email ?? '' }}
-      </p>
-    </div>
-  </template>
+      <template #body>
+        <div class="space-y-5">
+          <UCheckbox
+            v-model="shouldLogoutAll"
+            label="Logout from all devices"
+            description="Also end all other active sessions."
+          />
+
+          <div class="flex justify-end gap-3">
+            <UButton color="neutral" variant="ghost" @click="isLogoutModalOpen = false">
+              Cancel
+            </UButton>
+            <UButton color="error" :loading="isLogoutPending" @click="confirmLogout">
+              Logout
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 

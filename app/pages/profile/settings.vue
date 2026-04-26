@@ -1,10 +1,8 @@
 <script setup lang="ts">
-
+await navigateTo('/settings', {replace: true});
 </script>
 
-<template>
-
-</template>
+<template></template>
 
 <style scoped>
 

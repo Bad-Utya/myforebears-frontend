@@ -37,8 +37,8 @@ onMounted(async () => {
     <SideBar :active-tab="null" />
 
     <UMain class="w-full p-6 lg:p-10">
-      <UContainer class="max-w-4xl">
-        <div class="rounded-[32px] border border-default bg-elevated/60 p-8 space-y-4">
+      <UContainer>
+        <div class="rounded-4xl border border-default bg-elevated/60 p-8 space-y-4">
           <div class="space-y-2">
             <p class="text-sm text-muted">Tree</p>
             <h1 class="text-3xl font-semibold">

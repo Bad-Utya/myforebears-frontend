@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<{
     v-if="props.pending"
     class="relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40"
   >
-    <USkeleton class="flex-none w-[92px] h-[92px] rounded-xl" />
+    <USkeleton class="flex-none w-23 h-23 rounded-xl" />
 
     <div class="min-w-0 flex flex-col justify-between py-0.5 w-full">
       <div class="min-w-0 space-y-2">
@@ -45,7 +45,7 @@ const props = withDefaults(defineProps<{
     :to="props.href"
     class="group relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40 hover:bg-neutral/55 transition-colors"
   >
-    <div class="relative flex-none w-[92px] h-[92px] rounded-xl overflow-hidden bg-muted">
+    <div class="relative flex-none w-23 h-23 rounded-xl overflow-hidden bg-muted">
       <TreeCardCover
         v-if="!props.avatar"
         :seed="props.coverSeed ?? props.title"
@@ -64,7 +64,7 @@ const props = withDefaults(defineProps<{
       <div class="min-w-0">
         <p class="text-sm font-semibold text-highlighted truncate">{{ props.title }}</p>
         <p v-if="props.author" class="text-xs text-muted mt-0.5 truncate">By {{ props.author }}</p>
-        <p v-if="props.description" class="text-xs text-toned mt-2 line-clamp-2 max-h-[2.5rem] overflow-hidden">
+        <p v-if="props.description" class="text-xs text-toned mt-2 line-clamp-2 max-h-10 overflow-hidden">
           {{ props.description }}
         </p>
       </div>

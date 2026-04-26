@@ -3,7 +3,7 @@ import {getAccessToken, getRefreshToken, refreshAccessToken} from "~/composables
 import sendGetUserAvatarRequest from "~/composables/scripts/photos/getUserAvatar";
 import sendGetMyUserInfoRequest from "~/composables/scripts/users/getMyUserInfo";
 import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
-import type UserInfoDTO from "~/composables/scripts/users/dtos/inner/UserInfoDTO";
+import type {GetUserInfoResponse} from "~/composables/scripts/users/dtos/responses/GetUserInfoResponse";
 import {type UserData, useUserDataStore} from "~/composables/scripts/storages/create/userData";
 
 export default function useUserDataHandler() {
@@ -13,11 +13,12 @@ export default function useUserDataHandler() {
   const refreshToken = getRefreshToken();
 
   async function loadCurrentUser() {
-    const response = await sendGetMyUserInfoRequest() as DataDTO<UserInfoDTO>;
+    const response = await sendGetMyUserInfoRequest() as DataDTO<GetUserInfoResponse>;
+    const user = response.data?.user;
 
     return {
-      id: response.data?.id,
-      nickname: response.data?.nickname,
+      id: user?.id,
+      nickname: user?.nickname,
     } satisfies UserData;
   }
 
@@ -30,6 +31,7 @@ export default function useUserDataHandler() {
       const avatarBlob = await sendGetUserAvatarRequest(baseData.id);
       baseData.avatarUrl = URL.createObjectURL(avatarBlob);
     } catch {
+      // todo wth
       // ignore avatar errors
     }
   }

@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<{
   <NuxtLink
     v-else
     :to="props.href"
-    class="group relative block overflow-hidden rounded-[28px] border border-default bg-muted aspect-[3/4]"
+    class="group relative block overflow-hidden rounded-4xl border border-default bg-muted aspect-3/4"
   >
     <TreeCardCover
       v-if="!props.avatar"
