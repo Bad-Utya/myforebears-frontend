@@ -28,9 +28,7 @@ const props = withDefaults(defineProps<{
     <div class="min-w-0 flex flex-col justify-between py-0.5 w-full">
       <div class="min-w-0 space-y-2">
         <USkeleton class="h-4 w-40 rounded" />
-        <p class="text-xs text-muted truncate">
-          By username
-        </p>
+        <USkeleton class="h-3 w-24 rounded" />
         <USkeleton class="h-3 w-28 rounded" />
       </div>
     </div>
@@ -59,7 +57,7 @@ const props = withDefaults(defineProps<{
     <div class="min-w-0 flex flex-col justify-between py-0.5">
       <div class="min-w-0">
         <p class="text-sm font-semibold text-highlighted truncate">{{ props.title }}</p>
-        <p v-if="props.author" class="text-xs text-muted mt-0.5 truncate">By {{ props.author }}</p>
+        <p class="text-xs text-muted mt-0.5 truncate">By {{ props.author ?? 'username' }}</p>
         <p v-if="props.description" class="text-xs text-toned mt-2 line-clamp-2 max-h-10 overflow-hidden">
           {{ props.description }}
         </p>

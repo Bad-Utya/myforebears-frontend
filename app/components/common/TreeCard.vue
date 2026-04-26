@@ -25,9 +25,7 @@ const props = withDefaults(defineProps<{
     <div class="absolute inset-x-0 bottom-0 p-4 space-y-3">
       <div class="space-y-2.5">
         <USkeleton class="h-5 w-40 rounded" />
-        <p class="text-xs text-white/70 truncate">
-          By username
-        </p>
+        <USkeleton class="h-3 w-24 rounded" />
         <USkeleton class="h-3 w-28 rounded" />
       </div>
     </div>
@@ -57,8 +55,8 @@ const props = withDefaults(defineProps<{
         <p class="text-base font-semibold text-white truncate">
           {{ props.title }}
         </p>
-        <p v-if="props.author" class="text-xs text-white/70 mt-1 truncate">
-          By {{ props.author }}
+        <p class="text-xs text-white/70 mt-1 truncate">
+          By {{ props.author ?? 'username' }}
         </p>
         <p v-if="props.description" class="text-xs text-white/80 mt-3 line-clamp-3">
           {{ props.description }}
