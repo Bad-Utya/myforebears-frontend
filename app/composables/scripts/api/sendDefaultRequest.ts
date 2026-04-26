@@ -11,6 +11,21 @@ export type HttpRequestType =
   | "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE"
   | "get" | "head" | "patch" | "post" | "put" | "delete" | "connect" | "options" | "trace";
 
+function getRequestAwareHeaders() {
+  const authorizationHeaders = getAuthorizationHeaders() ?? {};
+
+  if (import.meta.client) {
+    return authorizationHeaders;
+  }
+
+  const requestHeaders = useRequestHeaders(['cookie']);
+
+  return {
+    ...requestHeaders,
+    ...authorizationHeaders
+  };
+}
+
 function getBodyOptions<TRequest extends IApiRequest>(method: string, request: TRequest) {
   if (method === 'GET' || method === 'HEAD') {
     return {};
@@ -52,7 +67,8 @@ async function executeDefaultFetchRequest<TFetchResponse>(
 ) {
   return await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
-    headers: getAuthorizationHeaders(),
+    credentials: 'include',
+    headers: getRequestAwareHeaders(),
     ...requestOptions,
   });
 }
@@ -65,20 +81,10 @@ export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest,
   const requestOptions = getBodyOptions(method, request);
 
   async function run(hasRetried = false): Promise<TReturnDto> {
+    let data: FetchResponse<TFetchResponse>;
+
     try {
-      const data = await executeDefaultFetchRequest<TFetchResponse>(path, type, method, requestOptions);
-
-      if (!data?.data) {
-        throw new ApiRequestError(
-          data?.error ?? 'no_connection',
-          data?.message ?? 'No connection to the server'
-        );
-      }
-
-      console.log(path, data);
-
-      const dataConverted = data.data as TFetchResponse;
-      return factory.createDTO(dataConverted);
+      data = await executeDefaultFetchRequest<TFetchResponse>(path, type, method, requestOptions);
     } catch (error) {
       const apiError = error instanceof ApiRequestError
         ? error
@@ -94,6 +100,18 @@ export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest,
 
       throw apiError;
     }
+
+    if (!data?.data) {
+      throw new ApiRequestError(
+        data?.error ?? 'no_connection',
+        data?.message ?? 'No connection to the server'
+      );
+    }
+
+    console.log(path, data);
+
+    const dataConverted = data.data as TFetchResponse;
+    return factory.createDTO(dataConverted);
   }
 
   return run();
@@ -103,26 +121,66 @@ export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetch
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
-  // TODO refactor
   const method = String(type).toUpperCase();
+  const requestOptions = getBodyOptions(method, request);
+  const hasRetried = ref(false);
+  const isRetrying = ref(false);
 
-  let {data, pending, error} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
+  const {data, pending, error, refresh} = useFetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
-    headers: getAuthorizationHeaders(),
-    ...getBodyOptions(method, request),
+    credentials: 'include',
+    headers: getRequestAwareHeaders(),
+    ...requestOptions,
   });
 
+  void watch(error, async (currentError) => {
+    if (!currentError) {
+      return;
+    }
+
+    const apiError = ApiRequestError.createFromFetchError(currentError as IFetchError<FetchErrorData>);
+
+    if (!shouldTryRefresh(path, apiError, hasRetried.value)) {
+      return;
+    }
+
+    hasRetried.value = true;
+    isRetrying.value = true;
+
+    try {
+      const refreshedAccessToken = await refreshAccessToken();
+
+      if (refreshedAccessToken) {
+        await refresh();
+      }
+    } finally {
+      isRetrying.value = false;
+    }
+  });
+
+  const requestPending = computed(() => pending.value || isRetrying.value);
+
   const dto = computed(() => {
+    if (requestPending.value) {
+      return undefined as TReturnDto;
+    }
+
     if (error.value) {
       throw ApiRequestError.createFromFetchError(error.value as IFetchError<FetchErrorData>);
     }
 
     if (!data.value?.data) {
-      throw new ApiRequestError('no_connection', 'No connection to the server');
+      throw new ApiRequestError(
+        data.value?.error ?? 'no_connection',
+        data.value?.message ?? 'No connection to the server'
+      );
     }
 
-    return factory.createDTO(data.value.data);
-  })
+    console.log(path, data.value);
 
-  return {data: dto, pending};
+    const dataConverted = data.value.data as TFetchResponse;
+    return factory.createDTO(dataConverted);
+  });
+
+  return {data: dto, pending: requestPending};
 }

@@ -1,5 +1,5 @@
 import {storeToRefs} from "pinia";
-import {getAccessToken, getRefreshToken, refreshAccessToken} from "~/composables/scripts/cookies/getAccessToken";
+import {getAccessToken, refreshAccessToken} from "~/composables/scripts/cookies/getAccessToken";
 import sendGetUserAvatarRequest from "~/composables/scripts/photos/getUserAvatar";
 import sendGetMyUserInfoRequest from "~/composables/scripts/users/getMyUserInfo";
 import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
@@ -10,7 +10,6 @@ export default function useUserDataHandler() {
   const userDataStore = useUserDataStore();
   const {userData, pending, initialized} = storeToRefs(userDataStore);
   const accessToken = getAccessToken();
-  const refreshToken = getRefreshToken();
 
   async function loadCurrentUser() {
     const response = await sendGetMyUserInfoRequest() as DataDTO<GetUserInfoResponse>;
@@ -48,11 +47,6 @@ export default function useUserDataHandler() {
     userDataStore.setPending(true);
     try {
       if (!accessToken.value) {
-        if (!refreshToken.value) {
-          userDataStore.clearUserData();
-          return;
-        }
-
         const refreshedAccessToken = await refreshAccessToken();
         if (!refreshedAccessToken) {
           userDataStore.clearUserData();

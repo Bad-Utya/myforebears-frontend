@@ -1,51 +1,48 @@
 import sendRefreshRequest from "~/composables/scripts/auth/refreshTokens";
 import {useAuthTokensStore} from "~/composables/scripts/storages/create/authTokens";
+import {useUserDataStore} from "~/composables/scripts/storages/create/userData";
 
 export type StoredAuthTokens = {
   access_token?: string | null;
-  refresh_token?: string | null;
 };
 
 let refreshPromise: Promise<string | null> | null = null;
+
+function setStoredAccessToken(nextAccessToken: string | null) {
+  const authTokensStore = useAuthTokensStore();
+  const userDataStore = useUserDataStore();
+  const previousAccessToken = authTokensStore.accessToken;
+
+  authTokensStore.setAccessToken(nextAccessToken);
+
+  if (previousAccessToken !== nextAccessToken) {
+    userDataStore.resetUserData();
+  }
+}
 
 export function getAccessToken() {
   const tokens = useAuthTokensStore();
   return computed(() => tokens.accessToken);
 }
 
-export function getRefreshToken() {
-  const refreshTokenCookie = useCookie<string | null>('refresh_token');
-  console.log(refreshTokenCookie.value);
-  return computed(() => refreshTokenCookie.value ?? null);
-}
-
 export function persistAuthTokens(tokens: StoredAuthTokens) {
-  const authTokensStore = useAuthTokensStore();
-  const refreshTokenCookie = useCookie<string | null>('refresh_token');
-
-  authTokensStore.setAccessToken(tokens.access_token ?? null);
-
-  if (tokens.refresh_token !== undefined) {
-    refreshTokenCookie.value = tokens.refresh_token ?? null;
-  }
+  setStoredAccessToken(tokens.access_token ?? null);
 }
 
 export function clearAuthTokens() {
-  const authTokensStore = useAuthTokensStore();
-  const refreshTokenCookie = useCookie<string | null>('refresh_token');
-
-  authTokensStore.clear();
-  refreshTokenCookie.value = null;
+  setStoredAccessToken(null);
 }
 
 export async function refreshAccessToken() {
   const authTokensStore = useAuthTokensStore();
-  const refreshTokenCookie = useCookie<string | null>('refresh_token');
 
-  if (!refreshTokenCookie.value) {
-    authTokensStore.clear();
-    return null;
-  }
+  console.log('[refreshAccessToken:start]', {
+    client: import.meta.client,
+    server: import.meta.server,
+    hasToken: !!authTokensStore.accessToken,
+    hasRefreshPromise: !!refreshPromise,
+    at: new Date().toISOString()
+  });
 
   if (refreshPromise) {
     return refreshPromise;
@@ -55,19 +52,21 @@ export async function refreshAccessToken() {
     try {
       const refreshed = await sendRefreshRequest();
       const nextAccessToken = refreshed.accessToken ?? null;
-      const nextRefreshToken = refreshed.refreshToken;
 
-      authTokensStore.setAccessToken(nextAccessToken);
-
-      if (nextRefreshToken !== undefined) {
-        refreshTokenCookie.value = nextRefreshToken ?? null;
-      }
+      setStoredAccessToken(nextAccessToken);
 
       return nextAccessToken;
     } catch {
       clearAuthTokens();
+
       return null;
     } finally {
+      console.log('[refreshAccessToken:finally]', {
+        client: import.meta.client,
+        server: import.meta.server,
+        storeTokenBeforeReset: !!useAuthTokensStore().accessToken,
+        at: new Date().toISOString()
+      });
       refreshPromise = null;
     }
   })();
@@ -77,22 +76,29 @@ export async function refreshAccessToken() {
 
 export async function getAccessTokenRefreshed() {
   const accessToken = getAccessToken();
-  const refreshToken = getRefreshToken();
+
+  console.log('[getAccessTokenRefreshed:start]', {
+    client: import.meta.client,
+    server: import.meta.server,
+    hasComputedToken: !!accessToken.value,
+    hasStoreToken: !!useAuthTokensStore().accessToken,
+    hasRefreshPromise: !!refreshPromise,
+    at: new Date().toISOString()
+  });
 
   if (accessToken.value) {
     return accessToken.value;
   }
 
-  if (!refreshToken.value) {
-    await navigateTo('/auth/login');
-    return null;
-  }
-
   const refreshedAccessToken = await refreshAccessToken();
-  if (!refreshedAccessToken) {
-    await navigateTo('/auth/login');
-    return null;
-  }
 
-  return refreshedAccessToken;
+  console.log('[getAccessTokenRefreshed:afterRefresh]', {
+    client: import.meta.client,
+    server: import.meta.server,
+    hasRefreshedToken: !!refreshedAccessToken,
+    hasStoreToken: !!useAuthTokensStore().accessToken,
+    at: new Date().toISOString()
+  });
+
+  return refreshedAccessToken ?? null;
 }

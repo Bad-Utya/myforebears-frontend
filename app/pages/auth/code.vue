@@ -53,7 +53,6 @@ async function sendRequest() {
 
     persistAuthTokens({
       access_token: result.accessToken ?? null,
-      refresh_token: result.refreshToken ?? null,
     });
 
     await navigateTo({path: '/main'});
