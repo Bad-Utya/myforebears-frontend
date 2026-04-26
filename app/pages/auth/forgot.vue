@@ -4,6 +4,8 @@ import EmailInput from "~/components/auth/EmailInput.vue";
 import sendResetLinkRequest from "~/composables/scripts/auth/sendResetLink";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
+definePageMeta({ middleware: 'guest' });
+
 const email = ref('');
 
 const isEmailCorrect = ref(false);

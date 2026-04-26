@@ -4,6 +4,8 @@ import sendRegisterRequest from "~/composables/scripts/auth/register";
 import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
+definePageMeta({ middleware: 'guest' });
+
 const MILLISECONDS_IN_MINUTE = 60000;
 const DELAY = MILLISECONDS_IN_MINUTE;
 

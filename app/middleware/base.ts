@@ -1,11 +1,11 @@
-import {getAccessToken} from "~/composables/scripts/cookies/getAccessToken";
+import {getAccessTokenRefreshed} from "~/composables/scripts/cookies/getAccessToken";
 
-export default defineNuxtRouteMiddleware((to) => {
-  const token = getAccessToken();
+export default defineNuxtRouteMiddleware(async () => {
+  const token = await getAccessTokenRefreshed();
 
-  if (!token.value) {
+  if (!token) {
     return navigateTo('/home');
   }
 
   return navigateTo('/main');
-})
+});

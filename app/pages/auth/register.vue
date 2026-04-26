@@ -5,6 +5,8 @@ import RegisterPasswordInput from "~/components/auth/RegisterPasswordInput.vue";
 import EmailInput from "~/components/auth/EmailInput.vue";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
+definePageMeta({ middleware: 'guest' });
+
 const email = ref('');
 const password = ref('');
 

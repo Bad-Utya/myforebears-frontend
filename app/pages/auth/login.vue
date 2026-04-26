@@ -6,6 +6,8 @@ import sendLoginRequest from "~/composables/scripts/auth/login";
 import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
+definePageMeta({ middleware: 'guest' });
+
 const email = ref('');
 const password = ref('');
 
