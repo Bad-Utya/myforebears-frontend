@@ -1,110 +1,76 @@
-import useUserDataState, {type UserData} from "~/composables/scripts/storages/create/userData";
-import {getAccessToken} from "~/composables/scripts/cookies/getAccessToken";
+import {storeToRefs} from "pinia";
+import {getAccessToken, getRefreshToken, refreshAccessToken} from "~/composables/scripts/cookies/getAccessToken";
 import sendGetUserAvatarRequest from "~/composables/scripts/photos/getUserAvatar";
-
-function decodeBase64Url(input: string) {
-  const normalized = input.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
-
-  const binary = atob(padded);
-  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
-
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  const parts = token.split('.');
-  const payloadPart = parts[1];
-  if (!payloadPart) return null;
-
-  try {
-    const payloadJson = decodeBase64Url(payloadPart);
-    const payload = JSON.parse(payloadJson);
-    if (!payload || typeof payload !== 'object') return null;
-    return payload as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
-
-function pickString(payload: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = payload[key];
-    if (typeof value === 'string' && value.length > 0) return value;
-  }
-  return undefined;
-}
-
-function pickNumber(payload: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = payload[key];
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
-    if (typeof value === 'string' && value.trim().length > 0) {
-      const parsed = Number(value);
-      if (Number.isFinite(parsed)) return parsed;
-    }
-  }
-  return undefined;
-}
+import sendGetMyUserInfoRequest from "~/composables/scripts/users/getMyUserInfo";
+import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
+import type UserInfoDTO from "~/composables/scripts/users/dtos/inner/UserInfoDTO";
+import {type UserData, useUserDataStore} from "~/composables/scripts/storages/create/userData";
 
 export default function useUserDataHandler() {
-  const userData = useUserDataState();
+  const userDataStore = useUserDataStore();
+  const {userData, pending, initialized} = storeToRefs(userDataStore);
   const accessToken = getAccessToken();
-  const pending = ref(false);
+  const refreshToken = getRefreshToken();
 
-  async function loadFromToken() {
-    const token = accessToken.value;
-    if (!token) return null;
+  async function loadCurrentUser() {
+    const response = await sendGetMyUserInfoRequest() as DataDTO<UserInfoDTO>;
 
-    const payload = decodeJwtPayload(token);
-    if (!payload) return null;
+    return {
+      id: response.data?.id,
+      nickname: response.data?.nickname,
+    } satisfies UserData;
+  }
 
-    const id = pickNumber(payload, ['user_id', 'userId', 'id', 'sub']);
-    const email = pickString(payload, ['email', 'mail']);
-    const username = pickString(payload, ['username', 'name', 'login', 'preferred_username']);
+  async function enrichWithAvatar(baseData: UserData) {
+    if (typeof baseData.id !== 'number') {
+      return;
+    }
 
-    const data: UserData = {id, email, username};
-    return data;
+    try {
+      const avatarBlob = await sendGetUserAvatarRequest(baseData.id);
+      baseData.avatarUrl = URL.createObjectURL(avatarBlob);
+    } catch {
+      // ignore avatar errors
+    }
   }
 
   async function ensureLoaded() {
-    if (pending.value) return;
-    if (userData.value) return;
+    if (pending.value) {
+      return;
+    }
 
-    pending.value = true;
+    if (userData.value) {
+      return;
+    }
+
+    userDataStore.setPending(true);
     try {
-      const baseData = await loadFromToken();
-      if (!baseData) {
-        userData.value = null;
-        return;
-      }
+      if (!accessToken.value) {
+        if (!refreshToken.value) {
+          userDataStore.clearUserData();
+          return;
+        }
 
-      if (typeof baseData.id === 'number') {
-        try {
-          const avatarBlob = await sendGetUserAvatarRequest(baseData.id);
-          const avatarUrl = URL.createObjectURL(avatarBlob);
-
-          baseData.avatarUrl = avatarUrl;
-        } catch {
-          // ignore avatar errors
+        const refreshedAccessToken = await refreshAccessToken();
+        if (!refreshedAccessToken) {
+          userDataStore.clearUserData();
+          return;
         }
       }
 
-      userData.value = baseData;
+      const baseData = await loadCurrentUser();
+      await enrichWithAvatar(baseData);
+
+      userDataStore.setUserData(baseData);
     } finally {
-      pending.value = false;
+      userDataStore.setPending(false);
     }
   }
 
-  onBeforeUnmount(() => {
-    const current = userData.value;
-    if (current?.avatarUrl) {
-      URL.revokeObjectURL(current.avatarUrl);
-    }
-  });
-
   return {
     userData,
-    pending: computed(() => pending.value),
+    pending,
+    initialized,
     ensureLoaded,
   };
 }

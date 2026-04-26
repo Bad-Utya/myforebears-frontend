@@ -7,7 +7,7 @@ export type ApiErrorData = {
 
 export const DEFAULT_API_ERROR: ApiErrorData = {
   code: 'request_failed',
-  message: 'Request failed',
+  message: 'Unexpected error happened, try again ',
 };
 
 export type FetchErrorData = {
@@ -36,6 +36,12 @@ export default class ApiRequestError extends Error {
       error.data?.message ?? error.statusText ?? error.message ?? DEFAULT_API_ERROR.message,
       error.statusCode
     );
+  }
+
+  static isUnauthorizedInvalidToken(error: unknown) {
+    const apiError = ApiRequestError.createFromAny(error);
+
+    return apiError.statusCode === 401 && apiError.code === 'invalid_token';
   }
 
   static createFromAny(error: any) {

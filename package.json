@@ -15,9 +15,11 @@
     "@iconify-json/simple-icons": "^1.2.68",
     "@nuxt/content": "^3.13.0",
     "@nuxt/ui": "^4.4.0",
+    "@pinia/nuxt": "^0.11.3",
     "again": "^0.0.1",
     "better-sqlite3": "^12.9.0",
     "nuxt": "^4.3.0",
+    "pinia": "^3.0.4",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

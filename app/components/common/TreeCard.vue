@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import TreeCardCover from "~/components/common/TreeCardCover.vue";
+
 const props = withDefaults(defineProps<{
   pending?: boolean;
   title: string;
   author?: string;
   description?: string;
   avatar: string;
+  coverSeed?: string;
   comments?: string;
   href: string;
 }>(), {
   pending: false,
 });
-
 </script>
 
 <template>
@@ -39,8 +41,13 @@ const props = withDefaults(defineProps<{
   <NuxtLink
     v-else
     :to="props.href"
-    class="group relative block overflow-hidden rounded-3xl border border-default bg-muted aspect-[3/4]"
+    class="group relative block overflow-hidden rounded-[28px] border border-default bg-muted aspect-[3/4]"
   >
+    <TreeCardCover
+      v-if="!props.avatar"
+      :seed="props.coverSeed ?? props.title"
+      class="absolute inset-0 transition-transform duration-300 group-hover:scale-[1.02]"
+    />
     <img
       v-if="props.avatar"
       :src="props.avatar"
@@ -48,7 +55,7 @@ const props = withDefaults(defineProps<{
       class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
       loading="lazy"
     />
-    <div class="absolute inset-0 bg-linear-to-t from-black/75 via-black/20 to-transparent" />
+    <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
     <div class="absolute inset-x-0 bottom-0 p-4">
       <div class="min-w-0">

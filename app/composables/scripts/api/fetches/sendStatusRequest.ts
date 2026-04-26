@@ -10,6 +10,7 @@ import {
 import type StatusDTO from "~/composables/scripts/api/dtos/StatusDTO";
 import type StatusResponse from "~/composables/scripts/api/dtos/StatusResponse";
 
+// todo properly use $fetch and useFetch
 export async function sendAsyncStatusRequest<TRequest extends IApiRequest>(
   path: string, request: TRequest,
   factory: IResponseFactory<StatusDTO, StatusResponse>,

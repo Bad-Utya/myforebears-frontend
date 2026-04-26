@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import TreeCardCover from "~/components/common/TreeCardCover.vue";
+
 const props = withDefaults(defineProps<{
   pending?: boolean;
   title: string;
   author?: string;
   description?: string;
   avatar: string;
+  coverSeed?: string;
   comments?: string;
   href: string;
 }>(), {
@@ -43,6 +46,11 @@ const props = withDefaults(defineProps<{
     class="group relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40 hover:bg-neutral/55 transition-colors"
   >
     <div class="relative flex-none w-[92px] h-[92px] rounded-xl overflow-hidden bg-muted">
+      <TreeCardCover
+        v-if="!props.avatar"
+        :seed="props.coverSeed ?? props.title"
+        class="absolute inset-0"
+      />
       <img
         v-if="props.avatar"
         :src="props.avatar"

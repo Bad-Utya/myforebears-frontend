@@ -52,8 +52,8 @@ async function sendRequest() {
     const result = await sendRegisterRequest(email.value, code.value);
 
     persistAuthTokens({
-      accessToken: result.accessToken ?? null,
-      refreshToken: result.refreshToken ?? null,
+      access_token: result.accessToken ?? null,
+      refresh_token: result.refreshToken ?? null,
     });
 
     await navigateTo({path: '/main'});

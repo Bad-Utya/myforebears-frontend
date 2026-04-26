@@ -4,6 +4,7 @@ import type IApiRequest from "~/composables/scripts/api/interfaces/IApiRequest";
 import type IResponseFactory from "~/composables/scripts/api/interfaces/IResponseFactory";
 import getAuthorizationHeaders from "~/composables/scripts/api/getAuthorizationHeaders";
 import ApiRequestError, {type FetchErrorData} from "~/composables/scripts/api/ApiRequestError";
+import {refreshAccessToken} from "~/composables/scripts/cookies/getAccessToken";
 import type {IFetchError} from "ofetch";
 
 export type HttpRequestType =
@@ -31,53 +32,71 @@ function getBodyOptions<TRequest extends IApiRequest>(method: string, request: T
   return {body: payload};
 }
 
-function ensureSuccessDto(
-  dto: unknown,
-  fetchResponse?: {error?: string; message?: string}
-) {
-  const maybeStatusDto = dto as {isSuccessful?: boolean; message?: string};
-
-  if (maybeStatusDto.isSuccessful === false) {
-    throw new ApiRequestError(
-      fetchResponse?.error ?? 'request_failed',
-      maybeStatusDto.message ?? fetchResponse?.message ?? 'Request failed'
-    );
+function shouldTryRefresh(path: string, error: unknown, hasRetried: boolean) {
+  if (hasRetried) {
+    return false;
   }
+
+  if (path === 'auth/refresh') {
+    return false;
+  }
+
+  return ApiRequestError.isUnauthorizedInvalidToken(error);
+}
+
+async function executeDefaultFetchRequest<TFetchResponse>(
+  path: string,
+  type: HttpRequestType,
+  method: string,
+  requestOptions: Record<string, unknown>
+) {
+  return await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
+    method: type,
+    headers: getAuthorizationHeaders(),
+    ...requestOptions,
+  });
 }
 
 export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
   path: string, request: TRequest,
   factory: IResponseFactory<TReturnDto, TFetchResponse>,
   type: HttpRequestType = 'POST') {
-  // TODO refactor
   const method = String(type).toUpperCase();
-  try {
-    let data = await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
-      method: type,
-      headers: getAuthorizationHeaders(),
-      ...getBodyOptions(method, request),
-    });
+  const requestOptions = getBodyOptions(method, request);
 
-    if (!data?.data) {
-      throw new ApiRequestError(
-        data?.error ?? 'no_connection',
-        data?.message ?? 'No connection to the server'
-      );
+  async function run(hasRetried = false): Promise<TReturnDto> {
+    try {
+      const data = await executeDefaultFetchRequest<TFetchResponse>(path, type, method, requestOptions);
+
+      if (!data?.data) {
+        throw new ApiRequestError(
+          data?.error ?? 'no_connection',
+          data?.message ?? 'No connection to the server'
+        );
+      }
+
+      console.log(path, data);
+
+      const dataConverted = data.data as TFetchResponse;
+      return factory.createDTO(dataConverted);
+    } catch (error) {
+      const apiError = error instanceof ApiRequestError
+        ? error
+        : ApiRequestError.createFromFetchError(error as IFetchError<FetchErrorData>);
+
+      if (shouldTryRefresh(path, apiError, hasRetried)) {
+        const refreshedAccessToken = await refreshAccessToken();
+
+        if (refreshedAccessToken) {
+          return run(true);
+        }
+      }
+
+      throw apiError;
     }
-
-    let dataConverted = data.data as TFetchResponse;
-    const dto = factory.createDTO(dataConverted);
-
-    ensureSuccessDto(dto, data);
-
-    return dto;
-  } catch (error) {
-    if (error instanceof ApiRequestError) {
-      throw error;
-    }
-
-    throw ApiRequestError.createFromFetchError(error as IFetchError<FetchErrorData>);
   }
+
+  return run();
 }
 
 export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetchResponse, TReturnDto>(
@@ -102,11 +121,7 @@ export function sendAsyncDefaultHeadRequest<TRequest extends IApiRequest, TFetch
       throw new ApiRequestError('no_connection', 'No connection to the server');
     }
 
-    const responseDto = factory.createDTO(data.value.data);
-
-    ensureSuccessDto(responseDto, data.value);
-
-    return responseDto;
+    return factory.createDTO(data.value.data);
   })
 
   return {data: dto, pending};

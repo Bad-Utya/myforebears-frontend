@@ -1,12 +1,21 @@
-export type AuthTokens = {
+import {defineStore} from "pinia";
+
+type AuthTokensState = {
   accessToken: string | null;
-  refreshToken: string | null;
 };
 
-export default function useAuthTokensState() {
-  return useState<AuthTokens>('auth-tokens', () => ({
+export const useAuthTokensStore = defineStore('auth-tokens', {
+  state: (): AuthTokensState => ({
     accessToken: null,
-    refreshToken: null,
-  }));
-}
+  }),
 
+  actions: {
+    setAccessToken(accessToken: string | null) {
+      this.accessToken = accessToken;
+    },
+
+    clear() {
+      this.accessToken = null;
+    }
+  }
+});

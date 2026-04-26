@@ -1,47 +1,81 @@
 import sendRefreshRequest from "~/composables/scripts/auth/refreshTokens";
-import useAuthTokensState from "~/composables/scripts/storages/create/authTokens";
+import {useAuthTokensStore} from "~/composables/scripts/storages/create/authTokens";
 
-export type PersistedAuthTokens = {
-  accessToken?: string | null;
-  refreshToken?: string | null;
+export type StoredAuthTokens = {
+  access_token?: string | null;
+  refresh_token?: string | null;
 };
 
-export function getAccessToken() {
-  const tokens = useAuthTokensState();
-  const accessTokenCookie = useCookie<string | null>('access_token');
+let refreshPromise: Promise<string | null> | null = null;
 
-  return computed<string | null>({
-    get: () => tokens.value.accessToken ?? accessTokenCookie.value,
-    set: (value) => {
-      tokens.value.accessToken = value;
-      accessTokenCookie.value = value;
-    },
-  });
+export function getAccessToken() {
+  const tokens = useAuthTokensStore();
+  return computed(() => tokens.accessToken);
 }
 
 export function getRefreshToken() {
-  const tokens = useAuthTokensState();
   const refreshTokenCookie = useCookie<string | null>('refresh_token');
-
-  return computed<string | null>({
-    get: () => tokens.value.refreshToken ?? refreshTokenCookie.value,
-    set: (value) => {
-      tokens.value.refreshToken = value;
-      refreshTokenCookie.value = value;
-    },
-  });
+  console.log(refreshTokenCookie.value);
+  return computed(() => refreshTokenCookie.value ?? null);
 }
 
-export function persistAuthTokens(tokens: PersistedAuthTokens) {
-  const accessToken = getAccessToken();
-  const refreshToken = getRefreshToken();
+export function persistAuthTokens(tokens: StoredAuthTokens) {
+  const authTokensStore = useAuthTokensStore();
+  const refreshTokenCookie = useCookie<string | null>('refresh_token');
 
-  accessToken.value = tokens.accessToken ?? null;
-  refreshToken.value = tokens.refreshToken ?? null;
+  authTokensStore.setAccessToken(tokens.access_token ?? null);
+
+  if (tokens.refresh_token !== undefined) {
+    refreshTokenCookie.value = tokens.refresh_token ?? null;
+  }
+}
+
+export function clearAuthTokens() {
+  const authTokensStore = useAuthTokensStore();
+  const refreshTokenCookie = useCookie<string | null>('refresh_token');
+
+  authTokensStore.clear();
+  refreshTokenCookie.value = null;
+}
+
+export async function refreshAccessToken() {
+  const authTokensStore = useAuthTokensStore();
+  const refreshTokenCookie = useCookie<string | null>('refresh_token');
+
+  if (!refreshTokenCookie.value) {
+    authTokensStore.clear();
+    return null;
+  }
+
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const refreshed = await sendRefreshRequest();
+      const nextAccessToken = refreshed.accessToken ?? null;
+      const nextRefreshToken = refreshed.refreshToken;
+
+      authTokensStore.setAccessToken(nextAccessToken);
+
+      if (nextRefreshToken !== undefined) {
+        refreshTokenCookie.value = nextRefreshToken ?? null;
+      }
+
+      return nextAccessToken;
+    } catch {
+      clearAuthTokens();
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 export async function getAccessTokenRefreshed() {
-  const tokens = useAuthTokensState();
   const accessToken = getAccessToken();
   const refreshToken = getRefreshToken();
 
@@ -54,21 +88,11 @@ export async function getAccessTokenRefreshed() {
     return null;
   }
 
-  try {
-    const refreshed = await sendRefreshRequest();
-    if (!refreshed.accessToken) {
-      await navigateTo('/auth/login');
-      return null;
-    }
-
-    persistAuthTokens({
-      accessToken: refreshed.accessToken ?? null,
-      refreshToken: refreshed.refreshToken ?? refreshToken.value ?? null,
-    });
-
-    return refreshed.accessToken ?? null;
-  } catch {
+  const refreshedAccessToken = await refreshAccessToken();
+  if (!refreshedAccessToken) {
     await navigateTo('/auth/login');
     return null;
   }
+
+  return refreshedAccessToken;
 }
