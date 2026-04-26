@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CreateAccountSuggestion from "~/components/common/CreateAccountSuggestion.vue";
 import sendLogoutAllRequest from "~/composables/scripts/auth/logoutAll";
 import sendLogoutRequest from "~/composables/scripts/auth/logout";
 import {clearAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
@@ -12,6 +13,7 @@ const userDataStore = useUserDataStore();
 const displayName = computed(() => userData.value?.nickname ?? userData.value?.email ?? 'Unknown user');
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id));
 const isLoading = computed(() => pending.value || !initialized.value);
+const isGuest = computed(() => initialized.value && !userData.value);
 const isLogoutModalOpen = ref(false);
 const shouldLogoutAll = ref(false);
 const isLogoutPending = ref(false);
@@ -82,42 +84,49 @@ onMounted(async () => {
 // https://ui.nuxt.com/docs/components/sidebar
 <template>
   <div class="w-full">
-    <div class="flex items-center gap-4">
-      <template v-if="isLoading">
-        <USkeleton class="size-12 shrink-0 rounded-full"></USkeleton>
-        <div class="w-full flex flex-col gap-y-2">
-          <USkeleton class="h-4 w-full"></USkeleton>
-          <USkeleton class="h-4 w-3/4"></USkeleton>
-        </div>
-      </template>
-      <template v-else>
-        <UDropdownMenu :items="dropdownItems" :content="{ side: 'top', align: 'start' }">
-          <UButton
-            block
-            color="neutral"
-            variant="ghost"
-            class="justify-start rounded-lg px-2 py-2"
-            :ui="{ base: 'w-full', leadingIcon: 'hidden', trailingIcon: 'hidden' }"
+    <div v-if="isLoading" class="flex items-center gap-4">
+      <USkeleton class="size-12 shrink-0 rounded-full"></USkeleton>
+      <div class="w-full flex flex-col gap-y-2">
+        <USkeleton class="h-4 w-full"></USkeleton>
+        <USkeleton class="h-4 w-3/4"></USkeleton>
+      </div>
+    </div>
+
+    <CreateAccountSuggestion
+      v-else-if="isGuest"
+      compact
+      title="Continue with an account"
+      description="Sign up to save your trees, manage your profile, and return to your data later."
+      button-label="Sign up"
+    />
+
+    <div v-else class="flex items-center gap-4">
+      <UDropdownMenu :items="dropdownItems" :content="{ side: 'top', align: 'start' }">
+        <UButton
+          block
+          color="neutral"
+          variant="ghost"
+          class="justify-start rounded-lg px-2 py-2"
+          :ui="{ base: 'w-full', leadingIcon: 'hidden', trailingIcon: 'hidden' }"
+        >
+          <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-12 shrink-0"/>
+          <span
+            v-else
+            :style="avatarPlaceholder.style"
+            class="size-12 shrink-0 rounded-full inline-flex items-center justify-center text-sm font-semibold select-none"
           >
-            <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-12 shrink-0"/>
-            <span
-              v-else
-              :style="avatarPlaceholder.style"
-              class="size-12 shrink-0 rounded-full inline-flex items-center justify-center text-sm font-semibold select-none"
-            >
-              {{ avatarPlaceholder.label }}
+            {{ avatarPlaceholder.label }}
+          </span>
+          <span class="min-w-0 flex flex-col items-start">
+            <span class="text-sm font-semibold text-highlighted truncate">
+              {{ displayName }}
             </span>
-            <span class="min-w-0 flex flex-col items-start">
-              <span class="text-sm font-semibold text-highlighted truncate">
-                {{ displayName }}
-              </span>
-              <span class="text-sm text-muted truncate">
-                {{ userData?.email ?? 'example@gmail.com' }}
-              </span>
+            <span class="text-sm text-muted truncate">
+              {{ userData?.email ?? 'example@gmail.com' }}
             </span>
-          </UButton>
-        </UDropdownMenu>
-      </template>
+          </span>
+        </UButton>
+      </UDropdownMenu>
     </div>
 
     <UModal

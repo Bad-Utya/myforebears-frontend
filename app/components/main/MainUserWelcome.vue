@@ -7,6 +7,7 @@ const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
 const displayName = computed(() => userData.value?.nickname ?? userData.value?.email ?? 'User');
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id));
 const isLoading = computed(() => pending.value || !initialized.value);
+const isGuest = computed(() => initialized.value && !userData.value);
 
 onMounted(async () => {
   await ensureLoaded();
@@ -14,7 +15,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-2">
+  <div v-if="isGuest" class="space-y-2">
+    <p class="text-left text-sm text-muted">Welcome,</p>
+    <p class="text-left text-xl font-semibold truncate">
+      Guest visitor
+    </p>
+  </div>
+
+  <div v-else class="space-y-2">
     <p class="text-left text-sm text-muted">Welcome back,</p>
 
     <div v-if="isLoading" class="flex items-center gap-3">
