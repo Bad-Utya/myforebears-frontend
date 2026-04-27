@@ -49,6 +49,42 @@
   --color-mauve-800: #826f91;
   --color-mauve-900: #564a61;
   --color-mauve-950: #2b2530;
+
+  --color-pine-50: #eefaf4;
+  --color-pine-100: #d7f3e4;
+  --color-pine-200: #b4e8cf;
+  --color-pine-300: #84d8af;
+  --color-pine-400: #56c691;
+  --color-pine-500: #34ad76;
+  --color-pine-600: #258c5d;
+  --color-pine-700: #1f6c4a;
+  --color-pine-800: #1b553d;
+  --color-pine-900: #174634;
+  --color-pine-950: #0b251b;
+
+  --color-coral-50: #fff2f2;
+  --color-coral-100: #ffe2e2;
+  --color-coral-200: #ffc9c9;
+  --color-coral-300: #ffa3a3;
+  --color-coral-400: #ff7474;
+  --color-coral-500: #fc4d4d;
+  --color-coral-600: #e73030;
+  --color-coral-700: #c12222;
+  --color-coral-800: #a02222;
+  --color-coral-900: #852323;
+  --color-coral-950: #490d0d;
+
+  --color-slateblue-50: #eef4ff;
+  --color-slateblue-100: #dfeaff;
+  --color-slateblue-200: #c6d9ff;
+  --color-slateblue-300: #a4bfff;
+  --color-slateblue-400: #8198ff;
+  --color-slateblue-500: #6472ff;
+  --color-slateblue-600: #4f53f5;
+  --color-slateblue-700: #433fd9;
+  --color-slateblue-800: #3735af;
+  --color-slateblue-900: #313488;
+  --color-slateblue-950: #1d1f4d;
 }
 
 :root{

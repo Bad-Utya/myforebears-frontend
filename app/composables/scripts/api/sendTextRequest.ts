@@ -1,12 +1,16 @@
 import getApiUrl from '~/composables/scripts/api/parseUrl'
 import getAuthorizationHeaders from '~/composables/scripts/api/getAuthorizationHeaders'
 import ApiRequestError, { type FetchErrorData } from '~/composables/scripts/api/ApiRequestError'
-import { refreshAccessToken } from '~/composables/scripts/cookies/getAccessToken'
+import { ensureAuthResolved, refreshAccessToken } from '~/composables/scripts/cookies/getAccessToken'
 import type { IFetchError } from 'ofetch'
 
 export type TextHttpRequestType = 'GET' | 'HEAD' | 'get' | 'head'
 
-function getRequestAwareHeaders() {
+async function getRequestAwareHeadersAsync(path?: string) {
+  if (path !== 'auth/refresh') {
+    await ensureAuthResolved()
+  }
+
   const authorizationHeaders = getAuthorizationHeaders() ?? {}
 
   if (import.meta.client) {
@@ -27,10 +31,12 @@ export async function sendAsyncTextFetchRequest(
 ) {
   async function run(hasRetried = false): Promise<string> {
     try {
+      const requestHeaders = await getRequestAwareHeadersAsync(path)
+
       return await $fetch<string>(getApiUrl(path), {
         method: type,
         credentials: 'include',
-        headers: getRequestAwareHeaders(),
+        headers: requestHeaders,
         responseType: 'text'
       })
     } catch (error) {

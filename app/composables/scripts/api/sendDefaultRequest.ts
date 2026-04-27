@@ -4,7 +4,7 @@ import type IApiRequest from '~/composables/scripts/api/interfaces/IApiRequest'
 import type IResponseFactory from '~/composables/scripts/api/interfaces/IResponseFactory'
 import getAuthorizationHeaders from '~/composables/scripts/api/getAuthorizationHeaders'
 import ApiRequestError, { type FetchErrorData } from '~/composables/scripts/api/ApiRequestError'
-import { refreshAccessToken } from '~/composables/scripts/cookies/getAccessToken'
+import { ensureAuthResolved, refreshAccessToken } from '~/composables/scripts/cookies/getAccessToken'
 import type { IFetchError } from 'ofetch'
 
 export type HttpRequestType
@@ -12,6 +12,25 @@ export type HttpRequestType
     | 'get' | 'head' | 'patch' | 'post' | 'put' | 'delete' | 'connect' | 'options' | 'trace'
 
 export function getRequestAwareHeaders() {
+  const authorizationHeaders = getAuthorizationHeaders() ?? {}
+
+  if (import.meta.client) {
+    return authorizationHeaders
+  }
+
+  const requestHeaders = useRequestHeaders(['cookie'])
+
+  return {
+    ...requestHeaders,
+    ...authorizationHeaders
+  }
+}
+
+export async function getRequestAwareHeadersAsync(path?: string) {
+  if (path !== 'auth/refresh') {
+    await ensureAuthResolved()
+  }
+
   const authorizationHeaders = getAuthorizationHeaders() ?? {}
 
   if (import.meta.client) {
@@ -74,13 +93,14 @@ async function executeDefaultFetchRequest<TFetchResponse>(
   requestOptions: Record<string, unknown>
 ) {
   const requestHeaders = (requestOptions.headers as Record<string, string> | undefined) ?? {}
+  const authAwareHeaders = await getRequestAwareHeadersAsync(path)
 
   return await $fetch<FetchResponse<TFetchResponse>>(getApiUrl(path), {
     method: type,
     credentials: 'include',
     ...requestOptions,
     headers: {
-      ...getRequestAwareHeaders(),
+      ...authAwareHeaders,
       ...requestHeaders
     }
   })

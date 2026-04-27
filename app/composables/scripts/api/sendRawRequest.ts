@@ -4,7 +4,7 @@ import type IResponseFactory from '~/composables/scripts/api/interfaces/IRespons
 import {
   type HttpRequestType,
   getBodyOptions,
-  getRequestAwareHeaders,
+  getRequestAwareHeadersAsync,
   shouldTryRefresh
 } from '~/composables/scripts/api/sendDefaultRequest'
 import ApiRequestError, { type FetchErrorData } from '~/composables/scripts/api/ApiRequestError'
@@ -25,12 +25,14 @@ export async function sendAsyncRawFetchRequest<TRequest extends IApiRequest, TFe
     let data: TFetchResponse
 
     try {
+      const authAwareHeaders = await getRequestAwareHeadersAsync(path)
+
       data = await $fetch<TFetchResponse>(getApiUrl(path), {
         method: type,
         credentials: 'include',
         ...requestOptions,
         headers: {
-          ...getRequestAwareHeaders(),
+          ...authAwareHeaders,
           ...requestHeaders
         }
       })

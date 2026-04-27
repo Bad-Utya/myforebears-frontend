@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Cropper from 'cropperjs'
+import AvatarCropper from '~/components/common/AvatarCropper.vue'
 import CreateAccountSuggestion from '~/components/common/CreateAccountSuggestion.vue'
 import sendResetByTokenRequest from '~/composables/scripts/auth/resetPasswordByToken'
 import sendUploadUserAvatarRequest from '~/composables/scripts/photos/uploadUserAvatar'
@@ -13,8 +13,7 @@ definePageMeta({ middleware: 'auth' })
 
 const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
-const cropperContainer = ref<HTMLElement | null>(null)
-const cropperSourceImage = ref<HTMLImageElement | null>(null)
+const avatarCropper = ref<{ exportBlob: (type?: string, size?: number) => Promise<Blob> } | null>(null)
 const userDataStore = useUserDataStore()
 const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
 
@@ -34,7 +33,6 @@ const passwordConfirm = ref('')
 const passwordPending = ref(false)
 const avatarPending = ref(false)
 const avatarSourceUrl = ref<string | null>(null)
-const cropper = shallowRef<Cropper | null>(null)
 
 const themeItems = [
   { key: 'light', label: 'Light' },
@@ -58,60 +56,11 @@ function revokeAvatarSourceUrl() {
 }
 
 function resetAvatarEditor() {
-  cropper.value?.destroy()
-  cropper.value = null
   revokeAvatarSourceUrl()
   avatarSourceUrl.value = null
 
   if (fileInput.value) {
     fileInput.value.value = ''
-  }
-}
-
-function buildCropperTemplate() {
-  return [
-    '<cropper-canvas background>',
-    '<cropper-image rotatable scalable translatable></cropper-image>',
-    '<cropper-shade hidden></cropper-shade>',
-    '<cropper-handle action="select" plain></cropper-handle>',
-    '<cropper-selection initial-coverage="0.85" initial-aspect-ratio="1" aspect-ratio="1" movable resizable>',
-    '<cropper-grid role="grid" bordered covered></cropper-grid>',
-    '<cropper-crosshair centered></cropper-crosshair>',
-    '<cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>',
-    '<cropper-handle action="n-resize"></cropper-handle>',
-    '<cropper-handle action="e-resize"></cropper-handle>',
-    '<cropper-handle action="s-resize"></cropper-handle>',
-    '<cropper-handle action="w-resize"></cropper-handle>',
-    '<cropper-handle action="ne-resize"></cropper-handle>',
-    '<cropper-handle action="nw-resize"></cropper-handle>',
-    '<cropper-handle action="se-resize"></cropper-handle>',
-    '<cropper-handle action="sw-resize"></cropper-handle>',
-    '</cropper-selection>',
-    '</cropper-canvas>'
-  ].join('')
-}
-
-async function initCropper() {
-  await nextTick()
-
-  if (!cropperSourceImage.value || !cropperContainer.value) {
-    return
-  }
-
-  cropper.value?.destroy()
-  cropper.value = new Cropper(cropperSourceImage.value, {
-    container: cropperContainer.value,
-    template: buildCropperTemplate()
-  })
-
-  const selection = cropper.value.getCropperSelection()
-
-  if (selection) {
-    selection.aspectRatio = 1
-    selection.initialAspectRatio = 1
-    selection.initialCoverage = 0.85
-    selection.precise = true
-    selection.$center()
   }
 }
 
@@ -210,41 +159,20 @@ async function handleAvatarFileChange(event: Event) {
   try {
     revokeAvatarSourceUrl()
     avatarSourceUrl.value = URL.createObjectURL(file)
-    await initCropper()
   } catch (error) {
     showApiErrorToast(error)
   }
 }
 
 async function saveAvatar() {
-  if (avatarPending.value || !cropper.value) {
+  if (avatarPending.value || !avatarCropper.value) {
     return
   }
 
   avatarPending.value = true
 
   try {
-    const selection = cropper.value.getCropperSelection()
-
-    if (!selection) {
-      throw new Error('Cropper selection is unavailable')
-    }
-
-    const canvas = await selection.$toCanvas({
-      width: 512,
-      height: 512
-    })
-
-    const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((nextBlob) => {
-        if (!nextBlob) {
-          reject(new Error('Avatar export failed'))
-          return
-        }
-
-        resolve(nextBlob)
-      }, 'image/png')
-    })
+    const blob = await avatarCropper.value.exportBlob('image/png', 512)
 
     const file = new File([blob], 'avatar.png', { type: 'image/png' })
 
@@ -573,15 +501,13 @@ onBeforeUnmount(() => {
 
           <div class="space-y-3 rounded-xl border border-default p-3">
             <div
-              ref="cropperContainer"
               class="settings-cropper mx-auto rounded-xl border border-default bg-muted/20"
             >
-              <img
+              <AvatarCropper
                 v-if="avatarSourceUrl"
-                ref="cropperSourceImage"
+                ref="avatarCropper"
                 :src="avatarSourceUrl"
-                alt="Avatar preview"
-              >
+              />
               <div
                 v-else
                 class="flex h-full min-h-80 items-center justify-center text-sm text-muted"
@@ -634,7 +560,8 @@ onBeforeUnmount(() => {
   max-height: 100%;
 }
 
-:deep(.settings-cropper img) {
-  max-width: 100%;
+:deep(.settings-cropper .vue-advanced-cropper) {
+  width: 100%;
+  height: 100%;
 }
 </style>
