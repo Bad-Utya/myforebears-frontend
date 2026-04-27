@@ -7,6 +7,6 @@ export default defineAppConfig({
     }
   },
   api: {
-    url: 'https://rooots.ru.tuna.am/api',
+    url: 'http://localhost:8081/api',
   }
 })
