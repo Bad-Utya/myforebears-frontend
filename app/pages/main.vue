@@ -6,7 +6,7 @@ import InlineFeed from "~/components/common/inline/InlineFeed.vue";
 import MainUserWelcome from "~/components/main/MainUserWelcome.vue";
 import useUserDataHandler from "~/composables/scripts/storages/get/userDataHandler";
 
-definePageMeta({ middleware: 'auth' })
+definePageMeta({middleware: 'auth'})
 
 const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
 const isGuest = computed(() => initialized.value && !pending.value && !userData.value);
@@ -23,7 +23,7 @@ onMounted(async () => {
     <UMain class="w-full p-4 lg:p-6">
       <UContainer class="">
         <div class="flex w-full items-start gap-4 flex-col lg:flex-row">
-          <MainUserWelcome />
+          <MainUserWelcome/>
           <TreeSearchFast class="ml-auto"/>
         </div>
 
@@ -35,7 +35,15 @@ onMounted(async () => {
           button-label="Create account"
         />
 
-        <InlineFeed title="For you" :limit="10" />
+
+        <InlineFeed title="For you" :limit="10">
+          <!--todo refacttor add a fallback slot-->
+          <!--          <template slot="fallback">-->
+          <!--          <p class="py-12 text-center text-sm text-muted">-->
+          <!--            Trees matching the selected parameters were not found.-->
+          <!--          </p>-->
+          <!--          </template>-->
+        </InlineFeed>
       </UContainer>
     </UMain>
   </div>
