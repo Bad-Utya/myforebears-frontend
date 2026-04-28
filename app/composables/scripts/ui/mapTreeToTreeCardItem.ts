@@ -28,6 +28,6 @@ export default function mapTreeToTreeCardItem(tree: TreeDTO, index: number): Tre
     description: 'Lorem ipsum, lenivets danya!',
     avatar: '',
     coverSeed: id,
-    href: `/trees/${id}`,
+    href: `/trees/${id}/main`,
   };
 }

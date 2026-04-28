@@ -16,8 +16,12 @@ const emit = defineEmits<{
   select: [key: T]
 }>()
 
-function handleSelect(key: T) {
-  emit('select', key)
+function handleSelect(item: SidebarButtonListItem<T>) {
+  if (item.href) {
+    return
+  }
+
+  emit('select', item.key)
 }
 </script>
 
@@ -37,7 +41,7 @@ function handleSelect(key: T) {
         : 'text-neutral hover:bg-muted hover:text-highlighted'"
       :label="item.label"
       :disabled="item.disabled"
-      @click="handleSelect(item.key)"
+      @click="handleSelect(item)"
     />
   </nav>
 </template>

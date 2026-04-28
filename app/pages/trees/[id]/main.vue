@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import SideBar from '~/components/common/SideBar.vue'
 import SidebarButtonList, { type SidebarButtonListItem } from '~/components/common/SidebarButtonList.vue'
-import TreeSidebarPanel, { type TreeSidebarSection } from '~/components/tree/TreeSidebarPanel.vue'
+import TreeSidebarPanel from '~/components/tree/TreeSidebarPanel.vue'
+
+type TreeSidebarSection = 'settings' | 'events'
+type TreeSidebarNavKey = TreeSidebarSection | 'timeline'
 import TreeCanvas from '~/components/tree/TreeCanvas.vue'
 import type DataDTO from '~/composables/scripts/api/dtos/DataDTO'
 import type TreeDTO from '~/composables/scripts/familytree/dtos/inner/TreeDTO'
@@ -55,9 +58,10 @@ const isEditable = computed(() => {
   return String(treeCreatorId.value) === String(currentUserId)
 })
 
-const sidebarItems = computed<SidebarButtonListItem<TreeSidebarSection>[]>(() => [
+const sidebarItems = computed<SidebarButtonListItem<TreeSidebarNavKey>[]>(() => [
   { key: 'settings', label: 'Tree settings', icon: 'i-lucide-settings-2' },
-  { key: 'events', label: 'Events', icon: 'i-lucide-calendar-days' }
+  { key: 'events', label: 'Events', icon: 'i-lucide-calendar-days' },
+  { key: 'timeline', label: 'Timeline', icon: 'i-lucide-history' }
 ])
 
 async function loadTreeData() {
@@ -134,7 +138,12 @@ function fitCanvas() {
   treeCanvasRef.value?.fitToView()
 }
 
-function openSidebarSection(section: TreeSidebarSection) {
+async function openSidebarSection(section: TreeSidebarNavKey) {
+  if (section === 'timeline') {
+    await navigateTo(`/trees/${treeId.value}/timeline`)
+    return
+  }
+
   sidebarSection.value = section
   sidebarPanelOpen.value = true
 }
@@ -231,7 +240,9 @@ onMounted(async () => {
       v-model:open="sidebarPanelOpen"
       side="right"
       :title="sidebarSection === 'settings' ? 'Tree settings' : 'Events'"
-      :description="sidebarSection === 'settings' ? 'Configure this tree and manage access.' : 'Create and manage tree events.'"
+      :description="sidebarSection === 'settings'
+        ? 'Configure this tree and manage access.'
+        : 'Create and manage tree events.'"
       :ui="{ content: 'sm:max-w-xl' }"
     >
       <template #body>

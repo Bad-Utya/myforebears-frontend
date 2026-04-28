@@ -92,4 +92,6 @@
   --ui-secondary: var(--color-mauve-600);
   --ui-neutral: var(--color-carbon-50);
   --ui-bg: var(--color-carbon-600);
+  --timeline-undated-bg: color-mix(in srgb, var(--color-banana-300) 24%, var(--ui-bg) 76%);
+  --timeline-undated-border: color-mix(in srgb, var(--color-banana-500) 38%, transparent 62%);
 }

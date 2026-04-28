@@ -122,7 +122,7 @@ async function createTree() {
 
     closeModal()
     emit('changed')
-    await navigateTo(`/trees/${treeId}`)
+    await navigateTo(`/trees/${treeId}/main`)
   } catch (error) {
     showApiErrorToast(error)
   } finally {
