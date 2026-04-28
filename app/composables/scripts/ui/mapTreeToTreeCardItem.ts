@@ -25,6 +25,7 @@ export default function mapTreeToTreeCardItem(tree: TreeDTO, index: number): Tre
   return {
     id,
     title: getTreeCardTitle(tree, index),
+    author: tree.creator_nickname,
     description: 'Lorem ipsum, lenivets danya!',
     avatar: '',
     coverSeed: id,

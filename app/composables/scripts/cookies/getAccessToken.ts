@@ -6,6 +6,9 @@ export type StoredAuthTokens = {
   access_token?: string | null
 }
 
+const ACCESS_TOKEN_WAIT_TIMEOUT_MS = 1200
+const ACCESS_TOKEN_WAIT_INTERVAL_MS = 30
+
 let refreshPromise: Promise<string | null> | null = null
 let authResolvePromise: Promise<string | null> | null = null
 let authResolved = false
@@ -31,7 +34,7 @@ export function getAccessToken() {
   return computed(() => tokens.accessToken)
 }
 
-export async function waitForAccessToken(timeoutMs = 900, intervalMs = 30) {
+export async function waitForAccessToken(timeoutMs = ACCESS_TOKEN_WAIT_TIMEOUT_MS, intervalMs = ACCESS_TOKEN_WAIT_INTERVAL_MS) {
   const accessToken = getAccessToken()
 
   if (accessToken.value) {
@@ -99,6 +102,16 @@ export async function refreshAccessToken() {
   return refreshPromise
 }
 
+async function resolveExistingAccessToken() {
+  const accessToken = getAccessToken()
+
+  if (accessToken.value) {
+    return accessToken.value
+  }
+
+  return await waitForAccessToken()
+}
+
 export async function ensureAuthResolved() {
   const accessToken = getAccessToken()
 
@@ -106,9 +119,11 @@ export async function ensureAuthResolved() {
     return accessToken.value ?? null
   }
 
-  if (accessToken.value) {
+  const resolvedExistingToken = await resolveExistingAccessToken()
+
+  if (resolvedExistingToken) {
     authResolved = true
-    return accessToken.value
+    return resolvedExistingToken
   }
 
   if (!import.meta.client) {
@@ -122,6 +137,12 @@ export async function ensureAuthResolved() {
 
   authResolvePromise = (async () => {
     try {
+      const tokenBeforeRefresh = await waitForAccessToken(150, ACCESS_TOKEN_WAIT_INTERVAL_MS)
+
+      if (tokenBeforeRefresh) {
+        return tokenBeforeRefresh
+      }
+
       const resolvedToken = await refreshAccessToken()
       return resolvedToken ?? null
     } finally {

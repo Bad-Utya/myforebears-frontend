@@ -18,11 +18,11 @@ withDefaults(defineProps<{
     :class="compact ? 'p-5' : 'p-8 text-center'"
   >
     <div class="mx-auto space-y-4" :class="compact ? 'max-w-none' : 'max-w-md'">
-      <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-muted">
+      <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-muted" v-if="!compact">
         <UIcon name="i-lucide-user-round-plus" class="size-7 text-muted" />
       </div>
 
-      <div class="space-y-2" :class="compact ? 'text-left' : ''">
+      <div class="space-y-2" :class="compact ? 'text-left' : ''" v-if="!compact">
         <h2 class="text-xl font-semibold">{{ title }}</h2>
         <p class="text-sm text-muted">
           {{ description }}

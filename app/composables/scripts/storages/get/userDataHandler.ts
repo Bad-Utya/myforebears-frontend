@@ -17,7 +17,9 @@ export default function useUserDataHandler() {
 
     return {
       id: user?.id,
+      email: user?.email,
       nickname: user?.nickname,
+      created_at_unix: user?.created_at_unix,
     } satisfies UserData;
   }
 
@@ -30,7 +32,6 @@ export default function useUserDataHandler() {
       const avatarBlob = await sendGetUserAvatarRequest(baseData.id);
       baseData.avatarUrl = URL.createObjectURL(avatarBlob);
     } catch {
-      // todo wth
       // ignore avatar errors
     }
   }

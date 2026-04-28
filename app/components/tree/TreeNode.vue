@@ -8,14 +8,16 @@ import type PersonDTO from '~/composables/scripts/familytree/dtos/inner/PersonDT
 import AddChildRequest from '~/composables/scripts/familytree/dtos/requests/AddChildRequest'
 import AddParentRequest from '~/composables/scripts/familytree/dtos/requests/AddParentRequest'
 import AddPartnerRequest from '~/composables/scripts/familytree/dtos/requests/AddPartnerRequest'
+import sendUpdatePersonGenderRequest from '~/composables/scripts/familytree/updatePersonGender'
+import sendUpdatePersonNameRequest from '~/composables/scripts/familytree/updatePersonName'
 import sendGetPersonAvatarRequest from '~/composables/scripts/photos/getPersonAvatar'
 import sendUploadPersonAvatarRequest from '~/composables/scripts/photos/uploadPersonAvatar'
-import sendUpdatePersonNameRequest from '~/composables/scripts/familytree/updatePersonName'
 import { getTreePersonId } from '~/composables/scripts/tree/resolveTreeRootPersonId'
 import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
 
 type ParentRole = 'FATHER' | 'MOTHER'
 type ChildGender = 'MALE' | 'FEMALE'
+type EditableGender = 'MALE' | 'FEMALE' | null
 type CreateActionType = 'child' | 'parent' | 'partner' | null
 
 const props = defineProps<{
@@ -54,6 +56,7 @@ const avatarReloadKey = ref(0)
 const firstName = ref('')
 const lastName = ref('')
 const patronymic = ref('')
+const selectedGender = ref<EditableGender>(null)
 const createFirstName = ref('')
 const createLastName = ref('')
 const createPatronymic = ref('')
@@ -150,6 +153,19 @@ const selectedParentRoleLabel = computed(() => {
   return selectedParentRole.value === 'FATHER' ? 'Father' : 'Mother'
 })
 
+function normalizeEditableGender(gender?: string): EditableGender {
+  switch (gender) {
+    case 'GENDER_MALE':
+    case 'MALE':
+      return 'MALE'
+    case 'GENDER_FEMALE':
+    case 'FEMALE':
+      return 'FEMALE'
+    default:
+      return null
+  }
+}
+
 function revokeAvatarSourceUrl() {
   if (!avatarSourceUrl.value?.startsWith('blob:')) {
     return
@@ -206,6 +222,7 @@ function syncForm() {
   firstName.value = props.person.first_name ?? ''
   lastName.value = props.person.last_name ?? ''
   patronymic.value = props.person.patronymic ?? ''
+  selectedGender.value = normalizeEditableGender(props.person.gender)
 }
 
 function resetCreateForm() {
@@ -262,9 +279,11 @@ async function savePerson() {
   isSaving.value = true
 
   try {
+    const currentGender = normalizeEditableGender(props.person.gender)
     const hasNameChanges = firstName.value !== (props.person.first_name ?? '')
       || lastName.value !== (props.person.last_name ?? '')
       || patronymic.value !== (props.person.patronymic ?? '')
+    const hasGenderChanges = selectedGender.value !== null && selectedGender.value !== currentGender
     const avatarFile = await buildAvatarFile()
     let updatedPerson = props.person
 
@@ -275,6 +294,15 @@ async function savePerson() {
         firstName.value,
         lastName.value,
         patronymic.value
+      )
+      updatedPerson = response.data?.person ?? updatedPerson
+    }
+
+    if (hasGenderChanges && selectedGender.value) {
+      const response = await sendUpdatePersonGenderRequest(
+        props.treeId,
+        personId.value,
+        selectedGender.value
       )
       updatedPerson = response.data?.person ?? updatedPerson
     }
@@ -570,6 +598,32 @@ onBeforeUnmount(() => {
             placeholder="Patronymic"
           />
 
+          <div class="space-y-2">
+            <p class="tree-node__info-label">
+              Gender
+            </p>
+            <div class="inline-flex rounded-full border border-default p-1">
+              <UButton
+                type="button"
+                size="xs"
+                color="neutral"
+                :variant="selectedGender === 'MALE' ? 'soft' : 'ghost'"
+                @click="selectedGender = 'MALE'"
+              >
+                Male
+              </UButton>
+              <UButton
+                type="button"
+                size="xs"
+                color="neutral"
+                :variant="selectedGender === 'FEMALE' ? 'soft' : 'ghost'"
+                @click="selectedGender = 'FEMALE'"
+              >
+                Female
+              </UButton>
+            </div>
+          </div>
+
           <div class="space-y-3 rounded-2xl border border-default bg-default/60 p-4">
             <div class="flex items-center justify-between gap-3">
               <div>
@@ -709,6 +763,7 @@ onBeforeUnmount(() => {
           </p>
           <div class="inline-flex rounded-full border border-default p-1">
             <UButton
+              type="button"
               size="xs"
               color="neutral"
               :variant="selectedChildGender === 'MALE' ? 'soft' : 'ghost'"
@@ -717,6 +772,7 @@ onBeforeUnmount(() => {
               Male
             </UButton>
             <UButton
+              type="button"
               size="xs"
               color="neutral"
               :variant="selectedChildGender === 'FEMALE' ? 'soft' : 'ghost'"
@@ -736,6 +792,7 @@ onBeforeUnmount(() => {
           </p>
           <div class="inline-flex rounded-full border border-default p-1">
             <UButton
+              type="button"
               v-for="role in props.availableParentRoles"
               :key="role"
               size="xs"

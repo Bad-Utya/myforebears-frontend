@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import AvatarCropper from '~/components/common/AvatarCropper.vue'
+import ApiRequestError from '~/composables/scripts/api/ApiRequestError'
 import sendCreateTreeRequest from '~/composables/scripts/familytree/createTree'
 import sendImportGedcomRequest from '~/composables/scripts/familytree/importGedcom'
 import sendUpdateTreeSettingsRequest from '~/composables/scripts/familytree/updateTreeSettings'
-import sendUploadPersonAvatarRequest from '~/composables/scripts/photos/uploadPersonAvatar'
+import sendUploadTreeAvatarRequest from '~/composables/scripts/photos/uploadTreeAvatar'
 import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
-import ApiRequestError from "~/composables/scripts/api/ApiRequestError";
 
 type TreeActionMode = 'create' | 'import'
 
@@ -63,7 +63,7 @@ async function buildAvatarFile() {
     return null
   }
 
-  return await avatarCropper.value.exportFile('tree-root-avatar.png', 512)
+  return await avatarCropper.value.exportFile('tree-avatar.png', 512)
 }
 
 function resetForm() {
@@ -93,9 +93,7 @@ async function createTree() {
   try {
     const response = await sendCreateTreeRequest()
     const createdTree = response.data?.tree
-    const rootPerson = response.data?.root_person
     const treeId = createdTree?.id ?? createdTree?.tree_id
-    const rootPersonId = rootPerson?.id ?? rootPerson?.person_id
 
     if (!treeId) {
       throw new ApiRequestError('tree_not_found', 'Created tree id is missing')
@@ -110,8 +108,8 @@ async function createTree() {
 
     const avatarFile = await buildAvatarFile()
 
-    if (avatarFile && rootPersonId) {
-      await sendUploadPersonAvatarRequest(treeId, rootPersonId, avatarFile)
+    if (avatarFile) {
+      await sendUploadTreeAvatarRequest(treeId, avatarFile)
     }
 
     toast.add({
@@ -268,10 +266,10 @@ onBeforeUnmount(() => {
                 <div class="flex items-center justify-between gap-3">
                   <div>
                     <p class="text-sm font-medium text-highlighted">
-                      Root person avatar
+                      Tree avatar
                     </p>
                     <p class="text-xs text-muted">
-                      Upload and crop the main avatar for the first person in this tree.
+                      Upload and crop the main image for this tree.
                     </p>
                   </div>
 
@@ -298,16 +296,17 @@ onBeforeUnmount(() => {
                   class="space-y-3"
                 >
                   <div
-                    class="tree-avatar-cropper rounded-2xl border border-default bg-elevated/70 p-3"
+                    class="tree-avatar-cropper mx-auto overflow-hidden rounded-4xl border border-default bg-elevated/70"
                   >
                     <AvatarCropper
                       ref="avatarCropper"
                       :src="avatarSourceUrl"
-                      class="mx-auto block max-h-72 w-full object-contain"
+                      :aspect-ratio="3 / 4"
+                      class="mx-auto block h-full w-full object-contain"
                     />
                   </div>
                   <p class="text-xs text-muted">
-                    Avatar will be cropped to a square before upload.
+                    Avatar will be cropped to the same portrait ratio used in tree cards.
                   </p>
                 </div>
 
@@ -377,7 +376,8 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .tree-avatar-cropper {
-  min-height: 18rem;
+  width: min(100%, 15rem);
+  aspect-ratio: 3 / 4;
 }
 
 .tree-avatar-cropper :deep(.vue-advanced-cropper) {

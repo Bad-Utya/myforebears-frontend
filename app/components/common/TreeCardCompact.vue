@@ -13,7 +13,6 @@ const props = withDefaults(defineProps<{
 }>(), {
   pending: false,
 });
-
 </script>
 
 <template>
@@ -21,7 +20,7 @@ const props = withDefaults(defineProps<{
     v-if="props.pending"
     class="relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40"
   >
-    <div class="relative flex-none w-23 h-23 rounded-xl overflow-hidden">
+    <div class="relative flex-none w-20 overflow-hidden rounded-4xl aspect-3/4 bg-muted">
       <USkeleton class="absolute inset-0" />
     </div>
 
@@ -39,19 +38,21 @@ const props = withDefaults(defineProps<{
     :to="props.href"
     class="group relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40 hover:bg-neutral/55 transition-colors"
   >
-    <div class="relative flex-none w-23 h-23 rounded-xl overflow-hidden bg-muted">
+    <div class="relative flex-none w-20 overflow-hidden rounded-4xl aspect-3/4 bg-muted">
       <TreeCardCover
         v-if="!props.avatar"
         :seed="props.coverSeed ?? props.title"
-        class="absolute inset-0"
+        :scale="0.5"
+        class="absolute inset-0 transition-transform duration-300"
       />
       <img
         v-if="props.avatar"
         :src="props.avatar"
         :alt="props.title"
-        class="w-full h-full object-cover"
+        class="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
         loading="lazy"
       />
+      <div class="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
     </div>
 
     <div class="min-w-0 flex flex-col justify-between py-0.5">

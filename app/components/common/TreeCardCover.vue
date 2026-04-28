@@ -4,9 +4,10 @@ import createTreeCardCover from "~/composables/scripts/ui/createTreeCardCover";
 const props = defineProps<{
   seed?: string;
   class?: string;
+  scale?: number;
 }>();
 
-const cover = computed(() => createTreeCardCover(props.seed));
+const cover = computed(() => createTreeCardCover(props.seed, props.scale));
 </script>
 
 <template>

@@ -11,7 +11,8 @@ import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
 import type {GetUserInfoResponse} from "~/composables/scripts/users/dtos/responses/GetUserInfoResponse";
 import type {ListTreesResponse} from "~/composables/scripts/familytree/dtos/responses/ListTreesResponse";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
-import mapTreeToTreeCardItem, {type TreeCardItem} from "~/composables/scripts/ui/mapTreeToTreeCardItem";
+import {loadTreeCardItems, revokeTreeCardItems} from "~/composables/scripts/ui/loadTreeCardItems";
+import type {TreeCardItem} from "~/composables/scripts/ui/mapTreeToTreeCardItem";
 
 const route = useRoute();
 const {userData, ensureLoaded} = useUserDataHandler();
@@ -32,24 +33,53 @@ const isOwnProfile = computed(() => {
   return typeof userId.value === 'number' && userId.value === userData.value?.id;
 });
 
+const registeredLabel = computed(() => {
+  if (!createdAtUnix.value) {
+    return 'Registration date unavailable';
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(createdAtUnix.value * 1000);
+});
+
 const profilePending = ref(true);
 const treesPending = ref(true);
 const nickname = ref('User');
+const createdAtUnix = ref<number | undefined>(undefined);
 const avatarUrl = ref<string | null>(null);
 const treeItems = ref<TreeCardItem[]>([]);
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(nickname.value, userId.value));
 const treesTitle = computed(() => isOwnProfile.value ? 'All Trees' : 'Public Trees');
+
+function revokeProfileAvatarUrl() {
+  if (avatarUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(avatarUrl.value);
+  }
+}
+
+function replaceTreeItems(nextItems: TreeCardItem[]) {
+  revokeTreeCardItems(treeItems.value);
+  treeItems.value = nextItems;
+}
 
 async function loadUserProfile(targetUserId: number) {
   const response = await sendGetUserInfoRequest(targetUserId) as DataDTO<GetUserInfoResponse>;
   const user = response.data?.user;
 
   nickname.value = user?.nickname ?? `User ${targetUserId}`;
+  createdAtUnix.value = user?.created_at_unix;
 
   try {
     const avatarBlob = await sendGetUserAvatarRequest(targetUserId);
-    avatarUrl.value = URL.createObjectURL(avatarBlob);
+    const nextAvatarUrl = URL.createObjectURL(avatarBlob);
+
+    revokeProfileAvatarUrl();
+    avatarUrl.value = nextAvatarUrl;
   } catch {
+    revokeProfileAvatarUrl();
     avatarUrl.value = null;
   }
 }
@@ -62,7 +92,7 @@ async function loadTrees(targetUserId: number) {
   ) as DataDTO<ListTreesResponse>;
   const trees = Array.isArray(response.data?.trees) ? response.data.trees : [];
 
-  treeItems.value = trees.map(mapTreeToTreeCardItem);
+  replaceTreeItems(await loadTreeCardItems(trees));
 }
 
 onMounted(async () => {
@@ -95,9 +125,8 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  if (avatarUrl.value?.startsWith('blob:')) {
-    URL.revokeObjectURL(avatarUrl.value);
-  }
+  revokeProfileAvatarUrl();
+  revokeTreeCardItems(treeItems.value);
 });
 </script>
 
@@ -142,7 +171,7 @@ onBeforeUnmount(() => {
                 />
               </div>
               <p class="text-sm text-toned">
-                Registered on April 26, 2026
+                Registered on {{ registeredLabel }}
               </p>
             </div>
           </div>

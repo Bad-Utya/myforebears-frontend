@@ -119,19 +119,25 @@ export async function sendAsyncDefaultFetchRequest<TRequest extends IApiRequest,
     try {
       data = await executeDefaultFetchRequest<TFetchResponse>(path, type, requestOptions)
     } catch (error) {
+
       const apiError = error instanceof ApiRequestError
         ? error
-        : ApiRequestError.createFromFetchError(error as IFetchError<FetchErrorData>)
+        : ApiRequestError.createFromFetchError(error as IFetchError<FetchErrorData>);
+
+      console.log(error);
+      console.log(shouldTryRefresh(path, apiError, hasRetried));
 
       if (shouldTryRefresh(path, apiError, hasRetried)) {
-        const refreshedAccessToken = await refreshAccessToken()
+        const refreshedAccessToken = await refreshAccessToken();
+
+        console.log(refreshedAccessToken);
 
         if (refreshedAccessToken) {
-          return run(true)
+          return run(true);
         }
       }
 
-      throw apiError
+      throw apiError;
     }
 
     if (!data || data.data === null || data.data === undefined) {

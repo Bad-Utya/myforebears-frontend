@@ -20,6 +20,19 @@ const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
 const isPageLoading = computed(() => pending.value || !initialized.value)
 const isGuest = computed(() => initialized.value && !userData.value)
 const displayName = computed(() => userData.value?.nickname ?? 'User')
+const registeredLabel = computed(() => {
+  const createdAtUnix = userData.value?.created_at_unix
+
+  if (!createdAtUnix) {
+    return 'Registration date unavailable'
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(createdAtUnix * 1000)
+})
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id))
 
 const nicknameModalOpen = ref(false)
@@ -271,6 +284,12 @@ onBeforeUnmount(() => {
                 </p>
                 <p class="truncate font-semibold text-highlighted">
                   {{ userData?.nickname ?? 'No nickname yet' }}
+                </p>
+                <p class="truncate text-sm text-muted">
+                  {{ userData?.email ?? 'Email unavailable' }}
+                </p>
+                <p class="truncate text-xs text-muted">
+                  Joined {{ registeredLabel }}
                 </p>
               </div>
             </section>

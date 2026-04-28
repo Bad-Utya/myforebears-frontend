@@ -3,9 +3,12 @@ import { Cropper, RectangleStencil } from 'vue-advanced-cropper'
 import type { CropperResult } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   src: string
-}>()
+  aspectRatio?: number
+}>(), {
+  aspectRatio: 1,
+})
 
 type CropperInstance = {
   getResult: () => CropperResult
@@ -16,11 +19,15 @@ const cropper = ref<CropperInstance | null>(null)
 
 function defaultSize({ visibleArea, imageSize }: { visibleArea?: { width: number; height: number } | null; imageSize: { width: number; height: number } }) {
   const area = visibleArea ?? imageSize
-  const side = Math.min(area.width, area.height) * 0.85
+  const maxWidth = area.width * 0.85
+  const maxHeight = area.height * 0.85
+  const maxHeightFromWidth = maxWidth / props.aspectRatio
+  const height = Math.min(maxHeight, maxHeightFromWidth)
+  const width = height * props.aspectRatio
 
   return {
-    width: side,
-    height: side,
+    width,
+    height,
   }
 }
 
@@ -29,12 +36,12 @@ function getCanvas(size = 512) {
   const canvas = result?.canvas
 
   if (!canvas) {
-    throw new Error('Cropper result is unavailable')
+    throw new Error('Avatar export failed')
   }
 
   const output = document.createElement('canvas')
   output.width = size
-  output.height = size
+  output.height = Math.round(size / props.aspectRatio)
 
   const context = output.getContext('2d')
 
@@ -42,8 +49,8 @@ function getCanvas(size = 512) {
     throw new Error('Canvas context is unavailable')
   }
 
-  context.clearRect(0, 0, size, size)
-  context.drawImage(canvas, 0, 0, size, size)
+  context.clearRect(0, 0, output.width, output.height)
+  context.drawImage(canvas, 0, 0, output.width, output.height)
 
   return output
 }
@@ -92,7 +99,7 @@ defineExpose({
     :auto-zoom="true"
     image-restriction="stencil"
     :stencil-component="RectangleStencil"
-    :stencil-props="{ aspectRatio: 1 }"
+    :stencil-props="{ aspectRatio: props.aspectRatio }"
     :default-size="defaultSize"
   />
 </template>

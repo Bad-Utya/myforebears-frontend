@@ -18,6 +18,20 @@ const isLogoutModalOpen = ref(false);
 const shouldLogoutAll = ref(false);
 const isLogoutPending = ref(false);
 
+const registeredLabel = computed(() => {
+  const createdAtUnix = userData.value?.created_at_unix;
+
+  if (!createdAtUnix) {
+    return 'Registration date unavailable';
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(createdAtUnix * 1000);
+});
+
 const dropdownItems = computed(() => [[
   {
     label: 'My profile',
@@ -81,7 +95,6 @@ onMounted(async () => {
 });
 </script>
 
-// https://ui.nuxt.com/docs/components/sidebar
 <template>
   <div class="w-full">
     <div v-if="isLoading" class="flex items-center gap-4">
@@ -95,8 +108,7 @@ onMounted(async () => {
     <CreateAccountSuggestion
       v-else-if="isGuest"
       compact
-      title="Continue with an account"
-      description="Sign up to save your trees, manage your profile, and return to your data later."
+      title="Not logged in"
       button-label="Sign up"
     />
 
@@ -122,7 +134,10 @@ onMounted(async () => {
               {{ displayName }}
             </span>
             <span class="text-sm text-muted truncate">
-              {{ userData?.email ?? 'example@gmail.com' }}
+              {{ userData?.email ?? 'Email unavailable' }}
+            </span>
+            <span class="text-xs text-muted truncate">
+              Joined {{ registeredLabel }}
             </span>
           </span>
         </UButton>

@@ -5,12 +5,18 @@ import sendListRandomPublicTreesRequest from "~/composables/scripts/familytree/l
 import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
 import type {ListTreesResponse} from "~/composables/scripts/familytree/dtos/responses/ListTreesResponse";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
-import mapTreeToTreeCardItem, {type TreeCardItem} from "~/composables/scripts/ui/mapTreeToTreeCardItem";
+import {loadTreeCardItems, revokeTreeCardItems} from "~/composables/scripts/ui/loadTreeCardItems";
+import type {TreeCardItem} from "~/composables/scripts/ui/mapTreeToTreeCardItem";
 
 const pending = ref(true);
 const items = ref<TreeCardItem[]>([]);
 
 definePageMeta({ middleware: 'auth' })
+
+function replaceItems(nextItems: TreeCardItem[]) {
+  revokeTreeCardItems(items.value);
+  items.value = nextItems;
+}
 
 onMounted(async () => {
   pending.value = true;
@@ -18,13 +24,17 @@ onMounted(async () => {
   try {
     const response = await sendListRandomPublicTreesRequest(10) as DataDTO<ListTreesResponse>;
     const trees = Array.isArray(response.data?.trees) ? response.data.trees : [];
-    items.value = trees.map(mapTreeToTreeCardItem);
+    replaceItems(await loadTreeCardItems(trees));
   } catch (error) {
     showApiErrorToast(error);
-    items.value = [];
+    replaceItems([]);
   } finally {
     pending.value = false;
   }
+});
+
+onBeforeUnmount(() => {
+  revokeTreeCardItems(items.value);
 });
 </script>
 

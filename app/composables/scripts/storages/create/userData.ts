@@ -4,6 +4,7 @@ export type UserData = {
   id?: number;
   email?: string;
   nickname?: string;
+  created_at_unix?: number;
   avatarUrl?: string;
 };
 
