@@ -33,6 +33,7 @@ const treeCanvasRef = ref<InstanceType<typeof TreeCanvas> | null>(null)
 const pending = ref(true)
 const tree = ref<TreeDTO | null>(null)
 const treeName = ref('Tree')
+const treeDescription = ref('')
 const treeAuthorName = ref('')
 const treeAuthorHref = ref<string | undefined>(undefined)
 const rootPerson = ref<PersonDTO>()
@@ -78,6 +79,7 @@ async function loadTreeData() {
 
   tree.value = treeDto ?? null
   treeName.value = treeDto?.name ?? treeDto?.title ?? `Tree ${treeId.value}`
+  treeDescription.value = treeDto?.description?.trim() ?? ''
   treeCreatorId.value = treeDto?.creator_id ?? null
   persons.value = Array.isArray(treeContent?.persons) ? treeContent.persons : []
   relationships.value = Array.isArray(treeContent?.relationships) ? treeContent.relationships : []
@@ -180,6 +182,7 @@ function handlePersonUpdated(updatedPerson: PersonDTO) {
 function handleTreeUpdated(updatedTree: TreeDTO) {
   tree.value = updatedTree
   treeName.value = updatedTree.name ?? updatedTree.title ?? treeName.value
+  treeDescription.value = updatedTree.description?.trim() ?? ''
   treeCreatorId.value = updatedTree.creator_id ?? treeCreatorId.value
   void loadTreeAuthor()
 }
@@ -222,6 +225,7 @@ onMounted(async () => {
         ref="treeCanvasRef"
         :tree-id="treeId ?? ''"
         :tree-name="treeName"
+        :tree-description="treeDescription"
         :tree-author-name="treeAuthorName"
         :tree-author-href="treeAuthorHref"
         :nodes="layout.nodes"

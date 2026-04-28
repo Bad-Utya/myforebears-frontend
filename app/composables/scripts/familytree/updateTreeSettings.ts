@@ -10,7 +10,8 @@ export default async function sendUpdateTreeSettingsRequest(
   treeId: string,
   isPublicOnMainPage: boolean,
   isViewRestricted: boolean,
-  name?: string
+  name?: string,
+  description?: string
 ) {
-  return sendUpdateTreeSettingsConverted(treeId, new UpdateTreeSettingsRequest(name, isPublicOnMainPage, isViewRestricted));
+  return sendUpdateTreeSettingsConverted(treeId, new UpdateTreeSettingsRequest(name, description, isPublicOnMainPage, isViewRestricted));
 }

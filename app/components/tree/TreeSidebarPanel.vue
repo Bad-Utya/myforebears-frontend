@@ -65,6 +65,7 @@ const eventTypes = ref<EventTypeDTO[]>([])
 const isEventsLoading = ref(false)
 
 const treeName = ref('')
+const treeDescription = ref('')
 const isPublicOnMainPage = ref(false)
 const isViewRestricted = ref(false)
 const accessEmail = ref('')
@@ -330,6 +331,7 @@ const positionedTimelineEvents = computed(() => {
 
 function syncTreeSettings() {
   treeName.value = props.tree?.name ?? props.tree?.title ?? ''
+  treeDescription.value = props.tree?.description ?? ''
   isPublicOnMainPage.value = Boolean(props.tree?.is_public_on_main_page)
   isViewRestricted.value = Boolean(props.tree?.is_view_restricted)
 }
@@ -644,7 +646,8 @@ async function saveTreeSettings() {
       props.treeId,
       isPublicOnMainPage.value,
       isViewRestricted.value,
-      treeName.value.trim() || undefined
+      treeName.value.trim() || undefined,
+      treeDescription.value.trim() || undefined
     ) as DataDTO<UpdateTreeSettingsResponse>
 
     const avatarFile = await buildAvatarFile()
@@ -928,7 +931,7 @@ onBeforeUnmount(() => {
             General
           </p>
           <p class="mt-1 text-xs text-muted">
-            Update tree name and visibility flags.
+            Update tree name, description and visibility flags.
           </p>
         </div>
 
@@ -938,6 +941,16 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="Tree name"
+            :disabled="!editable"
+          />
+
+          <UTextarea
+            v-model="treeDescription"
+            :rows="4"
+            autoresize
+            color="neutral"
+            variant="subtle"
+            placeholder="Tree description"
             :disabled="!editable"
           />
 

@@ -6,6 +6,6 @@ export async function sendCreateTreeConverted(request: CreateTreeRequest) {
   return sendAsyncDefaultFetchRequest('familytree/', request, new CreateTreeResponseFactory(), 'POST');
 }
 
-export default async function sendCreateTreeRequest() {
-  return sendCreateTreeConverted(new CreateTreeRequest());
+export default async function sendCreateTreeRequest(name?: string, description?: string) {
+  return sendCreateTreeConverted(new CreateTreeRequest(name, description));
 }

@@ -8,6 +8,7 @@ export default interface TreeDTO {
   root_person_id?: string
   name?: string
   title?: string
+  description?: string
   node_count?: number
   is_public_on_main_page?: boolean
   is_view_restricted?: boolean

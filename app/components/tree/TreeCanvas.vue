@@ -23,6 +23,7 @@ const SCALE_STEP = 0.12
 const props = defineProps<{
   treeId: string
   treeName: string
+  treeDescription?: string
   treeAuthorName?: string
   treeAuthorHref?: string
   nodes: TreeVisualNode[]
@@ -400,6 +401,9 @@ onBeforeUnmount(() => {
       <template v-else>
         <p class="text-sm font-semibold text-highlighted">
           {{ treeName }}
+        </p>
+        <p v-if="props.treeDescription?.trim()" class="mt-2 line-clamp-3 text-xs text-toned">
+          {{ props.treeDescription }}
         </p>
         <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
           <span>Author</span>

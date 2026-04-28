@@ -3,7 +3,6 @@ import AvatarCropper from '~/components/common/AvatarCropper.vue'
 import ApiRequestError from '~/composables/scripts/api/ApiRequestError'
 import sendCreateTreeRequest from '~/composables/scripts/familytree/createTree'
 import sendImportGedcomRequest from '~/composables/scripts/familytree/importGedcom'
-import sendUpdateTreeSettingsRequest from '~/composables/scripts/familytree/updateTreeSettings'
 import sendUploadTreeAvatarRequest from '~/composables/scripts/photos/uploadTreeAvatar'
 import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
 
@@ -18,6 +17,7 @@ const modalOpen = ref(false)
 const mode = ref<TreeActionMode>('create')
 const pending = ref(false)
 const treeName = ref('')
+const treeDescription = ref('')
 const gedcomContent = ref('')
 const selectedFileName = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -68,6 +68,7 @@ async function buildAvatarFile() {
 
 function resetForm() {
   treeName.value = ''
+  treeDescription.value = ''
   gedcomContent.value = ''
   selectedFileName.value = ''
   resetAvatarEditor()
@@ -91,20 +92,16 @@ async function createTree() {
   pending.value = true
 
   try {
-    const response = await sendCreateTreeRequest()
+    const response = await sendCreateTreeRequest(
+      treeName.value.trim(),
+      treeDescription.value.trim() || undefined
+    )
     const createdTree = response.data?.tree
     const treeId = createdTree?.id ?? createdTree?.tree_id
 
     if (!treeId) {
       throw new ApiRequestError('tree_not_found', 'Created tree id is missing')
     }
-
-    await sendUpdateTreeSettingsRequest(
-      treeId,
-      createdTree?.is_public_on_main_page ?? false,
-      createdTree?.is_view_restricted ?? false,
-      treeName.value.trim()
-    )
 
     const avatarFile = await buildAvatarFile()
 
@@ -259,6 +256,17 @@ onBeforeUnmount(() => {
                   v-model="treeName"
                   placeholder="My family tree"
                   size="lg"
+                />
+              </UFormField>
+
+              <UFormField
+                label="Description"
+              >
+                <UTextarea
+                  v-model="treeDescription"
+                  :rows="4"
+                  autoresize
+                  placeholder="What this tree is about"
                 />
               </UFormField>
 

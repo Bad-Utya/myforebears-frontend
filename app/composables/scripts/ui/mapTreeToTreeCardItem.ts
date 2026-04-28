@@ -22,12 +22,13 @@ export function getTreeCardTitle(tree: TreeDTO, index: number) {
 export default function mapTreeToTreeCardItem(tree: TreeDTO, index: number): TreeCardItem {
   const id = getTreeCardId(tree, index);
   const author = tree.creator_nickname?.trim();
+  const description = tree.description?.trim();
 
   return {
     id,
     title: getTreeCardTitle(tree, index),
     author: author || undefined,
-    description: 'Lorem ipsum, lenivets danya!',
+    description: description || undefined,
     avatar: '',
     coverSeed: id,
     href: `/trees/${id}/main`,
