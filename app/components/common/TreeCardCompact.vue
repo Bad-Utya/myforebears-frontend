@@ -58,7 +58,7 @@ const props = withDefaults(defineProps<{
     <div class="min-w-0 flex flex-col justify-between py-0.5">
       <div class="min-w-0">
         <p class="text-sm font-semibold text-highlighted truncate">{{ props.title }}</p>
-        <p class="text-xs text-muted mt-0.5 truncate">By {{ props.author ?? 'username' }}</p>
+        <p v-if="props.author?.trim()" class="text-xs text-muted mt-0.5 truncate">By {{ props.author }}</p>
         <p v-if="props.description" class="text-xs text-toned mt-2 line-clamp-2 max-h-10 overflow-hidden">
           {{ props.description }}
         </p>

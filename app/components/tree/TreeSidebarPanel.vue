@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AvatarCropper from '~/components/common/AvatarCropper.vue'
 import sendCreateEventTypeRequest from '~/composables/scripts/eventTypes/createEventType'
 import sendDeleteEventTypeRequest from '~/composables/scripts/eventTypes/deleteEventType'
 import type EventTypeDTO from '~/composables/scripts/eventTypes/dtos/inner/EventTypeDTO'
@@ -22,6 +23,8 @@ import type { ListTreeAccessEmailsResponse } from '~/composables/scripts/familyt
 import type { UpdateTreeSettingsResponse } from '~/composables/scripts/familytree/dtos/responses/UpdateTreeSettingsResponse'
 import sendListTreeAccessEmailsRequest from '~/composables/scripts/familytree/listTreeAccessEmails'
 import sendUpdateTreeSettingsRequest from '~/composables/scripts/familytree/updateTreeSettings'
+import sendGetTreeAvatarRequest from '~/composables/scripts/photos/getTreeAvatar'
+import sendUploadTreeAvatarRequest from '~/composables/scripts/photos/uploadTreeAvatar'
 import { getTreePersonId } from '~/composables/scripts/tree/resolveTreeRootPersonId'
 import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
 
@@ -52,6 +55,10 @@ const isSettingsSaving = ref(false)
 const isDeletingTree = ref(false)
 const accessEmailPending = ref(false)
 const accessEmails = ref<string[]>([])
+const avatarFileInput = ref<HTMLInputElement | null>(null)
+const avatarCropper = ref<{ exportFile: (fileName?: string, size?: number) => Promise<File> } | null>(null)
+const avatarSourceUrl = ref<string | null>(null)
+const avatarChanged = ref(false)
 
 const events = ref<EventDTO[]>([])
 const eventTypes = ref<EventTypeDTO[]>([])
@@ -327,6 +334,68 @@ function syncTreeSettings() {
   isViewRestricted.value = Boolean(props.tree?.is_view_restricted)
 }
 
+function revokeAvatarSourceUrl() {
+  if (!avatarSourceUrl.value?.startsWith('blob:')) {
+    return
+  }
+
+  URL.revokeObjectURL(avatarSourceUrl.value)
+}
+
+function resetAvatarInput() {
+  if (avatarFileInput.value) {
+    avatarFileInput.value.value = ''
+  }
+}
+
+async function loadTreeAvatar() {
+  revokeAvatarSourceUrl()
+  avatarSourceUrl.value = null
+  avatarChanged.value = false
+  resetAvatarInput()
+
+  if (!props.treeId) {
+    return
+  }
+
+  try {
+    const avatarBlob = await sendGetTreeAvatarRequest(props.treeId)
+    avatarSourceUrl.value = URL.createObjectURL(avatarBlob)
+  } catch {
+    avatarSourceUrl.value = null
+  }
+}
+
+async function handleAvatarFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+
+  if (!file) {
+    return
+  }
+
+  if (!file.type.startsWith('image/')) {
+    toast.add({
+      title: 'Please choose an image file',
+      color: 'error'
+    })
+    input.value = ''
+    return
+  }
+
+  revokeAvatarSourceUrl()
+  avatarSourceUrl.value = URL.createObjectURL(file)
+  avatarChanged.value = true
+}
+
+async function buildAvatarFile() {
+  if (!avatarChanged.value || !avatarCropper.value) {
+    return null
+  }
+
+  return await avatarCropper.value.exportFile('tree-avatar.png', 512)
+}
+
 function resetEventForm() {
   editingEventId.value = ''
   selectedEventTypeId.value = eventTypes.value[0]?.id ?? ''
@@ -578,6 +647,15 @@ async function saveTreeSettings() {
       treeName.value.trim() || undefined
     ) as DataDTO<UpdateTreeSettingsResponse>
 
+    const avatarFile = await buildAvatarFile()
+
+    if (avatarFile) {
+      await sendUploadTreeAvatarRequest(props.treeId, avatarFile)
+      avatarChanged.value = false
+    }
+
+    await loadTreeAvatar()
+
     const updatedTree = response.data?.tree
 
     if (updatedTree) {
@@ -782,6 +860,7 @@ watch(
   () => props.treeId,
   async () => {
     await Promise.all([
+      loadTreeAvatar(),
       loadAccessEmails(),
       loadEventsData()
     ])
@@ -790,11 +869,29 @@ watch(
 )
 
 watch(
+  () => props.section,
+  async (section) => {
+    if (section !== 'settings') {
+      return
+    }
+
+    await Promise.all([
+      loadTreeAvatar(),
+      loadAccessEmails()
+    ])
+  }
+)
+
+watch(
   () => [timelineDateFrom.value, timelineDateTo.value, timelinePersonIds.value.join(','), events.value.length],
   () => {
     timelineWindowStart.value = 0
   }
 )
+
+onBeforeUnmount(() => {
+  revokeAvatarSourceUrl()
+})
 </script>
 
 <template>
@@ -855,6 +952,61 @@ watch(
             label="Restricted view"
             :disabled="!editable"
           />
+
+          <div class="space-y-3 rounded-2xl border border-default bg-default/60 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-medium text-highlighted">
+                  Tree avatar
+                </p>
+                <p class="text-xs text-muted">
+                  Upload and crop the cover image used in tree cards.
+                </p>
+              </div>
+
+              <UButton
+                type="button"
+                color="neutral"
+                variant="outline"
+                :disabled="!editable"
+                @click="avatarFileInput?.click()"
+              >
+                Choose image
+              </UButton>
+            </div>
+
+            <input
+              ref="avatarFileInput"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleAvatarFileChange"
+            >
+
+            <div
+              v-if="avatarSourceUrl"
+              class="space-y-3"
+            >
+              <div class="tree-avatar-cropper mx-auto overflow-hidden rounded-4xl border border-default bg-elevated/70">
+                <AvatarCropper
+                  ref="avatarCropper"
+                  :src="avatarSourceUrl"
+                  :aspect-ratio="3 / 4"
+                  class="mx-auto block h-full w-full object-contain"
+                />
+              </div>
+              <p class="text-xs text-muted">
+                Avatar will be cropped to the same portrait ratio used in tree cards.
+              </p>
+            </div>
+
+            <p
+              v-else
+              class="text-sm text-muted"
+            >
+              Avatar is optional. Upload one to show it in tree cards.
+            </p>
+          </div>
 
           <UButton
             color="neutral"
@@ -1474,6 +1626,17 @@ watch(
 </template>
 
 <style scoped>
+.tree-avatar-cropper {
+  width: 100%;
+  min-height: 20rem;
+  max-height: 28rem;
+}
+
+.tree-avatar-cropper :deep(.vue-advanced-cropper) {
+  height: 100%;
+  min-height: 20rem;
+}
+
 .timeline-list {
   position: relative;
 }

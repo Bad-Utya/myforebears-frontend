@@ -10,7 +10,7 @@ import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
 const userDataStore = useUserDataStore();
-const displayName = computed(() => userData.value?.nickname ?? userData.value?.email ?? 'Unknown user');
+const displayName = computed(() => userData.value?.nickname?.trim() || 'Unknown user');
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id));
 const isLoading = computed(() => pending.value || !initialized.value);
 const isGuest = computed(() => initialized.value && !userData.value);
@@ -132,9 +132,6 @@ onMounted(async () => {
           <span class="min-w-0 flex flex-col items-start">
             <span class="text-sm font-semibold text-highlighted truncate">
               {{ displayName }}
-            </span>
-            <span class="text-sm text-muted truncate">
-              {{ userData?.email ?? 'Email unavailable' }}
             </span>
             <span class="text-xs text-muted truncate">
               Joined {{ registeredLabel }}

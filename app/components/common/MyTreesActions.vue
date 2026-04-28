@@ -376,11 +376,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .tree-avatar-cropper {
-  width: min(100%, 15rem);
-  aspect-ratio: 3 / 4;
+  width: 100%;
+  min-height: 20rem;
+  max-height: 28rem;
 }
 
 .tree-avatar-cropper :deep(.vue-advanced-cropper) {
-  min-height: 18rem;
+  height: 100%;
+  min-height: 20rem;
 }
 </style>
