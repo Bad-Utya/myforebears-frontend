@@ -16,15 +16,22 @@ type TreeNodeExpose = {
   ) => void
 }
 
+const MIN_SCALE = 0.34
+const MAX_SCALE = 1.6
+const SCALE_STEP = 0.12
+
 const props = defineProps<{
   treeId: string
   treeName: string
+  treeAuthorName?: string
+  treeAuthorHref?: string
   nodes: TreeVisualNode[]
   connections: TreeVisualConnection[]
   relationships: RelationshipDTO[]
   width: number
   height: number
   editable?: boolean
+  pending?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -45,6 +52,7 @@ let resizeObserver: ResizeObserver | undefined
 const treeNodeRefs = new Map<string, TreeNodeExpose>()
 
 const nodeMap = computed(() => new Map(props.nodes.map(node => [node.id, node])))
+const scalePercentLabel = computed(() => `${Math.round(scale.value * 100)}%`)
 
 function isPartnerRelationshipType(type?: string) {
   return typeof type === 'string' && type.includes('PARTNER')
@@ -256,15 +264,41 @@ function fitToView() {
     availableHeight / props.height
   )
 
-  scale.value = Math.max(0.34, nextScale)
+  scale.value = Math.max(MIN_SCALE, Math.min(MAX_SCALE, nextScale))
   translateX.value = (viewportWidth - props.width * scale.value) / 2
   translateY.value = (viewportHeight - props.height * scale.value) / 2
+}
+
+function setScale(nextScale: number) {
+  const viewport = viewportRef.value
+
+  if (!viewport) {
+    return
+  }
+
+  const clampedScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, nextScale))
+  const viewportCenterX = viewport.clientWidth / 2
+  const viewportCenterY = viewport.clientHeight / 2
+  const sceneCenterX = (viewportCenterX - translateX.value) / scale.value
+  const sceneCenterY = (viewportCenterY - translateY.value) / scale.value
+
+  translateX.value = viewportCenterX - sceneCenterX * clampedScale
+  translateY.value = viewportCenterY - sceneCenterY * clampedScale
+  scale.value = clampedScale
+}
+
+function zoomIn() {
+  setScale(scale.value + SCALE_STEP)
+}
+
+function zoomOut() {
+  setScale(scale.value - SCALE_STEP)
 }
 
 function startDragging(event: PointerEvent) {
   const target = event.target as HTMLElement | null
 
-  if (target?.closest('[data-tree-node="true"]')) {
+  if (props.pending || target?.closest('[data-tree-node="true"]')) {
     return
   }
 
@@ -312,7 +346,9 @@ function openNodeActionModal(
 }
 
 defineExpose({
-  fitToView
+  fitToView,
+  zoomIn,
+  zoomOut
 })
 
 watch(
@@ -351,12 +387,35 @@ onBeforeUnmount(() => {
     ref="viewportRef"
     class="tree-canvas relative h-full w-full overflow-hidden"
     :class="{ 'tree-canvas--dragging': isDragging }"
+    :aria-busy="props.pending"
     @pointerdown="startDragging"
   >
-    <div
-      class="tree-canvas__grid absolute inset-0"
-      aria-hidden="true"
-    />
+    <div class="tree-canvas__grid absolute inset-0" aria-hidden="true" />
+
+    <div class="tree-canvas__summary absolute left-5 top-5 z-10 max-w-[min(28rem,calc(100%-8rem))] rounded-2xl border border-default bg-default/92 px-4 py-3 shadow-lg backdrop-blur">
+      <template v-if="props.pending">
+        <USkeleton class="h-5 w-40 rounded" />
+        <USkeleton class="mt-2 h-4 w-28 rounded" />
+      </template>
+      <template v-else>
+        <p class="text-sm font-semibold text-highlighted">
+          {{ treeName }}
+        </p>
+        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+          <span>Author</span>
+          <NuxtLink
+            v-if="props.treeAuthorHref"
+            :to="props.treeAuthorHref"
+            class="font-medium text-primary hover:text-primary/80"
+          >
+            {{ props.treeAuthorName || 'Unknown author' }}
+          </NuxtLink>
+          <span v-else class="font-medium text-highlighted">
+            {{ props.treeAuthorName || 'Unknown author' }}
+          </span>
+        </div>
+      </template>
+    </div>
 
     <div
       v-if="nodes.length > 0"
@@ -441,14 +500,25 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <div
-      v-else
-      class="absolute inset-0 flex items-center justify-center p-6"
-    >
+    <div v-else-if="!props.pending" class="absolute inset-0 flex items-center justify-center p-6">
       <div class="px-6 py-5 text-center">
         <p class="text-sm text-muted">
           No tree content available for {{ treeName }}
         </p>
+      </div>
+    </div>
+
+    <div class="tree-canvas__controls absolute bottom-5 right-5 z-10 flex items-center gap-2 rounded-2xl border border-default bg-default/92 p-2 shadow-lg backdrop-blur">
+      <UButton color="neutral" variant="ghost" icon="i-lucide-minus" :disabled="props.pending" @click="zoomOut" />
+      <UButton color="neutral" variant="ghost" icon="i-lucide-scan-search" :disabled="props.pending || nodes.length === 0" @click="fitToView" />
+      <UButton color="neutral" variant="ghost" icon="i-lucide-plus" :disabled="props.pending" @click="zoomIn" />
+      <span class="min-w-14 text-center text-xs font-medium text-muted">{{ scalePercentLabel }}</span>
+    </div>
+
+    <div v-if="props.pending" class="tree-canvas__loading absolute inset-0 z-[5] flex items-center justify-center backdrop-blur-[2px]">
+      <div class="flex items-center gap-3 rounded-full border border-default bg-default/90 px-4 py-2 text-sm text-highlighted shadow-lg">
+        <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin" />
+        Loading tree
       </div>
     </div>
   </div>
@@ -476,7 +546,11 @@ onBeforeUnmount(() => {
 }
 
 .tree-canvas__grid {
-  background: none;
+  background:
+    linear-gradient(to right, color-mix(in srgb, var(--ui-border) 28%, transparent 72%) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ui-border) 28%, transparent 72%) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.28;
 }
 
 .tree-canvas__scene {
@@ -484,23 +558,27 @@ onBeforeUnmount(() => {
   will-change: transform;
 }
 
-.tree-canvas__partner-child-action-anchor {
-  position: absolute;
-  z-index: 4;
-  transform: translate(-50%, -50%);
-}
-
+.tree-canvas__partner-child-action-anchor,
 .tree-canvas__node-action-anchor {
   position: absolute;
   z-index: 4;
   transform: translate(-50%, -50%);
 }
 
-.tree-canvas__node-action {
+.tree-canvas__node-action,
+.tree-canvas__partner-child-action {
   box-shadow: none;
 }
 
-.tree-canvas__partner-child-action {
-  box-shadow: none;
+.tree-canvas__controls {
+  box-shadow: 0 20px 40px color-mix(in srgb, black 20%, transparent 80%);
+}
+
+.tree-canvas__summary {
+  box-shadow: 0 20px 40px color-mix(in srgb, black 16%, transparent 84%);
+}
+
+.tree-canvas__loading {
+  background: color-mix(in srgb, var(--ui-bg) 70%, transparent 30%);
 }
 </style>
