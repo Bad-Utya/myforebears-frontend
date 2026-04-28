@@ -5,6 +5,7 @@ import TreeSearchFast from "~/components/main/TreeSearchFast.vue";
 import InlineFeed from "~/components/common/inline/InlineFeed.vue";
 import MainUserWelcome from "~/components/main/MainUserWelcome.vue";
 import useUserDataHandler from "~/composables/scripts/storages/get/userDataHandler";
+import InlineUserFeed from "~/components/common/inline/InlineUserFeed.vue";
 
 definePageMeta({middleware: 'auth'})
 
@@ -36,7 +37,7 @@ onMounted(async () => {
         />
 
 
-        <InlineFeed title="For you" :limit="10">
+        <InlineFeed title="Trees for you" :limit="10">
           <!--todo refacttor add a fallback slot-->
           <!--          <template slot="fallback">-->
           <!--          <p class="py-12 text-center text-sm text-muted">-->
@@ -44,6 +45,8 @@ onMounted(async () => {
           <!--          </p>-->
           <!--          </template>-->
         </InlineFeed>
+
+        <InlineUserFeed title="Recommended users" :limit="10"/>
       </UContainer>
     </UMain>
   </div>

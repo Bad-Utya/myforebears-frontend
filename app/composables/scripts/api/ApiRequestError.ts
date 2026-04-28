@@ -40,8 +40,15 @@ export default class ApiRequestError extends Error {
 
   static isUnauthorizedInvalidToken(error: unknown) {
     const apiError = ApiRequestError.createFromAny(error);
+    const normalizedCode = apiError.code.trim().toLowerCase();
+    const normalizedMessage = apiError.message.trim().toLowerCase();
 
-    return apiError.statusCode === 401 && apiError.code === 'invalid_token';
+    if (apiError.statusCode !== 401) {
+      return false;
+    }
+
+    return normalizedCode === 'invalid_token'
+      || (normalizedCode === 'unauthorized' && normalizedMessage === 'invalid token');
   }
 
   static createFromAny(error: any) {
