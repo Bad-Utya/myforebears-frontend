@@ -49,7 +49,7 @@ async function sendRequest() {
                      :disabled="!isEmailCorrect" :variant="isEmailCorrect ? 'solid' : 'outline'"
                      @click="sendRequest()">Submit</UButton>
             <div class="flex ml-auto gap-0">
-            <UButton class="" variant="link" color="neutral" to="./forgot">I don't have an account</UButton>
+            <UButton class="" variant="link" color="neutral" to="./register">I don't have an account</UButton>
             <UButton class="" variant="link" color="neutral" to="./forgot">Forgot password</UButton>
             </div>
           </div>
