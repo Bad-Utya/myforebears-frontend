@@ -966,8 +966,8 @@ onBeforeUnmount(() => {
             :disabled="!editable"
           />
 
-          <div class="space-y-3 rounded-2xl border border-default bg-default/60 p-4">
-            <div class="flex items-center justify-between gap-3">
+          <div class="space-y-3 rounded-2xl border border-default bg-settings-section-bg p-4">
+            <div class="flex flex-col items-start gap-3">
               <div>
                 <p class="text-sm font-medium text-highlighted">
                   Tree avatar
@@ -982,6 +982,7 @@ onBeforeUnmount(() => {
                 color="neutral"
                 variant="outline"
                 :disabled="!editable"
+                class="w-fit"
                 @click="avatarFileInput?.click()"
               >
                 Choose image
@@ -1437,9 +1438,12 @@ onBeforeUnmount(() => {
       v-model:open="eventModalOpen"
       :title="eventModalTitle"
       :description="eventModalDescription"
+      :ui="{
+        content: 'bg-default flex flex-col focus:outline-none'
+      }"
     >
       <template #body>
-        <div class="space-y-4">
+        <div class="mx-auto flex w-full max-w-3xl flex-col gap-4">
           <div class="space-y-2">
             <label class="text-sm text-muted">Event type</label>
             <USelect
@@ -1550,7 +1554,7 @@ onBeforeUnmount(() => {
             />
           </div>
 
-          <div v-if="selectedPrimaryPeople.length || selectedAdditionalPeople.length" class="rounded-xl border border-default p-3">
+          <div v-if="selectedPrimaryPeople.length || selectedAdditionalPeople.length" class="rounded-xl border border-default bg-settings-section-bg p-3">
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-xs font-medium uppercase tracking-[0.16em] text-muted">Participants</span>
               <UBadge
@@ -1596,9 +1600,12 @@ onBeforeUnmount(() => {
       v-model:open="eventTypeModalOpen"
       title="Create event type"
       description="Add a reusable event template."
+      :ui="{
+        content: 'bg-default flex flex-col focus:outline-none'
+      }"
     >
       <template #body>
-        <div class="space-y-4">
+        <div class="mx-auto flex w-full max-w-xl flex-col gap-4">
           <UInput
             v-model="eventTypeName"
             color="neutral"

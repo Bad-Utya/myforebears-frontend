@@ -21,7 +21,7 @@ const isLogoutPending = ref(false);
 
 const dropdownItems = computed(() => [[
   {
-    label: 'Public profile',
+    label: 'My profile',
     icon: 'i-lucide-user-round',
     disabled: typeof userData.value?.id !== 'number',
     class: 'rounded-xl',

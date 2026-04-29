@@ -2,11 +2,8 @@
 import AvatarCropper from '~/components/common/AvatarCropper.vue'
 import ApiRequestError from '~/composables/scripts/api/ApiRequestError'
 import sendCreateTreeRequest from '~/composables/scripts/familytree/createTree'
-import sendImportGedcomRequest from '~/composables/scripts/familytree/importGedcom'
 import sendUploadTreeAvatarRequest from '~/composables/scripts/photos/uploadTreeAvatar'
 import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
-
-type TreeActionMode = 'create' | 'import'
 
 const emit = defineEmits<{
   changed: []
@@ -14,13 +11,9 @@ const emit = defineEmits<{
 
 const toast = useToast()
 const modalOpen = ref(false)
-const mode = ref<TreeActionMode>('create')
 const pending = ref(false)
 const treeName = ref('')
 const treeDescription = ref('')
-const gedcomContent = ref('')
-const selectedFileName = ref('')
-const fileInput = ref<HTMLInputElement | null>(null)
 const avatarFileInput = ref<HTMLInputElement | null>(null)
 const avatarCropper = ref<{ exportFile: (fileName?: string, size?: number) => Promise<File> } | null>(null)
 const avatarSourceUrl = ref<string | null>(null)
@@ -30,15 +23,7 @@ const isSubmitDisabled = computed(() => {
     return true
   }
 
-  if (mode.value === 'create') {
-    return !treeName.value.trim()
-  }
-
-  if (mode.value === 'import') {
-    return !gedcomContent.value.trim()
-  }
-
-  return false
+  return !treeName.value.trim()
 })
 
 function revokeAvatarSourceUrl() {
@@ -69,13 +54,7 @@ async function buildAvatarFile() {
 function resetForm() {
   treeName.value = ''
   treeDescription.value = ''
-  gedcomContent.value = ''
-  selectedFileName.value = ''
   resetAvatarEditor()
-
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
 }
 
 function openModal() {
@@ -84,7 +63,6 @@ function openModal() {
 
 function closeModal() {
   modalOpen.value = false
-  mode.value = 'create'
   resetForm()
 }
 
@@ -125,22 +103,6 @@ async function createTree() {
   }
 }
 
-async function handleGedcomFileChange(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-
-  if (!file) {
-    return
-  }
-
-  try {
-    gedcomContent.value = await file.text()
-    selectedFileName.value = file.name
-  } catch (error) {
-    showApiErrorToast(error)
-  }
-}
-
 async function handleAvatarFileChange(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
@@ -166,35 +128,7 @@ async function handleAvatarFileChange(event: Event) {
   }
 }
 
-async function importGedcom() {
-  if (!gedcomContent.value.trim()) {
-    return
-  }
-
-  pending.value = true
-
-  try {
-    await sendImportGedcomRequest(gedcomContent.value)
-    toast.add({
-      title: 'GEDCOM imported',
-      description: 'The tree list was updated after import.',
-      color: 'success'
-    })
-    closeModal()
-    emit('changed')
-  } catch (error) {
-    showApiErrorToast(error)
-  } finally {
-    pending.value = false
-  }
-}
-
 async function submit() {
-  if (mode.value === 'import') {
-    await importGedcom()
-    return
-  }
-
   await createTree()
 }
 
@@ -218,146 +152,85 @@ onBeforeUnmount(() => {
     <UModal
       v-model:open="modalOpen"
       title="Create tree"
-      description="Create an empty tree or import one from GEDCOM."
+      description="Create a new tree"
+      :ui="{
+        content: 'bg-default flex flex-col focus:outline-none'
+      }"
     >
       <template #body>
         <form
-          class="space-y-4"
+          class="mx-auto flex w-full max-w-3xl flex-col gap-4"
           @submit.prevent="submit"
         >
-          <div class="inline-flex rounded-full border border-default p-1">
-            <UButton
-              type="button"
-              color="neutral"
-              size="xs"
-              :variant="mode === 'create' ? 'soft' : 'ghost'"
-              @click="mode = 'create'"
+          <div class="space-y-4">
+            <UFormField
+              label="Tree name"
+              required
             >
-              Create
-            </UButton>
-            <UButton
-              type="button"
-              color="neutral"
-              size="xs"
-              :variant="mode === 'import' ? 'soft' : 'ghost'"
-              @click="mode = 'import'"
+              <UInput
+                v-model="treeName"
+                placeholder="My family tree"
+                size="lg"
+                color="neutral"
+                variant="subtle"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField
+              label="Description"
             >
-              Import
-            </UButton>
-          </div>
+              <UTextarea
+                v-model="treeDescription"
+                :rows="4"
+                autoresize
+                color="neutral"
+                variant="subtle"
+                placeholder="What this tree is about"
+                class="w-full"
+              />
+            </UFormField>
 
-          <template v-if="mode === 'create'">
-            <div class="space-y-4">
-              <UFormField
-                label="Tree name"
-                required
-              >
-                <UInput
-                  v-model="treeName"
-                  placeholder="My family tree"
-                  size="lg"
-                />
-              </UFormField>
-
-              <UFormField
-                label="Description"
-              >
-                <UTextarea
-                  v-model="treeDescription"
-                  :rows="4"
-                  autoresize
-                  placeholder="What this tree is about"
-                />
-              </UFormField>
-
-              <div class="space-y-3 rounded-2xl border border-default bg-default/60 p-4">
-                <div class="flex items-center justify-between gap-3">
-                  <div>
-                    <p class="text-sm font-medium text-highlighted">
-                      Tree avatar
-                    </p>
-                    <p class="text-xs text-muted">
-                      Upload and crop the main image for this tree.
-                    </p>
-                  </div>
-
-                  <UButton
-                    type="button"
-                    color="neutral"
-                    variant="outline"
-                    @click="avatarFileInput?.click()"
-                  >
-                    Choose image
-                  </UButton>
-                </div>
-
-                <input
-                  ref="avatarFileInput"
-                  type="file"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleAvatarFileChange"
-                >
-
-                <div
-                  v-if="avatarSourceUrl"
-                  class="space-y-3"
-                >
-                  <div
-                    class="tree-avatar-cropper mx-auto overflow-hidden rounded-4xl border border-default bg-elevated/70"
-                  >
-                    <AvatarCropper
-                      ref="avatarCropper"
-                      :src="avatarSourceUrl"
-                      :aspect-ratio="3 / 4"
-                      class="mx-auto block h-full w-full object-contain"
-                    />
-                  </div>
-                  <p class="text-xs text-muted">
-                    Avatar will be cropped to the same portrait ratio used in tree cards.
-                  </p>
-                </div>
-
-                <p
-                  v-else
-                  class="text-sm text-muted"
-                >
-                  Avatar is optional. You can add or change it later.
+            <div class="space-y-3 rounded-2xl border border-default bg-default p-4">
+              <div class="flex flex-row items-center gap-3">
+                <p class="text-sm font-medium text-highlighted">
+                  Tree avatar
                 </p>
+
+                <UButton
+                  type="button"
+                  color="neutral"
+                  variant="subtle"
+                  class="w-fit ml-auto"
+                  @click="avatarFileInput?.click()"
+                >
+                  Choose image
+                </UButton>
+              </div>
+
+              <input
+                ref="avatarFileInput"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleAvatarFileChange"
+              >
+
+              <div
+                v-if="avatarSourceUrl"
+                class="space-y-3"
+              >
+                <div class="tree-avatar-cropper mx-auto overflow-hidden rounded-4xl border border-default bg-elevated/70">
+                  <AvatarCropper
+                    ref="avatarCropper"
+                    :src="avatarSourceUrl"
+                    :aspect-ratio="3 / 4"
+                    class="mx-auto block h-full w-full object-contain"
+                  />
+                </div>
               </div>
             </div>
-          </template>
-
-          <template v-else>
-            <input
-              ref="fileInput"
-              type="file"
-              accept=".ged,.gedcom,text/plain"
-              class="hidden"
-              @change="handleGedcomFileChange"
-            >
-
-            <div class="flex flex-wrap items-center gap-3">
-              <UButton
-                type="button"
-                color="neutral"
-                variant="outline"
-                @click="fileInput?.click()"
-              >
-                Choose file
-              </UButton>
-              <span class="text-sm text-muted">
-                {{ selectedFileName || 'No file selected' }}
-              </span>
-            </div>
-
-            <UTextarea
-              v-model="gedcomContent"
-              :rows="12"
-              autoresize
-              placeholder="0 HEAD&#10;1 GEDC&#10;2 VERS 5.5.1&#10;..."
-            />
-          </template>
+          </div>
 
           <div class="flex justify-end gap-3">
             <UButton
@@ -373,7 +246,7 @@ onBeforeUnmount(() => {
               :loading="pending"
               :disabled="isSubmitDisabled"
             >
-              {{ mode === 'import' ? 'Import' : 'Create' }}
+              Create
             </UButton>
           </div>
         </form>

@@ -247,7 +247,7 @@ onMounted(async () => {
       :description="sidebarSection === 'settings'
         ? 'Configure this tree and manage access.'
         : 'Create and manage tree events.'"
-      :ui="{ content: 'sm:max-w-xl' }"
+      :ui="{ content: 'bg-default sm:max-w-xl' }"
     >
       <template #body>
         <TreeSidebarPanel

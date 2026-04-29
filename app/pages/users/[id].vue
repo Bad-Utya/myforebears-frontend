@@ -136,7 +136,7 @@ onBeforeUnmount(() => {
 
     <UMain class="w-full p-6 lg:p-10">
       <UContainer>
-        <div class="rounded-4xl border border-default bg-elevated/60 p-8 mb-6">
+        <div class="mb-6 rounded-t-4xl rounded-b-none border border-default bg-elevated/60 p-8">
           <div v-if="profilePending" class="flex items-center gap-4">
             <USkeleton class="size-20 rounded-full" />
             <div class="space-y-3">
@@ -156,9 +156,9 @@ onBeforeUnmount(() => {
               {{ avatarPlaceholder.label }}
             </div>
 
-            <div class="space-y-1 min-w-0">
+            <div class="min-w-0 space-y-1">
               <div class="flex items-center gap-3">
-                <h1 class="text-3xl font-semibold truncate">
+                <h1 class="truncate text-3xl font-semibold leading-none">
                   {{ nickname }}
                 </h1>
                 <UButton
@@ -166,7 +166,8 @@ onBeforeUnmount(() => {
                   icon="i-lucide-settings-2"
                   color="neutral"
                   variant="ghost"
-                  class="shrink-0 rounded-full"
+                  size="md"
+                  class="shrink-0 self-center rounded-full"
                   to="/settings"
                 />
               </div>

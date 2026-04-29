@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AvatarCropper from '~/components/common/AvatarCropper.vue'
 import CreateAccountSuggestion from '~/components/common/CreateAccountSuggestion.vue'
+import PasswordInput from '~/components/auth/PasswordInput.vue'
 import sendResetByTokenRequest from '~/composables/scripts/auth/resetPasswordByToken'
 import sendUploadUserAvatarRequest from '~/composables/scripts/photos/uploadUserAvatar'
 import { useUserDataStore } from '~/composables/scripts/storages/create/userData'
@@ -43,6 +44,7 @@ const nickname = ref('')
 const nicknamePending = ref(false)
 const password = ref('')
 const passwordConfirm = ref('')
+const showPasswords = ref(false)
 const passwordPending = ref(false)
 const avatarPending = ref(false)
 const avatarSourceUrl = ref<string | null>(null)
@@ -85,6 +87,7 @@ function openNicknameModal() {
 function openPasswordModal() {
   password.value = ''
   passwordConfirm.value = ''
+  showPasswords.value = false
   passwordModalOpen.value = true
 }
 
@@ -264,7 +267,7 @@ onBeforeUnmount(() => {
           />
 
           <template v-else>
-            <section class="flex items-center gap-4 rounded-xl border border-default px-4 py-3">
+            <section class="flex items-center gap-4 rounded-xl border border-default bg-settings-section-bg px-4 py-3">
               <UAvatar
                 v-if="userData?.avatarUrl"
                 :src="userData.avatarUrl"
@@ -279,9 +282,6 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="min-w-0 flex-1">
-                <p class="text-sm text-muted">
-                  Profile
-                </p>
                 <p class="truncate font-semibold text-highlighted">
                   {{ userData?.nickname ?? 'No nickname yet' }}
                 </p>
@@ -299,9 +299,6 @@ onBeforeUnmount(() => {
                 <p class="font-medium text-highlighted">
                   Theme
                 </p>
-                <p class="text-sm text-muted">
-                  Mock toggle
-                </p>
               </div>
 
               <div class="inline-flex rounded-lg border border-default p-1">
@@ -309,7 +306,7 @@ onBeforeUnmount(() => {
                   v-for="item in themeItems"
                   :key="item.key"
                   size="xs"
-                  color="neutral"
+                  color="primary"
                   :variant="item.key === 'dark' ? 'soft' : 'ghost'"
                   class="px-3"
                   @click="onThemeMockClick"
@@ -324,9 +321,6 @@ onBeforeUnmount(() => {
                 <p class="font-medium text-highlighted">
                   Language
                 </p>
-                <p class="text-sm text-muted">
-                  Mock toggle
-                </p>
               </div>
 
               <div class="inline-flex rounded-lg border border-default p-1">
@@ -334,7 +328,7 @@ onBeforeUnmount(() => {
                   v-for="item in languageItems"
                   :key="item.key"
                   size="xs"
-                  color="neutral"
+                  color="primary"
                   :variant="item.key === 'ru' ? 'soft' : 'ghost'"
                   class="px-3"
                   @click="onLanguageMockClick"
@@ -368,9 +362,6 @@ onBeforeUnmount(() => {
               <div>
                 <p class="font-medium text-highlighted">
                   Avatar
-                </p>
-                <p class="text-sm text-muted">
-                  Upload a file and adjust the crop
                 </p>
               </div>
 
@@ -412,10 +403,13 @@ onBeforeUnmount(() => {
       v-model:open="nicknameModalOpen"
       title="Edit nickname"
       description="Update the public name shown on your profile."
+      :ui="{
+        content: 'bg-default flex flex-col focus:outline-none'
+      }"
     >
       <template #body>
         <form
-          class="space-y-4"
+          class="mx-auto flex w-full max-w-xl flex-col items-stretch gap-4"
           @submit.prevent="saveNickname"
         >
           <UInput
@@ -423,6 +417,8 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="Enter your nickname"
+            size="lg"
+            class="w-full"
           />
 
           <div class="flex justify-end gap-3">
@@ -449,26 +445,39 @@ onBeforeUnmount(() => {
       v-model:open="passwordModalOpen"
       title="Change password"
       description="Enter your new password twice."
+      :ui="{
+        content: 'bg-default flex flex-col focus:outline-none'
+      }"
     >
       <template #body>
         <form
-          class="space-y-4"
+          class="mx-auto flex w-full max-w-3xl flex-col items-stretch gap-4"
           @submit.prevent="savePassword"
         >
-          <UInput
-            v-model="password"
-            type="password"
-            color="neutral"
-            variant="subtle"
-            placeholder="New password"
-          />
-          <UInput
-            v-model="passwordConfirm"
-            type="password"
-            color="neutral"
-            variant="subtle"
-            placeholder="Repeat password"
-          />
+          <div class="flex items-stretch gap-3">
+            <PasswordInput
+              v-model="password"
+              placeholder="New password"
+              :revealed="showPasswords"
+              hide-toggle
+              class="flex-1"
+            />
+            <UButton
+              type="button"
+              variant="subtle"
+              :icon="showPasswords ? 'i-lucide-eye' : 'i-lucide-eye-closed'"
+              :color="showPasswords ? 'primary' : 'neutral'"
+              class="shrink-0"
+              @click="showPasswords = !showPasswords"
+            />
+            <PasswordInput
+              v-model="passwordConfirm"
+              placeholder="Repeat password"
+              :revealed="showPasswords"
+              hide-toggle
+              class="w-full"
+            />
+          </div>
 
           <div class="flex justify-end gap-3">
             <UButton
@@ -493,21 +502,17 @@ onBeforeUnmount(() => {
     <UModal
       v-model:open="avatarModalOpen"
       title="Edit avatar"
-      description="Upload an image and adjust the square crop."
     >
       <template #body>
         <div class="space-y-4">
-          <div class="flex items-center gap-3">
+          <div>
             <UButton
-              class="w-min"
+              class="w-fit"
               variant="outline"
               @click="fileInput?.click()"
             >
               Choose file
             </UButton>
-            <p class="text-sm text-muted">
-              The crop area stays inside the editor bounds.
-            </p>
           </div>
 
           <input
@@ -518,7 +523,7 @@ onBeforeUnmount(() => {
             @change="handleAvatarFileChange"
           >
 
-          <div class="space-y-3 rounded-xl border border-default p-3">
+          <div class="space-y-3 rounded-xl border border-default bg-settings-section-bg p-3">
             <div
               class="settings-cropper mx-auto rounded-xl border border-default bg-muted/20"
             >

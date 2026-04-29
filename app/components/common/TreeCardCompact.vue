@@ -38,7 +38,7 @@ const props = withDefaults(defineProps<{
     :to="props.href"
     class="group relative flex gap-3 rounded-2xl border border-default bg-card-bg p-3 transition-colors duration-200 ease-out hover:bg-white/6"
   >
-    <div class="relative aspect-3/4 w-20 flex-none overflow-hidden rounded-2xl bg-card-bg">
+    <div class="relative aspect-3/4 w-20 flex-none overflow-hidden rounded-xl bg-card-bg">
       <TreeCardCover
         v-if="!props.avatar"
         :seed="props.coverSeed ?? props.title"
