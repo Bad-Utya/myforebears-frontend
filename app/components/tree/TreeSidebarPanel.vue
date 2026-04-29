@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AvatarCropper from '~/components/common/AvatarCropper.vue'
+import { treeFieldUi, treeSelectMenuUi, treeSelectUi, treeTextareaUi } from '~/composables/ui/treeTheme'
 import sendCreateEventTypeRequest from '~/composables/scripts/eventTypes/createEventType'
 import sendDeleteEventTypeRequest from '~/composables/scripts/eventTypes/deleteEventType'
 import type EventTypeDTO from '~/composables/scripts/eventTypes/dtos/inner/EventTypeDTO'
@@ -959,6 +960,7 @@ onBeforeUnmount(() => {
             placeholder="Tree name"
             class="w-full"
             :disabled="!editable"
+            :ui="treeFieldUi"
           />
 
           <UTextarea
@@ -970,6 +972,7 @@ onBeforeUnmount(() => {
             placeholder="Tree description"
             class="w-full"
             :disabled="!editable"
+            :ui="treeTextareaUi"
           />
 
           <UCheckbox
@@ -1054,6 +1057,7 @@ onBeforeUnmount(() => {
             variant="subtle"
             placeholder="user@example.com"
             :disabled="!editable"
+            :ui="treeFieldUi"
           />
           <UButton
             color="neutral"
@@ -1260,6 +1264,7 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="From"
+            :ui="treeFieldUi"
           />
           <UInput
             v-model="timelineDateTo"
@@ -1267,6 +1272,7 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="To"
+            :ui="treeFieldUi"
           />
         </div>
 
@@ -1283,6 +1289,7 @@ onBeforeUnmount(() => {
             placeholder="Choose people"
             color="neutral"
             variant="subtle"
+            :ui="treeSelectMenuUi"
           />
         </div>
 
@@ -1346,7 +1353,7 @@ onBeforeUnmount(() => {
                     bottom: `${5.25 + event.stackIndex * 3.9}rem`
                   }"
                 >
-                  <div class="rounded-lg border border-default bg-default/96 px-3 py-2 shadow-sm">
+                  <div class="rounded-lg border border-default bg-[var(--timeline-event-card-bg)] px-3 py-2 shadow-sm">
                     <p class="text-xs font-semibold text-highlighted">
                       {{ formatEventTypeLabel(event.event_type_id) }}
                     </p>
@@ -1388,7 +1395,7 @@ onBeforeUnmount(() => {
               <article
                 v-for="event in undatedTimelineEvents"
                 :key="`timeline-undated-${event.id || event.event_id}`"
-                class="rounded-lg border border-default px-3 py-3"
+                class="timeline-undated-card rounded-lg border px-3 py-3"
                 :class="{ 'timeline-item--approximate': isApproximateEvent(event) }"
               >
                 <div class="flex flex-wrap items-start justify-between gap-3">
@@ -1435,6 +1442,7 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="subtle"
               class="min-w-72 max-w-full"
+              :ui="treeSelectUi"
             />
           </div>
 
@@ -1447,6 +1455,7 @@ onBeforeUnmount(() => {
               type="date"
               color="neutral"
               variant="subtle"
+              :ui="treeFieldUi"
             />
 
             <div v-else-if="eventDatePrecision === 'MONTH'" class="grid gap-3 sm:grid-cols-2">
@@ -1458,6 +1467,7 @@ onBeforeUnmount(() => {
                 color="neutral"
                 variant="subtle"
                 placeholder="MM"
+                :ui="treeFieldUi"
               />
               <UInput
                 v-model="eventDateYear"
@@ -1467,6 +1477,7 @@ onBeforeUnmount(() => {
                 color="neutral"
                 variant="subtle"
                 placeholder="YYYY"
+                :ui="treeFieldUi"
               />
             </div>
 
@@ -1479,6 +1490,7 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="subtle"
               placeholder="YYYY"
+              :ui="treeFieldUi"
             />
 
             <USelect
@@ -1488,6 +1500,7 @@ onBeforeUnmount(() => {
               placeholder="Choose date precision"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectUi"
               @update:model-value="handleEventPrecisionChange"
             />
 
@@ -1498,6 +1511,7 @@ onBeforeUnmount(() => {
               placeholder="Choose date bound"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectUi"
             />
           </div>
 
@@ -1514,6 +1528,7 @@ onBeforeUnmount(() => {
               placeholder="Choose primary people"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectMenuUi"
             />
             <p v-if="primaryCountError" class="text-xs text-error">
               {{ primaryCountError }}
@@ -1533,6 +1548,7 @@ onBeforeUnmount(() => {
               placeholder="Choose additional people"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectMenuUi"
             />
           </div>
 
@@ -1593,6 +1609,7 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="Type name"
+            :ui="treeFieldUi"
           />
 
           <UInput
@@ -1602,6 +1619,7 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="Primary persons count"
+            :ui="treeFieldUi"
           />
 
           <USelect
@@ -1611,6 +1629,7 @@ onBeforeUnmount(() => {
             placeholder="Choose primary people rule"
             color="neutral"
             variant="subtle"
+            :ui="treeSelectUi"
           />
 
           <div class="flex justify-end gap-2">
@@ -1644,8 +1663,7 @@ onBeforeUnmount(() => {
 }
 
 .timeline-board {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ui-bg) 98%, white 2%), color-mix(in srgb, var(--ui-bg) 94%, white 6%));
+  background: var(--color-timeline-board-bg);
 }
 
 .timeline-stage {
@@ -1660,7 +1678,7 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   bottom: 2.75rem;
-  border-top: 1px dashed color-mix(in srgb, var(--ui-border) 76%, transparent 24%);
+  border-top: 1px dashed var(--color-timeline-axis);
 }
 
 .timeline-year-marker {
@@ -1673,7 +1691,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
   height: 0.9rem;
   width: 1px;
-  background: color-mix(in srgb, var(--ui-border) 88%, transparent 12%);
+  background: var(--color-timeline-tick);
 }
 
 .timeline-year-marker__label {
@@ -1693,7 +1711,7 @@ onBeforeUnmount(() => {
   margin: 0.35rem auto 0;
   height: 1.85rem;
   width: 1px;
-  border-left: 1px dashed color-mix(in srgb, var(--ui-border) 80%, transparent 20%);
+  border-left: 1px dashed var(--color-timeline-stem);
 }
 
 .timeline-event-card--approximate > div:first-child,
@@ -1701,11 +1719,16 @@ onBeforeUnmount(() => {
   background:
     repeating-linear-gradient(
       -45deg,
-      color-mix(in srgb, var(--ui-warning) 10%, transparent 90%) 0,
-      color-mix(in srgb, var(--ui-warning) 10%, transparent 90%) 8px,
+      var(--color-timeline-approximate-stripe) 0,
+      var(--color-timeline-approximate-stripe) 8px,
       transparent 8px,
       transparent 16px
     ),
-    color-mix(in srgb, var(--ui-bg) 96%, var(--ui-warning) 4%) !important;
+    var(--color-timeline-approximate-bg) !important;
+}
+
+.timeline-undated-card {
+  border-color: var(--color-timeline-undated-border);
+  background: var(--color-timeline-undated-bg);
 }
 </style>

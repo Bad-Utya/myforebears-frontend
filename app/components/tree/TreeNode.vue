@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AvatarCropper from '~/components/common/AvatarCropper.vue'
+import { treeFieldUi } from '~/composables/ui/treeTheme'
 import sendAddChildRequest from '~/composables/scripts/familytree/addChild'
 import sendAddParentRequest from '~/composables/scripts/familytree/addParent'
 import sendAddPartnerRequest from '~/composables/scripts/familytree/addPartner'
@@ -587,18 +588,21 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="First name"
+            :ui="treeFieldUi"
           />
           <UInput
             v-model="lastName"
             color="neutral"
             variant="subtle"
             placeholder="Last name"
+            :ui="treeFieldUi"
           />
           <UInput
             v-model="patronymic"
             color="neutral"
             variant="subtle"
             placeholder="Patronymic"
+            :ui="treeFieldUi"
           />
 
           <div class="space-y-2">
@@ -739,18 +743,21 @@ onBeforeUnmount(() => {
           color="neutral"
           variant="subtle"
           placeholder="First name"
+          :ui="treeFieldUi"
         />
         <UInput
           v-model="createLastName"
           color="neutral"
           variant="subtle"
           placeholder="Last name"
+          :ui="treeFieldUi"
         />
         <UInput
           v-model="createPatronymic"
           color="neutral"
           variant="subtle"
           placeholder="Patronymic"
+          :ui="treeFieldUi"
         />
 
         <div
@@ -870,33 +877,33 @@ onBeforeUnmount(() => {
 }
 
 .tree-node--male {
-  --tree-node-bg: color-mix(in srgb, var(--color-slateblue-950) 72%, var(--color-carbon-950) 28%);
-  --tree-avatar-bg: color-mix(in srgb, var(--color-slateblue-700) 26%, var(--color-carbon-300) 74%);
-  --tree-avatar-text: var(--color-slateblue-50);
+  --tree-node-bg: var(--color-tree-node-male-bg);
+  --tree-avatar-bg: var(--color-tree-node-male-avatar-bg);
+  --tree-avatar-text: var(--color-tree-node-male-avatar-text);
 }
 
 .tree-node--female {
-  --tree-node-bg: color-mix(in srgb, var(--color-coral-950) 54%, var(--color-carbon-950) 46%);
-  --tree-avatar-bg: color-mix(in srgb, var(--color-coral-700) 24%, var(--color-carbon-300) 76%);
-  --tree-avatar-text: var(--color-coral-50);
+  --tree-node-bg: var(--color-tree-node-female-bg);
+  --tree-avatar-bg: var(--color-tree-node-female-avatar-bg);
+  --tree-avatar-text: var(--color-tree-node-female-avatar-text);
 }
 
 .tree-node--unspecified {
-  --tree-node-bg: color-mix(in srgb, var(--color-pine-950) 60%, var(--color-carbon-950) 40%);
-  --tree-avatar-bg: color-mix(in srgb, var(--color-pine-700) 24%, var(--color-carbon-300) 76%);
-  --tree-avatar-text: var(--color-pine-50);
+  --tree-node-bg: var(--color-tree-node-unspecified-bg);
+  --tree-avatar-bg: var(--color-tree-node-unspecified-avatar-bg);
+  --tree-avatar-text: var(--color-tree-node-unspecified-avatar-text);
 }
 
 .tree-node__info {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  background: color-mix(in srgb, white 4%, transparent 96%);
+  background: var(--color-tree-node-info-bg);
   padding: 0.875rem 1rem;
 }
 
 .tree-node__info-label {
-  color: color-mix(in srgb, white 58%, var(--ui-primary) 42%);
+  color: var(--color-tree-node-info-label);
   font-size: 0.73rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -904,7 +911,7 @@ onBeforeUnmount(() => {
 }
 
 .tree-node__info-value {
-  color: color-mix(in srgb, white 88%, var(--ui-primary) 12%);
+  color: var(--color-tree-node-info-value);
   font-size: 0.95rem;
 }
 

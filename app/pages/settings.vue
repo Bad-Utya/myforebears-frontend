@@ -16,13 +16,12 @@ definePageMeta({ middleware: 'auth' })
 const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const avatarCropper = ref<{ exportBlob: (type?: string, size?: number) => Promise<Blob> } | null>(null)
+const colorMode = useColorMode()
 const userDataStore = useUserDataStore()
 const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
 const {
-  theme,
   language,
   ensureLoaded: ensureAppPreferencesLoaded,
-  setTheme,
   setLanguage
 } = useAppPreferencesHandler()
 
@@ -56,11 +55,6 @@ const showPasswords = ref(false)
 const passwordPending = ref(false)
 const avatarPending = ref(false)
 const avatarSourceUrl = ref<string | null>(null)
-
-const themeItems = [
-  { key: 'light', label: 'Light' },
-  { key: 'dark', label: 'Dark' }
-] as const
 
 const languageItems = [
   { key: 'ru', label: 'Ru' },
@@ -306,23 +300,14 @@ onBeforeUnmount(() => {
                   Theme
                 </p>
                 <p class="text-sm text-muted">
-                  {{ theme === 'dark' ? 'Dark' : 'Light' }}
+                  {{ colorMode.value === 'dark' ? 'Dark' : 'Light' }}
                 </p>
               </div>
 
-              <div class="inline-flex rounded-lg border border-default p-1">
-                <UButton
-                  v-for="item in themeItems"
-                  :key="item.key"
-                  size="xs"
-                  color="primary"
-                  :variant="item.key === theme ? 'soft' : 'ghost'"
-                  class="px-3"
-                  @click="setTheme(item.key)"
-                >
-                  {{ item.label }}
-                </UButton>
-              </div>
+              <UColorModeSwitch
+                size="sm"
+                color="primary"
+              />
             </section>
 
             <section class="flex items-center justify-between gap-4 rounded-xl border border-default px-4 py-3">

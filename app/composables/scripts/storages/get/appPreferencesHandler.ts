@@ -2,20 +2,10 @@ import {storeToRefs} from "pinia";
 import {
   type AppLanguage,
   type AppPreferences,
-  type AppTheme,
   useAppPreferencesStore
 } from "~/composables/scripts/storages/create/appPreferences";
 
 const STORAGE_KEY = 'rooots.app-preferences';
-
-type StoredAppPreferences = Partial<AppPreferences> & {
-  themeManual?: boolean;
-  languageManual?: boolean;
-};
-
-function normalizeTheme(value?: string): AppTheme {
-  return value === 'light' ? 'light' : 'dark';
-}
 
 function normalizeLanguage(value?: string): AppLanguage {
   return value?.toLowerCase().startsWith('ru') ? 'ru' : 'en';
@@ -24,21 +14,18 @@ function normalizeLanguage(value?: string): AppLanguage {
 function detectSystemPreferences(): AppPreferences {
   if (typeof window === 'undefined') {
     return {
-      theme: 'dark',
       language: 'en',
     };
   }
 
-  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true;
   const browserLanguage = navigator.languages?.[0] ?? navigator.language;
 
   return {
-    theme: prefersDark ? 'dark' : 'light',
     language: normalizeLanguage(browserLanguage),
   };
 }
 
-function readStoredPreferences(): StoredAppPreferences | null {
+function readStoredPreferences(): AppPreferences | null {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -50,20 +37,17 @@ function readStoredPreferences(): StoredAppPreferences | null {
       return null;
     }
 
-    const parsedValue = JSON.parse(rawValue) as StoredAppPreferences;
+    const parsedValue = JSON.parse(rawValue) as Partial<AppPreferences>;
 
     return {
-      theme: normalizeTheme(parsedValue.theme),
       language: normalizeLanguage(parsedValue.language),
-      themeManual: parsedValue.themeManual === true,
-      languageManual: parsedValue.languageManual === true,
     };
   } catch {
     return null;
   }
 }
 
-function persistPreferences(preferences: StoredAppPreferences) {
+function persistPreferences(preferences: AppPreferences) {
   if (typeof window === 'undefined') {
     return;
   }
@@ -77,30 +61,17 @@ function applyPreferences(preferences: AppPreferences) {
   }
 
   document.documentElement.lang = preferences.language;
-  document.documentElement.dataset.appTheme = preferences.theme;
-  document.documentElement.style.colorScheme = preferences.theme;
 }
 
 export default function useAppPreferencesHandler() {
   const appPreferencesStore = useAppPreferencesStore();
   const {preferences, initialized} = storeToRefs(appPreferencesStore);
-  const theme = computed(() => preferences.value?.theme ?? 'dark');
   const language = computed(() => preferences.value?.language ?? 'en');
 
   function syncPreferences(nextPreferences: AppPreferences) {
     appPreferencesStore.setPreferences(nextPreferences);
+    persistPreferences(nextPreferences);
     applyPreferences(nextPreferences);
-  }
-
-  function persistManualPreferences(partialPreferences: Partial<AppPreferences>) {
-    const storedPreferences = readStoredPreferences();
-
-    persistPreferences({
-      theme: partialPreferences.theme ?? storedPreferences?.theme,
-      language: partialPreferences.language ?? storedPreferences?.language,
-      themeManual: partialPreferences.theme !== undefined ? true : storedPreferences?.themeManual === true,
-      languageManual: partialPreferences.language !== undefined ? true : storedPreferences?.languageManual === true,
-    });
   }
 
   function ensureLoaded() {
@@ -112,42 +83,20 @@ export default function useAppPreferencesHandler() {
       return;
     }
 
-    const systemPreferences = detectSystemPreferences();
-    const storedPreferences = readStoredPreferences();
-
-    syncPreferences({
-      theme: storedPreferences?.themeManual ? storedPreferences.theme ?? systemPreferences.theme : systemPreferences.theme,
-      language: storedPreferences?.languageManual ? storedPreferences.language ?? systemPreferences.language : systemPreferences.language,
-    });
-  }
-
-  function setTheme(nextTheme: AppTheme) {
-    const nextPreferences = {
-      theme: nextTheme,
-      language: language.value,
-    } satisfies AppPreferences;
-
-    syncPreferences(nextPreferences);
-    persistManualPreferences({ theme: nextTheme });
+    syncPreferences(readStoredPreferences() ?? detectSystemPreferences());
   }
 
   function setLanguage(nextLanguage: AppLanguage) {
-    const nextPreferences = {
-      theme: theme.value,
+    syncPreferences({
       language: nextLanguage,
-    } satisfies AppPreferences;
-
-    syncPreferences(nextPreferences);
-    persistManualPreferences({ language: nextLanguage });
+    });
   }
 
   return {
     preferences,
     initialized,
-    theme,
     language,
     ensureLoaded,
-    setTheme,
     setLanguage,
   };
 }

@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import useAppPreferencesHandler from '~/composables/scripts/storages/get/appPreferencesHandler'
 
-const { theme, language, ensureLoaded, setTheme, setLanguage } = useAppPreferencesHandler()
-const isDarkTheme = computed({
-  get: () => theme.value === 'dark',
-  set: (value: boolean) => setTheme(value ? 'dark' : 'light')
-})
-
+const colorMode = useColorMode()
+const { language, ensureLoaded, setLanguage } = useAppPreferencesHandler()
 const isRussianLanguage = computed({
   get: () => language.value === 'ru',
   set: (value: boolean) => setLanguage(value ? 'ru' : 'en')
@@ -26,17 +22,13 @@ onMounted(() => {
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-2">
             <span class="text-sm font-medium text-muted">
-              {{ isDarkTheme ? 'Dark' : 'Light' }}
+              {{ colorMode.value === 'dark' ? 'Dark' : 'Light' }}
             </span>
 
-              <USwitch
-                class="ml-auto"
-              v-model="isDarkTheme"
+            <UColorModeSwitch
+              class="ml-auto"
               size="md"
               color="primary"
-              checked-icon="i-lucide-moon"
-              unchecked-icon="i-lucide-sun"
-              aria-label="Toggle theme"
             />
           </div>
 

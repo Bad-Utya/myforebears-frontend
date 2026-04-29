@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { treeFieldUi, treeSelectMenuUi, treeSelectUi } from '~/composables/ui/treeTheme'
 import type DataDTO from '~/composables/scripts/api/dtos/DataDTO'
 import type EventTypeDTO from '~/composables/scripts/eventTypes/dtos/inner/EventTypeDTO'
 import type { ListEventTypesResponse } from '~/composables/scripts/eventTypes/dtos/responses/ListEventTypesResponse'
@@ -786,7 +787,7 @@ onBeforeUnmount(() => {
                 '--timeline-level': event.stackIndex
               }"
             >
-              <div class="timeline-event__card rounded-lg border border-default bg-tree-panel-item-bg px-3 py-2 shadow-sm">
+              <div class="timeline-event__card rounded-lg border border-default bg-[var(--timeline-event-card-bg)] px-3 py-2 shadow-sm">
                 <p class="text-xs font-semibold text-highlighted">
                   {{ formatEventTypeLabel(event.event_type_id) }}
                 </p>
@@ -824,6 +825,7 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="subtle"
               placeholder="From"
+              :ui="treeFieldUi"
             />
             <UInput
               v-model="timelineDateTo"
@@ -831,6 +833,7 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="subtle"
               placeholder="To"
+              :ui="treeFieldUi"
             />
             <USelectMenu
               v-model="timelinePersonIds"
@@ -842,6 +845,7 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="subtle"
               class="lg:col-span-2"
+              :ui="treeSelectMenuUi"
             />
           </div>
 
@@ -865,7 +869,7 @@ onBeforeUnmount(() => {
               <article
                 v-for="event in undatedTimelineEvents"
                 :key="`undated-${event.id || event.event_id}`"
-                class="group rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3"
+                class="timeline-undated-card group rounded-lg border px-3 py-3"
                 :class="{ 'timeline-event__card--approximate': isApproximateEvent(event) }"
               >
                 <div class="flex items-start justify-between gap-3">
@@ -912,6 +916,7 @@ onBeforeUnmount(() => {
               placeholder="Choose event type"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectUi"
             />
           </div>
 
@@ -924,11 +929,12 @@ onBeforeUnmount(() => {
               type="date"
               color="neutral"
               variant="subtle"
+              :ui="treeFieldUi"
             />
 
             <div v-else-if="eventDatePrecision === 'MONTH'" class="grid gap-3 sm:grid-cols-2">
-              <UInput v-model="eventDateMonth" type="number" min="1" max="12" color="neutral" variant="subtle" placeholder="MM" />
-              <UInput v-model="eventDateYear" type="number" min="1" max="9999" color="neutral" variant="subtle" placeholder="YYYY" />
+              <UInput v-model="eventDateMonth" type="number" min="1" max="12" color="neutral" variant="subtle" placeholder="MM" :ui="treeFieldUi" />
+              <UInput v-model="eventDateYear" type="number" min="1" max="9999" color="neutral" variant="subtle" placeholder="YYYY" :ui="treeFieldUi" />
             </div>
 
             <UInput
@@ -940,6 +946,7 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="subtle"
               placeholder="YYYY"
+              :ui="treeFieldUi"
             />
 
             <USelect
@@ -949,6 +956,7 @@ onBeforeUnmount(() => {
               placeholder="Choose date precision"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectUi"
               @update:model-value="handleEventPrecisionChange"
             />
 
@@ -959,6 +967,7 @@ onBeforeUnmount(() => {
               placeholder="Choose date bound"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectUi"
             />
           </div>
 
@@ -973,6 +982,7 @@ onBeforeUnmount(() => {
               placeholder="Choose primary people"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectMenuUi"
             />
             <p v-if="primaryCountError" class="text-xs text-error">
               {{ primaryCountError }}
@@ -990,6 +1000,7 @@ onBeforeUnmount(() => {
               placeholder="Choose additional people"
               color="neutral"
               variant="subtle"
+              :ui="treeSelectMenuUi"
             />
           </div>
 
@@ -1038,7 +1049,7 @@ onBeforeUnmount(() => {
 
 .timeline-canvas {
   min-height: 32rem;
-  background: color-mix(in srgb, var(--ui-bg) 90%, white 10%);
+  background: var(--color-timeline-canvas-bg);
   box-shadow: 0 20px 40px color-mix(in srgb, black 14%, transparent 86%);
 }
 
@@ -1067,7 +1078,7 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   border: 1px solid var(--ui-border);
   border-radius: 1rem;
-  background: color-mix(in srgb, var(--ui-bg) 92%, white 8%);
+  background: var(--color-timeline-control-bg);
   padding: 0.5rem;
   box-shadow: 0 20px 40px color-mix(in srgb, black 14%, transparent 86%);
   backdrop-filter: blur(8px);
@@ -1082,7 +1093,7 @@ onBeforeUnmount(() => {
 .timeline-axis {
   position: absolute;
   bottom: 4rem;
-  border-top: 1px dashed color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-top: 1px dashed var(--color-timeline-axis);
 }
 
 .timeline-year-marker {
@@ -1094,7 +1105,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
   height: 1rem;
   width: 1px;
-  background: color-mix(in srgb, var(--ui-border) 88%, transparent 12%);
+  background: var(--color-timeline-tick);
 }
 
 .timeline-year-marker__label {
@@ -1112,19 +1123,32 @@ onBeforeUnmount(() => {
 
 .timeline-event__card {
   margin-bottom: 0.4rem;
-  box-shadow: 0 12px 28px color-mix(in srgb, black 12%, transparent 88%);
+  box-shadow: var(--color-timeline-card-shadow);
 }
 
 .timeline-event__stem {
   margin: 0.35rem auto 0;
   height: calc(2.4rem + var(--timeline-level, 0) * 6.6rem);
   width: 1px;
-  border-left: 1px dashed color-mix(in srgb, var(--ui-border) 80%, transparent 20%);
+  border-left: 1px dashed var(--color-timeline-stem);
 }
 
 .timeline-event--approximate .timeline-event__card,
 .timeline-event__card--approximate {
-  background: var(--tree-panel-item-bg) !important;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      var(--color-timeline-approximate-stripe) 0,
+      var(--color-timeline-approximate-stripe) 8px,
+      transparent 8px,
+      transparent 16px
+    ),
+    var(--color-timeline-approximate-bg) !important;
+}
+
+.timeline-undated-card {
+  border-color: var(--color-timeline-undated-border);
+  background: var(--color-timeline-undated-bg);
 }
 
 </style>

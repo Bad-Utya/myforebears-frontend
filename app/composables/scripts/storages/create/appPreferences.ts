@@ -1,10 +1,8 @@
 import {defineStore} from "pinia";
 
-export type AppTheme = 'light' | 'dark';
 export type AppLanguage = 'ru' | 'en';
 
 export type AppPreferences = {
-  theme: AppTheme;
   language: AppLanguage;
 };
 
@@ -27,7 +25,6 @@ export const useAppPreferencesStore = defineStore('app-preferences', {
 
     patchPreferences(partialPreferences: Partial<AppPreferences>) {
       this.preferences = {
-        theme: this.preferences?.theme ?? 'dark',
         language: this.preferences?.language ?? 'en',
         ...partialPreferences,
       };

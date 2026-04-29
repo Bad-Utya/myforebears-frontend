@@ -566,8 +566,8 @@ onBeforeUnmount(() => {
   --tree-badge-bg: color-mix(in srgb, var(--ui-primary) 12%, transparent 88%);
   --tree-badge-border: color-mix(in srgb, var(--ui-primary) 28%, transparent 72%);
   --tree-badge-text: color-mix(in srgb, white 82%, var(--ui-primary) 18%);
-  --tree-lineage-color: color-mix(in srgb, var(--ui-primary) 54%, white 46%);
-  --tree-partner-color: color-mix(in srgb, var(--ui-secondary) 58%, white 42%);
+  --tree-lineage-color: var(--color-tree-lineage);
+  --tree-partner-color: var(--color-tree-partner);
   background: color-mix(in srgb, var(--ui-bg) 90%, black 10%);
   cursor: grab;
 }
@@ -578,8 +578,8 @@ onBeforeUnmount(() => {
 
 .tree-canvas__grid {
   background:
-    linear-gradient(to right, color-mix(in srgb, var(--ui-border) 28%, transparent 72%) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--ui-border) 28%, transparent 72%) 1px, transparent 1px);
+    linear-gradient(to right, var(--color-tree-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-tree-grid-line) 1px, transparent 1px);
   background-size: 32px 32px;
   opacity: 0.28;
 }
