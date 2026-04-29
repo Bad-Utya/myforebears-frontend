@@ -29,8 +29,8 @@ withDefaults(defineProps<{
         </p>
       </div>
 
-      <div class="flex gap-3" :class="compact ? 'flex-col sm:flex-row' : 'justify-center'">
-        <UButton color="neutral" variant="soft" icon="i-lucide-user-round-plus" to="/auth/register">
+      <div class="flex gap-3" :class="compact ? 'mx-auto flex-row' : 'justify-center'">
+        <UButton color="primary" variant="soft" icon="i-lucide-user-round-plus" to="/auth/register">
           {{ buttonLabel }}
         </UButton>
         <UButton color="neutral" variant="ghost" to="/auth/login">
