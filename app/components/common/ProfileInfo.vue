@@ -10,7 +10,8 @@ import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
 
 const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
 const userDataStore = useUserDataStore();
-const displayName = computed(() => userData.value?.nickname?.trim() || 'Unknown user');
+const displayName = computed(() => userData.value?.nickname?.trim() || userData.value?.email?.trim() || 'Unknown user');
+const emailLabel = computed(() => userData.value?.email?.trim() || 'Email unavailable');
 const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id));
 const isLoading = computed(() => pending.value || !initialized.value);
 const isGuest = computed(() => initialized.value && !userData.value);
@@ -18,25 +19,12 @@ const isLogoutModalOpen = ref(false);
 const shouldLogoutAll = ref(false);
 const isLogoutPending = ref(false);
 
-const registeredLabel = computed(() => {
-  const createdAtUnix = userData.value?.created_at_unix;
-
-  if (!createdAtUnix) {
-    return 'Registration date unavailable';
-  }
-
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(createdAtUnix * 1000);
-});
-
 const dropdownItems = computed(() => [[
   {
-    label: 'My profile',
+    label: 'Public profile',
     icon: 'i-lucide-user-round',
     disabled: typeof userData.value?.id !== 'number',
+    class: 'rounded-xl',
     onSelect: async () => {
       if (typeof userData.value?.id !== 'number') {
         return;
@@ -48,6 +36,7 @@ const dropdownItems = computed(() => [[
   {
     label: 'Settings',
     icon: 'i-lucide-settings-2',
+    class: 'rounded-xl',
     onSelect: async () => {
       await navigateTo('/settings');
     }
@@ -57,6 +46,10 @@ const dropdownItems = computed(() => [[
     label: 'Logout',
     icon: 'i-lucide-log-out',
     color: 'error',
+    class: 'rounded-xl text-error before:bg-transparent data-highlighted:before:bg-transparent data-[state=open]:before:bg-transparent',
+    ui: {
+      itemLeadingIcon: 'text-error'
+    },
     onSelect: () => {
       isLogoutModalOpen.value = true;
     }
@@ -113,12 +106,27 @@ onMounted(async () => {
     />
 
     <div v-else class="flex items-center gap-4">
-      <UDropdownMenu :items="dropdownItems" :content="{ side: 'top', align: 'start' }">
+      <UDropdownMenu
+        :items="dropdownItems"
+        :content="{ side: 'top', align: 'start', sideOffset: 12 }"
+        size="lg"
+        :ui="{
+          content: 'w-72 -ml-4 rounded-3xl border border-[var(--sidebar-border)] bg-sidebar-bg p-2 shadow-2xl ring-0',
+          viewport: 'space-y-2 divide-y-0',
+          group: 'p-0',
+          separator: 'mx-2 my-2 h-px bg-[var(--sidebar-border)]',
+          item: 'min-h-12 items-center rounded-xl px-3 py-3 text-sm text-[var(--sidebar-text)] transition-colors before:rounded-xl before:bg-transparent data-highlighted:before:bg-[var(--sidebar-hover)] data-[state=open]:before:bg-[var(--sidebar-hover)]',
+          itemLeadingIcon: 'size-5 text-[var(--sidebar-text-muted)]',
+          itemTrailingIcon: 'size-4 text-[var(--sidebar-text-muted)]',
+          itemLabel: 'font-medium',
+          itemTrailing: 'ml-auto'
+        }"
+      >
         <UButton
           block
           color="neutral"
           variant="ghost"
-          class="justify-start rounded-lg px-2 py-2"
+          class="justify-start rounded-2xl px-2 py-2 text-(--sidebar-text) hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)"
           :ui="{ base: 'w-full', leadingIcon: 'hidden', trailingIcon: 'hidden' }"
         >
           <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-12 shrink-0"/>
@@ -130,11 +138,11 @@ onMounted(async () => {
             {{ avatarPlaceholder.label }}
           </span>
           <span class="min-w-0 flex flex-col items-start">
-            <span class="text-sm font-semibold text-highlighted truncate">
+            <span class="text-sm font-semibold text-(--sidebar-text) truncate">
               {{ displayName }}
             </span>
-            <span class="text-xs text-muted truncate">
-              Joined {{ registeredLabel }}
+            <span class="text-xs text-(--sidebar-text-muted) truncate">
+              {{ emailLabel }}
             </span>
           </span>
         </UButton>

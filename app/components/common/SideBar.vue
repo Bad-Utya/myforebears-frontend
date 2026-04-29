@@ -23,14 +23,17 @@ const items: SidebarButtonListItem<Exclude<TabKey, null>>[] = [
 </script>
 
 <template>
-  <div v-if="isShown" class="flex h-screen w-fit flex-col gap-y-12 border-r border-default bg-neutral p-4">
+  <div
+    v-if="isShown"
+    class="sticky top-0 flex h-screen w-72 shrink-0 self-start flex-col gap-y-12 overflow-y-auto border-r border-[var(--sidebar-border)] bg-sidebar-bg p-4 text-[var(--sidebar-text)]"
+  >
     <div class="flex w-full items-center justify-between">
       <Logo />
       <UButton
         icon="i-lucide-arrow-left"
         color="neutral"
         variant="ghost"
-        class="rounded-xl"
+        class="rounded-xl text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
         @click="toggleVisibility"
       />
     </div>
@@ -42,10 +45,10 @@ const items: SidebarButtonListItem<Exclude<TabKey, null>>[] = [
     <ProfileInfo class="mt-auto" />
   </div>
 
-  <div v-else class="absolute">
+  <div v-else class="fixed left-4 top-4 z-30">
     <UButton
       icon="i-lucide-arrow-right"
-      class="m-4 rounded-xl"
+      class="rounded-xl"
       color="neutral"
       variant="soft"
       @click="toggleVisibility"
