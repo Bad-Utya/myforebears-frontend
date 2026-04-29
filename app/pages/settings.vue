@@ -467,14 +467,15 @@ onBeforeUnmount(() => {
               class="shrink-0"
               @click="showPasswords = !showPasswords"
             />
-            <PasswordInput
-              v-model="passwordConfirm"
-              placeholder="Repeat password"
-              :revealed="showPasswords"
-              hide-toggle
-              class="w-full"
-            />
           </div>
+
+          <PasswordInput
+            v-model="passwordConfirm"
+            placeholder="Repeat password"
+            :revealed="showPasswords"
+            hide-toggle
+            class="w-full"
+          />
 
           <div class="flex justify-end gap-3">
             <UButton
