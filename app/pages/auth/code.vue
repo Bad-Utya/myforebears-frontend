@@ -3,6 +3,7 @@ import {computed, ref} from 'vue';
 import sendRegisterRequest from "~/composables/scripts/auth/register";
 import {persistAuthTokens} from "~/composables/scripts/cookies/getAccessToken";
 import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
+import getLinkByEmail from "~/composables/scripts/redirect/email/getLinkByEmail";
 
 definePageMeta({ middleware: 'guest' });
 
@@ -71,7 +72,7 @@ function sendCodeAgain() {
 }
 
 async function openEmailLink() {
-  await navigateTo('/redirect/email', {external: true});
+  await navigateTo(getLinkByEmail(email.value), {external: true});
 }
 
 onMounted(() => {
