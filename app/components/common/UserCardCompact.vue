@@ -33,20 +33,19 @@ const registeredLabel = computed(() => {
 <template>
   <div
     v-if="props.pending"
-    class="flex min-h-32 items-center gap-4 rounded-2xl border border-default bg-neutral/40 p-4"
+    class="flex min-h-32 items-center gap-4 rounded-2xl border border-default bg-card-bg p-4"
   >
-    <USkeleton class="size-16 shrink-0 rounded-full" />
+    <USkeleton class="size-16 shrink-0 rounded-full bg-[var(--sidebar-skeleton)]" />
     <div class="min-w-0 flex-1 space-y-2">
-      <USkeleton class="h-4 w-32 rounded" />
-      <USkeleton class="h-3 w-28 rounded" />
-      <USkeleton class="h-8 w-24 rounded-xl" />
+      <USkeleton class="h-4 w-32 rounded bg-[var(--sidebar-skeleton)]" />
+      <USkeleton class="h-3 w-28 rounded bg-[var(--sidebar-skeleton)]" />
     </div>
   </div>
 
   <NuxtLink
     v-else
     :to="props.href"
-    class="group flex min-h-32 items-center gap-4 rounded-2xl border border-default bg-neutral/40 p-4 transition-colors hover:bg-neutral/55"
+    class="group flex min-h-32 items-center gap-4 rounded-2xl border border-default bg-card-bg p-4 transition-colors duration-200 ease-out hover:bg-white/6"
   >
     <UAvatar
       v-if="props.avatarUrl"
@@ -68,11 +67,6 @@ const registeredLabel = computed(() => {
       <p v-if="registeredLabel" class="mt-1 truncate text-xs text-muted">
         Joined {{ registeredLabel }}
       </p>
-      <div class="mt-3">
-        <span class="inline-flex items-center rounded-full border border-default px-2.5 py-1 text-xs text-toned">
-          View profile
-        </span>
-      </div>
     </div>
   </NuxtLink>
 </template>

@@ -87,12 +87,14 @@
   --color-slateblue-950: #1d1f4d;
 
   --color-sidebar-bg: rgb(16 16 16);
+  --color-card-bg: rgb(16 16 16);
   --color-sidebar-border: rgb(255 255 255 / 0.06);
   --color-sidebar-hover: rgb(255 255 255 / 0.08);
   --color-sidebar-active: rgb(255 255 255 / 0.14);
   --color-sidebar-active-hover: rgb(255 255 255 / 0.18);
   --color-sidebar-text: rgb(255 255 255 / 0.92);
   --color-sidebar-text-muted: rgb(255 255 255 / 0.56);
+  --color-sidebar-skeleton: rgb(255 255 255 / 0.16);
 }
 
 :root{
@@ -102,12 +104,14 @@
   --ui-bg: var(--color-carbon-600);
   --app-bg: var(--ui-bg);
   --sidebar-bg: var(--color-sidebar-bg);
+  --card-bg: var(--color-card-bg);
   --sidebar-border: var(--color-sidebar-border);
   --sidebar-hover: var(--color-sidebar-hover);
   --sidebar-active: var(--color-sidebar-active);
   --sidebar-active-hover: var(--color-sidebar-active-hover);
   --sidebar-text: var(--color-sidebar-text);
   --sidebar-text-muted: var(--color-sidebar-text-muted);
+  --sidebar-skeleton: var(--color-sidebar-skeleton);
   --timeline-undated-bg: color-mix(in srgb, var(--color-banana-300) 24%, var(--ui-bg) 76%);
   --timeline-undated-border: color-mix(in srgb, var(--color-banana-500) 38%, transparent 62%);
 }

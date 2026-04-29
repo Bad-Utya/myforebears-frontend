@@ -4,6 +4,11 @@ export default defineAppConfig({
       primary: 'turquoise',
       secondary: 'mauve',
       neutral: 'carbon',
+    },
+    checkbox: {
+      slots: {
+        base: 'rounded-sm ring ring-inset ring-primary/60 overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-2'
+      }
     }
   },
   api: {

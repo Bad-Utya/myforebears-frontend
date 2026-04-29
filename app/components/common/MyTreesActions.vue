@@ -206,8 +206,8 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <UButton
-      size="sm"
-      color="neutral"
+      size="lg"
+      color="primary"
       variant="soft"
       icon="i-lucide-plus"
       @click="openModal"

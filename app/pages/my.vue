@@ -17,8 +17,6 @@ const items = ref<TreeCardItem[]>([])
 const { userData, initialized, ensureLoaded } = useUserDataHandler()
 const isGuest = computed(() => initialized.value && !userData.value)
 
-definePageMeta({ middleware: 'auth' })
-
 function replaceItems(nextItems: TreeCardItem[]) {
   revokeTreeCardItems(items.value)
   items.value = nextItems
@@ -54,7 +52,7 @@ onBeforeUnmount(() => {
 
     <UMain class="w-full p-4 lg:p-6">
       <UContainer>
-        <div class="mb-4 space-y-1">
+        <div class="mb-4">
           <div
             v-if="!isGuest"
             class="flex items-center justify-between gap-3"
@@ -70,9 +68,6 @@ onBeforeUnmount(() => {
           >
             My Trees
           </h1>
-          <p class="text-sm text-muted">
-            {{ isGuest ? 'Create an account to keep your trees in one place.' : 'All your family trees in one grid.' }}
-          </p>
         </div>
 
         <CreateAccountSuggestion
@@ -84,7 +79,7 @@ onBeforeUnmount(() => {
 
         <template v-else>
           <TreeCardGrid
-            title="All Trees"
+            title=""
             :items="items"
             :pending="pending"
             :limit="12"

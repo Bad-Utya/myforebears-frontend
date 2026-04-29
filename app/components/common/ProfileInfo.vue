@@ -91,10 +91,10 @@ onMounted(async () => {
 <template>
   <div class="w-full">
     <div v-if="isLoading" class="flex items-center gap-4">
-      <USkeleton class="size-12 shrink-0 rounded-full"></USkeleton>
+      <USkeleton class="size-12 shrink-0 rounded-full bg-[var(--sidebar-skeleton)]"></USkeleton>
       <div class="w-full flex flex-col gap-y-2">
-        <USkeleton class="h-4 w-full"></USkeleton>
-        <USkeleton class="h-4 w-3/4"></USkeleton>
+        <USkeleton class="h-4 w-full bg-[var(--sidebar-skeleton)]"></USkeleton>
+        <USkeleton class="h-4 w-3/4 bg-[var(--sidebar-skeleton)]"></USkeleton>
       </div>
     </div>
 
@@ -126,7 +126,7 @@ onMounted(async () => {
           block
           color="neutral"
           variant="ghost"
-          class="justify-start rounded-2xl px-2 py-2 text-(--sidebar-text) hover:bg-(--sidebar-hover) hover:text-(--sidebar-text)"
+          class="gap-3.5 justify-start rounded-2xl px-2 py-2 text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
           :ui="{ base: 'w-full', leadingIcon: 'hidden', trailingIcon: 'hidden' }"
         >
           <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-12 shrink-0"/>
@@ -137,14 +137,18 @@ onMounted(async () => {
           >
             {{ avatarPlaceholder.label }}
           </span>
-          <span class="min-w-0 flex flex-col items-start">
-            <span class="text-sm font-semibold text-(--sidebar-text) truncate">
+          <span class="min-w-0 flex flex-1 flex-col items-start">
+            <span class="text-sm font-semibold text-[var(--sidebar-text)] truncate">
               {{ displayName }}
             </span>
-            <span class="text-xs text-(--sidebar-text-muted) truncate">
+            <span class="text-xs text-[var(--sidebar-text-muted)] truncate">
               {{ emailLabel }}
             </span>
           </span>
+          <UIcon
+            name="i-lucide-chevron-up"
+            class="size-4 shrink-0 text-[var(--sidebar-text-muted)]"
+          />
         </UButton>
       </UDropdownMenu>
     </div>
@@ -152,14 +156,17 @@ onMounted(async () => {
     <UModal
       v-model:open="isLogoutModalOpen"
       title="Confirm logout"
-      description="Choose how you want to end the session."
+      description="Choose if you want to end other sessions"
+      :ui="{
+        content: 'bg-default flex flex-col focus:outline-none'
+      }"
     >
       <template #body>
         <div class="space-y-5">
           <UCheckbox
             v-model="shouldLogoutAll"
+            color="primary"
             label="Logout from all devices"
-            description="Also end all other active sessions."
           />
 
           <div class="flex justify-end gap-3">

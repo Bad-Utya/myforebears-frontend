@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<{
 <template>
   <div
     v-if="props.pending"
-    class="relative overflow-hidden rounded-3xl border border-default bg-neutral/30 aspect-[3/4]"
+    class="relative overflow-hidden rounded-3xl border border-default bg-card-bg aspect-[3/4]"
   >
     <USkeleton class="absolute inset-0" />
     <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
@@ -34,7 +34,7 @@ const props = withDefaults(defineProps<{
   <NuxtLink
     v-else
     :to="props.href"
-    class="group relative block overflow-hidden rounded-4xl border border-default bg-muted aspect-3/4"
+    class="group relative block aspect-3/4 overflow-hidden rounded-4xl border border-default bg-card-bg transition-transform duration-200 ease-out hover:scale-[1.03] active:scale-[0.97]"
   >
     <TreeCardCover
       v-if="!props.avatar"
@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<{
         <p class="text-base font-semibold text-white truncate">
           {{ props.title }}
         </p>
-        <p v-if="props.author?.trim()" class="text-xs text-white/70 mt-1 truncate">
+        <p v-if="props.author?.trim()" class="text-xs text-white/70 mt-0 truncate">
           By {{ props.author }}
         </p>
         <p v-if="props.description" class="text-xs text-white/80 mt-3 line-clamp-3">

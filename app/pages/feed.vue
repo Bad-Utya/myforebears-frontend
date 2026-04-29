@@ -11,8 +11,6 @@ import type {TreeCardItem} from "~/composables/scripts/ui/mapTreeToTreeCardItem"
 const pending = ref(true);
 const items = ref<TreeCardItem[]>([]);
 
-definePageMeta({ middleware: 'auth' })
-
 function replaceItems(nextItems: TreeCardItem[]) {
   revokeTreeCardItems(items.value);
   items.value = nextItems;
@@ -44,7 +42,11 @@ onBeforeUnmount(() => {
 
     <UMain class="w-full p-4 lg:p-6">
       <UContainer>
-        <h1>Feed</h1>
+        <div class="mb-5">
+          <h1 class="text-2xl font-semibold">
+            Feed
+          </h1>
+        </div>
         <TreeCardGrid title="" :items="items" :pending="pending" :limit="10">
           <template #fallback>
             <p class="py-12 text-center text-sm text-muted">

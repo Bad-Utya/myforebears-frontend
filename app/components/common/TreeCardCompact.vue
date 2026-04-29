@@ -18,17 +18,17 @@ const props = withDefaults(defineProps<{
 <template>
   <div
     v-if="props.pending"
-    class="relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40"
+    class="relative flex gap-3 rounded-2xl border border-default bg-card-bg p-3"
   >
-    <div class="relative flex-none w-20 overflow-hidden rounded-4xl aspect-3/4 bg-muted">
-      <USkeleton class="absolute inset-0" />
+    <div class="relative aspect-3/4 w-20 flex-none overflow-hidden rounded-2xl bg-card-bg">
+      <USkeleton class="absolute inset-0 bg-[var(--sidebar-skeleton)]" />
     </div>
 
     <div class="min-w-0 flex flex-col justify-between py-0.5 w-full">
       <div class="min-w-0 space-y-2">
-        <USkeleton class="h-4 w-40 rounded" />
-        <USkeleton class="h-3 w-24 rounded" />
-        <USkeleton class="h-3 w-28 rounded" />
+        <USkeleton class="h-4 w-40 rounded bg-[var(--sidebar-skeleton)]" />
+        <USkeleton class="h-3 w-24 rounded bg-[var(--sidebar-skeleton)]" />
+        <USkeleton class="h-3 w-28 rounded bg-[var(--sidebar-skeleton)]" />
       </div>
     </div>
   </div>
@@ -36,9 +36,9 @@ const props = withDefaults(defineProps<{
   <NuxtLink
     v-else
     :to="props.href"
-    class="group relative flex gap-3 p-3 rounded-2xl border border-default bg-neutral/40 hover:bg-neutral/55 transition-colors"
+    class="group relative flex gap-3 rounded-2xl border border-default bg-card-bg p-3 transition-colors duration-200 ease-out hover:bg-white/6"
   >
-    <div class="relative flex-none w-20 overflow-hidden rounded-4xl aspect-3/4 bg-muted">
+    <div class="relative aspect-3/4 w-20 flex-none overflow-hidden rounded-2xl bg-card-bg">
       <TreeCardCover
         v-if="!props.avatar"
         :seed="props.coverSeed ?? props.title"
@@ -58,7 +58,7 @@ const props = withDefaults(defineProps<{
     <div class="min-w-0 flex flex-col justify-between py-0.5">
       <div class="min-w-0">
         <p class="text-sm font-semibold text-highlighted truncate">{{ props.title }}</p>
-        <p v-if="props.author?.trim()" class="text-xs text-muted mt-0.5 truncate">By {{ props.author }}</p>
+        <p v-if="props.author?.trim()" class="text-xs text-muted mt-0 truncate">By {{ props.author }}</p>
         <p v-if="props.description" class="text-xs text-toned mt-2 line-clamp-2 max-h-10 overflow-hidden">
           {{ props.description }}
         </p>
