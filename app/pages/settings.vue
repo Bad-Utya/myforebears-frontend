@@ -4,6 +4,7 @@ import CreateAccountSuggestion from '~/components/common/CreateAccountSuggestion
 import PasswordInput from '~/components/auth/PasswordInput.vue'
 import sendResetByTokenRequest from '~/composables/scripts/auth/resetPasswordByToken'
 import sendUploadUserAvatarRequest from '~/composables/scripts/photos/uploadUserAvatar'
+import useAppPreferencesHandler from '~/composables/scripts/storages/get/appPreferencesHandler'
 import { useUserDataStore } from '~/composables/scripts/storages/create/userData'
 import useUserDataHandler from '~/composables/scripts/storages/get/userDataHandler'
 import createAvatarPlaceholder from '~/composables/scripts/ui/createAvatarPlaceholder'
@@ -17,6 +18,13 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const avatarCropper = ref<{ exportBlob: (type?: string, size?: number) => Promise<Blob> } | null>(null)
 const userDataStore = useUserDataStore()
 const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
+const {
+  theme,
+  language,
+  ensureLoaded: ensureAppPreferencesLoaded,
+  setTheme,
+  setLanguage
+} = useAppPreferencesHandler()
 
 const isPageLoading = computed(() => pending.value || !initialized.value)
 const isGuest = computed(() => initialized.value && !userData.value)
@@ -58,9 +66,6 @@ const languageItems = [
   { key: 'ru', label: 'Ru' },
   { key: 'en', label: 'En' }
 ] as const
-
-function onThemeMockClick() {}
-function onLanguageMockClick() {}
 
 function revokeAvatarSourceUrl() {
   if (!avatarSourceUrl.value?.startsWith('blob:')) {
@@ -217,6 +222,7 @@ watch(avatarModalOpen, (isOpen) => {
 })
 
 onMounted(async () => {
+  ensureAppPreferencesLoaded()
   await ensureLoaded()
 })
 
@@ -299,6 +305,9 @@ onBeforeUnmount(() => {
                 <p class="font-medium text-highlighted">
                   Theme
                 </p>
+                <p class="text-sm text-muted">
+                  {{ theme === 'dark' ? 'Dark' : 'Light' }}
+                </p>
               </div>
 
               <div class="inline-flex rounded-lg border border-default p-1">
@@ -307,9 +316,9 @@ onBeforeUnmount(() => {
                   :key="item.key"
                   size="xs"
                   color="primary"
-                  :variant="item.key === 'dark' ? 'soft' : 'ghost'"
+                  :variant="item.key === theme ? 'soft' : 'ghost'"
                   class="px-3"
-                  @click="onThemeMockClick"
+                  @click="setTheme(item.key)"
                 >
                   {{ item.label }}
                 </UButton>
@@ -321,6 +330,9 @@ onBeforeUnmount(() => {
                 <p class="font-medium text-highlighted">
                   Language
                 </p>
+                <p class="text-sm text-muted">
+                  {{ language === 'ru' ? 'Russian' : 'English' }}
+                </p>
               </div>
 
               <div class="inline-flex rounded-lg border border-default p-1">
@@ -329,9 +341,9 @@ onBeforeUnmount(() => {
                   :key="item.key"
                   size="xs"
                   color="primary"
-                  :variant="item.key === 'ru' ? 'soft' : 'ghost'"
+                  :variant="item.key === language ? 'soft' : 'ghost'"
                   class="px-3"
-                  @click="onLanguageMockClick"
+                  @click="setLanguage(item.key)"
                 >
                   {{ item.label }}
                 </UButton>
