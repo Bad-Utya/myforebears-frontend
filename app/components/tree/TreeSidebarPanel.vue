@@ -203,6 +203,25 @@ const canSubmitEvent = computed(() => {
     && (eventDateUnknown.value || Boolean(buildEventDateIso()))
 })
 
+function formatEventTypePeopleRule(eventType: EventTypeDTO) {
+  const count = eventType.primary_persons_count ?? 0
+  const mode = eventType.primary_persons_mode ?? ''
+
+  if (mode.includes('UNLIMITED')) {
+    return count > 0 ? `${count}+` : 'Any'
+  }
+
+  if (mode.includes('AT_LEAST')) {
+    return `${count}+`
+  }
+
+  if (mode.includes('EXACT')) {
+    return String(count)
+  }
+
+  return count > 0 ? String(count) : 'Any'
+}
+
 const filteredTimelineEvents = computed(() => {
   const from = timelineDateFrom.value || undefined
   const to = timelineDateTo.value || undefined
@@ -325,8 +344,14 @@ const positionedTimelineEvents = computed(() => {
         ...event,
         left: `${Math.min(100, Math.max(0, left))}%`,
         stackIndex
-      }
-    })
+  }
+})
+
+watch(isPublicOnMainPage, (isPublic) => {
+  if (isPublic) {
+    isViewRestricted.value = false
+  }
+})
 })
 
 function syncTreeSettings() {
@@ -899,7 +924,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col gap-4">
-    <header class="border-b border-default pb-4">
+    <header v-if="props.section === 'timeline'" class="border-b border-default pb-4">
       <p class="text-sm font-semibold text-highlighted">
         {{ panelTitle }}
       </p>
@@ -925,22 +950,14 @@ onBeforeUnmount(() => {
       v-else-if="props.section === 'settings'"
       class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-2"
     >
-      <section class="rounded-xl border border-default p-4">
-        <div>
-          <p class="text-sm font-semibold text-highlighted">
-            General
-          </p>
-          <p class="mt-1 text-xs text-muted">
-            Update tree name, description and visibility flags.
-          </p>
-        </div>
-
-        <div class="mt-4 space-y-3">
+      <section class="rounded-xl border border-default bg-default p-4">
+        <div class="flex w-full flex-col gap-3">
           <UInput
             v-model="treeName"
             color="neutral"
             variant="subtle"
             placeholder="Tree name"
+            class="w-full"
             :disabled="!editable"
           />
 
@@ -951,6 +968,7 @@ onBeforeUnmount(() => {
             color="neutral"
             variant="subtle"
             placeholder="Tree description"
+            class="w-full"
             :disabled="!editable"
           />
 
@@ -963,26 +981,20 @@ onBeforeUnmount(() => {
           <UCheckbox
             v-model="isViewRestricted"
             label="Restricted view"
-            :disabled="!editable"
+            :disabled="!editable || isPublicOnMainPage"
           />
 
-          <div class="space-y-3 rounded-2xl border border-default bg-settings-section-bg p-4">
-            <div class="flex flex-col items-start gap-3">
-              <div>
-                <p class="text-sm font-medium text-highlighted">
-                  Tree avatar
-                </p>
-                <p class="text-xs text-muted">
-                  Upload and crop the cover image used in tree cards.
-                </p>
-              </div>
-
+          <div class="space-y-3 rounded-2xl border border-default bg-default p-4">
+            <div class="flex flex-row items-center gap-3">
+              <p class="text-sm font-medium text-highlighted">
+                Tree avatar
+              </p>
               <UButton
                 type="button"
                 color="neutral"
-                variant="outline"
+                variant="subtle"
                 :disabled="!editable"
-                class="w-fit"
+                class="ml-auto w-fit"
                 @click="avatarFileInput?.click()"
               >
                 Choose image
@@ -1009,22 +1021,13 @@ onBeforeUnmount(() => {
                   class="mx-auto block h-full w-full object-contain"
                 />
               </div>
-              <p class="text-xs text-muted">
-                Avatar will be cropped to the same portrait ratio used in tree cards.
-              </p>
             </div>
-
-            <p
-              v-else
-              class="text-sm text-muted"
-            >
-              Avatar is optional. Upload one to show it in tree cards.
-            </p>
           </div>
 
           <UButton
-            color="neutral"
+            color="primary"
             variant="soft"
+            class="w-fit"
             :disabled="!editable"
             :loading="isSettingsSaving"
             @click="saveTreeSettings"
@@ -1067,7 +1070,7 @@ onBeforeUnmount(() => {
           <div
             v-for="email in accessEmails"
             :key="email"
-            class="flex items-center justify-between gap-2 rounded-lg border border-default px-3 py-2"
+            class="flex items-center justify-between gap-2 rounded-lg border border-default bg-tree-panel-item-bg px-3 py-2"
           >
             <span class="min-w-0 truncate text-sm text-highlighted">{{ email }}</span>
             <UButton
@@ -1085,9 +1088,9 @@ onBeforeUnmount(() => {
         </p>
       </section>
 
-      <section class="rounded-xl border border-red-500/30 bg-red-500/5 p-4">
+      <section class="rounded-xl border border-red-500/30 p-4">
         <div>
-          <p class="text-sm font-semibold text-red-300">
+          <p class="text-sm font-semibold text-highlighted">
             Danger zone
           </p>
           <p class="mt-1 text-xs text-muted">
@@ -1110,40 +1113,6 @@ onBeforeUnmount(() => {
 
     <div v-else-if="props.section === 'events'" class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-2">
       <section class="rounded-xl border border-default p-4">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <p class="text-sm font-semibold text-highlighted">
-              Event actions
-            </p>
-            <p class="mt-1 text-xs text-muted">
-              Create events and extend the list of available event types.
-            </p>
-          </div>
-
-          <div class="flex gap-2">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-badge-plus"
-              :disabled="!editable"
-              @click="eventTypeModalOpen = true"
-            >
-              Type
-            </UButton>
-            <UButton
-              color="neutral"
-              variant="soft"
-              icon="i-lucide-calendar-plus"
-              :disabled="!editable"
-              @click="openCreateEventModal"
-            >
-              Event
-            </UButton>
-          </div>
-        </div>
-      </section>
-
-      <section class="rounded-xl border border-default p-4">
         <div class="flex items-center justify-between gap-3">
           <div>
             <p class="text-sm font-semibold text-highlighted">
@@ -1153,9 +1122,15 @@ onBeforeUnmount(() => {
               Reusable templates for event creation.
             </p>
           </div>
-          <UBadge color="neutral" variant="subtle">
-            {{ eventTypes.length }}
-          </UBadge>
+          <UButton
+            color="neutral"
+            variant="subtle"
+            icon="i-lucide-badge-plus"
+            :disabled="!editable"
+            @click="eventTypeModalOpen = true"
+          >
+            Type
+          </UButton>
         </div>
 
         <div v-if="isEventsLoading" class="mt-4 flex flex-col gap-2">
@@ -1167,14 +1142,14 @@ onBeforeUnmount(() => {
           <article
             v-for="eventType in eventTypes"
             :key="eventType.id"
-            class="group flex items-center justify-between gap-2 rounded-lg border border-default px-3 py-2"
+            class="group flex items-center justify-between gap-2 rounded-lg border border-default bg-tree-panel-item-bg px-3 py-2"
           >
             <div class="min-w-0">
               <p class="truncate text-sm text-highlighted">
                 {{ eventType.name || 'Unnamed type' }}
               </p>
               <p class="text-xs text-muted">
-                Primary people: {{ eventType.primary_persons_count ?? 0 }} / {{ eventType.primary_persons_mode ?? '—' }}
+                People count: {{ formatEventTypePeopleRule(eventType) }}
               </p>
             </div>
             <UButton
@@ -1188,7 +1163,7 @@ onBeforeUnmount(() => {
           </article>
         </div>
 
-        <p v-else class="mt-4 text-sm text-muted">
+        <p v-else class="mt-4 rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3 text-sm text-muted">
           No event types available.
         </p>
       </section>
@@ -1203,9 +1178,15 @@ onBeforeUnmount(() => {
               Timeline entries attached to this tree.
             </p>
           </div>
-          <UBadge color="neutral" variant="subtle">
-            {{ events.length }}
-          </UBadge>
+          <UButton
+            color="neutral"
+            variant="soft"
+            icon="i-lucide-calendar-plus"
+            :disabled="!editable"
+            @click="openCreateEventModal"
+          >
+            Event
+          </UButton>
         </div>
 
         <div v-if="isEventsLoading" class="mt-4 flex flex-col gap-2">
@@ -1218,7 +1199,7 @@ onBeforeUnmount(() => {
           <article
             v-for="event in events"
             :key="event.id || event.event_id"
-            class="group rounded-lg border border-default px-3 py-3"
+            class="group rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
@@ -1255,7 +1236,7 @@ onBeforeUnmount(() => {
           </article>
         </div>
 
-        <p v-else class="mt-4 text-sm text-muted">
+        <p v-else class="mt-4 rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3 text-sm text-muted">
           No events created yet.
         </p>
       </section>
@@ -1444,8 +1425,8 @@ onBeforeUnmount(() => {
     >
       <template #body>
         <div class="mx-auto flex w-full max-w-3xl flex-col gap-4">
-          <div class="space-y-2">
-            <label class="text-sm text-muted">Event type</label>
+          <div class="flex items-start justify-between gap-6">
+            <label class="pt-2 text-sm text-muted">Event type</label>
             <USelect
               v-model="selectedEventTypeId"
               :items="eventTypes.map(eventType => ({ label: eventType.name || 'Unnamed type', value: eventType.id || '' }))"
@@ -1453,6 +1434,7 @@ onBeforeUnmount(() => {
               placeholder="Choose event type"
               color="neutral"
               variant="subtle"
+              class="min-w-72 max-w-full"
             />
           </div>
 
@@ -1583,7 +1565,7 @@ onBeforeUnmount(() => {
               Cancel
             </UButton>
             <UButton
-              color="neutral"
+              color="primary"
               variant="soft"
               :loading="isEventSaving"
               :disabled="!canSubmitEvent"
@@ -1635,7 +1617,7 @@ onBeforeUnmount(() => {
             <UButton color="neutral" variant="ghost" @click="eventTypeModalOpen = false">
               Cancel
             </UButton>
-            <UButton color="neutral" variant="soft" :loading="isEventTypeSaving" @click="createEventType">
+            <UButton color="primary" variant="soft" :loading="isEventTypeSaving" @click="createEventType">
               Create type
             </UButton>
           </div>

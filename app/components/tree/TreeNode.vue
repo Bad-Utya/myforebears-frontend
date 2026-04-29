@@ -515,11 +515,14 @@ onBeforeUnmount(() => {
     v-model:open="modalOpen"
     :title="modalName"
     :description="isRoot ? 'Root person of this tree.' : 'Family member details.'"
+    :ui="{
+      content: 'bg-default flex flex-col focus:outline-none'
+    }"
   >
     <template #body>
-      <div class="space-y-5">
-        <div class="flex items-start gap-4">
-          <div class="tree-node__avatar-shell shrink-0">
+      <div class="mx-auto flex w-full max-w-3xl flex-col gap-5">
+        <div class="flex items-start gap-4 rounded-xl border border-default bg-settings-section-bg p-4">
+          <div class="tree-node__avatar-shell tree-node__avatar-shell--modal shrink-0">
             <img
               v-if="avatarUrl"
               :src="avatarUrl"
@@ -552,23 +555,23 @@ onBeforeUnmount(() => {
           v-if="!editMode"
           class="grid gap-3 sm:grid-cols-2"
         >
-          <div class="tree-node__info">
+          <div class="tree-node__info rounded-xl border border-default bg-default">
             <span class="tree-node__info-label">Role</span>
             <span class="tree-node__info-value">{{ props.roleLabel || 'Family member' }}</span>
           </div>
-          <div class="tree-node__info">
+          <div class="tree-node__info rounded-xl border border-default bg-default">
             <span class="tree-node__info-label">Gender</span>
             <span class="tree-node__info-value">{{ genderLabel }}</span>
           </div>
-          <div class="tree-node__info">
+          <div class="tree-node__info rounded-xl border border-default bg-default">
             <span class="tree-node__info-label">First name</span>
             <span class="tree-node__info-value">{{ props.person.first_name || '—' }}</span>
           </div>
-          <div class="tree-node__info">
+          <div class="tree-node__info rounded-xl border border-default bg-default">
             <span class="tree-node__info-label">Last name</span>
             <span class="tree-node__info-value">{{ props.person.last_name || '—' }}</span>
           </div>
-          <div class="tree-node__info sm:col-span-2">
+          <div class="tree-node__info rounded-xl border border-default bg-default sm:col-span-2">
             <span class="tree-node__info-label">Patronymic</span>
             <span class="tree-node__info-value">{{ props.person.patronymic || '—' }}</span>
           </div>
@@ -576,7 +579,7 @@ onBeforeUnmount(() => {
 
         <form
           v-else
-          class="space-y-4"
+          class="mx-auto flex w-full max-w-3xl flex-col gap-4"
           @submit.prevent="savePerson"
         >
           <UInput
@@ -624,21 +627,16 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="space-y-3 rounded-2xl border border-default bg-default/60 p-4">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <p class="text-sm font-medium text-highlighted">
-                  Avatar
-                </p>
-                <p class="text-xs text-muted">
-                  Upload and crop a square avatar for this person.
-                </p>
-              </div>
-
+          <div class="space-y-3 rounded-2xl border border-default bg-default p-4">
+            <div class="flex items-center gap-3">
+              <p class="text-sm font-medium text-highlighted">
+                Avatar
+              </p>
               <UButton
                 type="button"
                 color="neutral"
-                variant="outline"
+                variant="subtle"
+                class="ml-auto w-fit"
                 @click="avatarFileInput?.click()"
               >
                 Choose image
@@ -666,9 +664,6 @@ onBeforeUnmount(() => {
                   class="mx-auto block max-h-72 w-full object-contain"
                 />
               </div>
-              <p class="text-xs text-muted">
-                New avatar will be uploaded when you save changes.
-              </p>
             </div>
           </div>
 
@@ -699,6 +694,7 @@ onBeforeUnmount(() => {
             color="error"
             variant="ghost"
             icon="i-lucide-trash-2"
+            class="mr-auto"
             :loading="isDeleting"
             @click="deletePerson"
           >
@@ -729,10 +725,13 @@ onBeforeUnmount(() => {
     v-model:open="createModalOpen"
     :title="createActionTitle"
     description="Create a new related person in this tree."
+    :ui="{
+      content: 'bg-default flex flex-col focus:outline-none'
+    }"
   >
     <template #body>
       <form
-        class="space-y-4"
+        class="mx-auto flex w-full max-w-3xl flex-col gap-4"
         @submit.prevent="createRelatedPerson"
       >
         <UInput
@@ -851,6 +850,10 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   overflow: hidden;
   background: var(--tree-avatar-bg);
+}
+
+.tree-node__avatar-shell--modal {
+  background: color-mix(in srgb, var(--color-carbon-300) 24%, var(--color-carbon-700) 76%);
 }
 
 .tree-node__avatar-fallback {

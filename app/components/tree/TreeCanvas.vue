@@ -81,6 +81,7 @@ const nodeActions = computed(() => {
       action: 'parent' | 'partner' | 'child'
       label: string
       icon: string
+      anchorClass: string
       x: number
       y: number
     }> = []
@@ -95,8 +96,9 @@ const nodeActions = computed(() => {
         action: 'parent',
         label: 'Parent',
         icon: 'i-lucide-arrow-up-to-line',
-        x: node.x + node.width / 2,
-        y: node.y - 20
+        anchorClass: 'tree-canvas__node-action-anchor--top-left',
+        x: node.x,
+        y: node.y
       })
     }
 
@@ -107,8 +109,9 @@ const nodeActions = computed(() => {
         action: 'partner',
         label: 'Partner',
         icon: 'i-lucide-heart-plus',
-        x: node.x + node.width + 20,
-        y: node.y + node.height / 2
+        anchorClass: 'tree-canvas__node-action-anchor--top-right',
+        x: node.x + node.width,
+        y: node.y
       })
 
       actions.push({
@@ -117,8 +120,9 @@ const nodeActions = computed(() => {
         action: 'child',
         label: 'Child',
         icon: 'i-lucide-baby',
-        x: node.x + node.width / 2,
-        y: node.y + node.height + 20
+        anchorClass: 'tree-canvas__node-action-anchor--bottom-left',
+        x: node.x,
+        y: node.y + node.height
       })
     }
 
@@ -270,7 +274,7 @@ function fitToView() {
   translateY.value = (viewportHeight - props.height * scale.value) / 2
 }
 
-function setScale(nextScale: number) {
+function setScale(nextScale: number, anchorRatioX = 0.5, anchorRatioY = 0.5) {
   const viewport = viewportRef.value
 
   if (!viewport) {
@@ -278,13 +282,13 @@ function setScale(nextScale: number) {
   }
 
   const clampedScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, nextScale))
-  const viewportCenterX = viewport.clientWidth / 2
-  const viewportCenterY = viewport.clientHeight / 2
-  const sceneCenterX = (viewportCenterX - translateX.value) / scale.value
-  const sceneCenterY = (viewportCenterY - translateY.value) / scale.value
+  const anchorX = viewport.clientWidth * anchorRatioX
+  const anchorY = viewport.clientHeight * anchorRatioY
+  const sceneCenterX = (anchorX - translateX.value) / scale.value
+  const sceneCenterY = (anchorY - translateY.value) / scale.value
 
-  translateX.value = viewportCenterX - sceneCenterX * clampedScale
-  translateY.value = viewportCenterY - sceneCenterY * clampedScale
+  translateX.value = anchorX - sceneCenterX * clampedScale
+  translateY.value = anchorY - sceneCenterY * clampedScale
   scale.value = clampedScale
 }
 
@@ -321,6 +325,27 @@ function handlePointerMove(event: PointerEvent) {
 
 function stopDragging() {
   isDragging.value = false
+}
+
+function handleWheel(event: WheelEvent) {
+  event.preventDefault()
+
+  const viewport = viewportRef.value
+  const bounds = viewport?.getBoundingClientRect()
+
+  if (!bounds) {
+    return
+  }
+
+  const anchorRatioX = (event.clientX - bounds.left) / bounds.width
+  const anchorRatioY = (event.clientY - bounds.top) / bounds.height
+  const direction = event.deltaY > 0 ? -1 : 1
+
+  setScale(
+    scale.value + direction * SCALE_STEP,
+    Math.max(0, Math.min(1, anchorRatioX)),
+    Math.max(0, Math.min(1, anchorRatioY))
+  )
 }
 
 function setTreeNodeRef(nodeId: string, instance: TreeNodeExpose | null) {
@@ -390,6 +415,7 @@ onBeforeUnmount(() => {
     :class="{ 'tree-canvas--dragging': isDragging }"
     :aria-busy="props.pending"
     @pointerdown="startDragging"
+    @wheel.prevent="handleWheel"
   >
     <div class="tree-canvas__grid absolute inset-0" aria-hidden="true" />
 
@@ -406,7 +432,7 @@ onBeforeUnmount(() => {
           {{ props.treeDescription }}
         </p>
         <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-          <span>Author</span>
+          <span>By</span>
           <NuxtLink
             v-if="props.treeAuthorHref"
             :to="props.treeAuthorHref"
@@ -446,6 +472,7 @@ onBeforeUnmount(() => {
         v-for="action in nodeActions"
         :key="action.id"
         class="tree-canvas__node-action-anchor"
+        :class="action.anchorClass"
         :style="{
           left: `${action.x}px`,
           top: `${action.y}px`
@@ -564,6 +591,23 @@ onBeforeUnmount(() => {
 
 .tree-canvas__partner-child-action-anchor,
 .tree-canvas__node-action-anchor {
+  position: absolute;
+  z-index: 4;
+}
+
+.tree-canvas__node-action-anchor--top-left {
+  transform: translate(0, calc(-100% - 8px));
+}
+
+.tree-canvas__node-action-anchor--top-right {
+  transform: translate(-100%, calc(-100% - 8px));
+}
+
+.tree-canvas__node-action-anchor--bottom-left {
+  transform: translate(0, 8px);
+}
+
+.tree-canvas__partner-child-action-anchor {
   position: absolute;
   z-index: 4;
   transform: translate(-50%, -50%);

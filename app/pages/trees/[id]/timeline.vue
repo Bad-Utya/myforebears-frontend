@@ -250,7 +250,7 @@ const positionedTimelineEvents = computed<PositionedTimelineEvent[]>(() => {
 })
 
 const timelineSummary = computed(() => {
-  return `${filteredTimelineEvents.value.length} events • ${timelineYears.value.length ? `${timelineStartYear.value}–${timelineEndYear.value}` : 'No dated events'}`
+  return timelineYears.value.length ? `${timelineStartYear.value}–${timelineEndYear.value}` : 'No dated events'
 })
 
 function normalizeEventDatePrecision(value?: string) {
@@ -711,7 +711,7 @@ onBeforeUnmount(() => {
 <template>
   <UMain class="timeline-page min-h-screen p-4 sm:p-6">
     <div class="mx-auto flex max-w-[1500px] flex-col gap-4">
-      <section class="rounded-[2rem] border border-default bg-default/90 p-4 shadow-sm sm:p-6">
+      <section class="rounded-xl border border-default bg-default p-4 sm:p-6">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <p class="text-lg font-semibold text-highlighted">
@@ -723,16 +723,15 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="flex items-center gap-2">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-minus" :disabled="pending" @click="zoomOut" />
-            <UButton color="neutral" variant="ghost" icon="i-lucide-scan-search" :disabled="pending" @click="fitTimeline" />
-            <UButton color="neutral" variant="ghost" icon="i-lucide-plus" :disabled="pending" @click="zoomIn" />
-            <span class="min-w-14 text-center text-xs font-medium text-muted">{{ scalePercentLabel }}</span>
+            <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" @click="navigateTo(`/trees/${treeId}/main`)">
+              Back
+            </UButton>
           </div>
         </div>
 
         <div
           ref="viewportRef"
-          class="timeline-canvas relative overflow-hidden rounded-[1.5rem] border border-default bg-white/50"
+          class="timeline-canvas relative overflow-hidden rounded-xl border border-default bg-default"
           :class="{ 'cursor-grabbing': isDragging, 'cursor-grab': !isDragging }"
           @pointerdown="startDragging"
           @wheel.prevent="handleWheel"
@@ -741,7 +740,7 @@ onBeforeUnmount(() => {
             class="timeline-canvas__nav timeline-canvas__nav--left"
             data-export-ignore="true"
             color="neutral"
-            variant="soft"
+            variant="subtle"
             icon="i-lucide-chevron-left"
             :disabled="pending"
             @click.stop="shiftTimeline(1)"
@@ -750,17 +749,24 @@ onBeforeUnmount(() => {
             class="timeline-canvas__nav timeline-canvas__nav--right"
             data-export-ignore="true"
             color="neutral"
-            variant="soft"
+            variant="subtle"
             icon="i-lucide-chevron-right"
             :disabled="pending"
             @click.stop="shiftTimeline(-1)"
           />
 
+          <div class="timeline-canvas__controls" data-export-ignore="true">
+            <UButton color="neutral" variant="ghost" icon="i-lucide-minus" :disabled="pending" @click.stop="zoomOut" />
+            <UButton color="neutral" variant="ghost" icon="i-lucide-scan-search" :disabled="pending" @click.stop="fitTimeline" />
+            <UButton color="neutral" variant="ghost" icon="i-lucide-plus" :disabled="pending" @click.stop="zoomIn" />
+            <span class="min-w-14 text-center text-xs font-medium text-muted">{{ scalePercentLabel }}</span>
+          </div>
+
           <div v-if="pending" class="absolute inset-0 z-10 flex items-center justify-center">
-            <div class="flex items-center gap-3 rounded-full border border-default bg-default/90 px-4 py-2 text-sm text-highlighted shadow-lg">
-              <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin" />
-              Loading timeline
-            </div>
+              <div class="flex items-center gap-3 rounded-full border border-default bg-default px-4 py-2 text-sm text-highlighted shadow-lg">
+                <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin" />
+                Loading timeline
+              </div>
           </div>
 
           <div
@@ -780,14 +786,14 @@ onBeforeUnmount(() => {
                 '--timeline-level': event.stackIndex
               }"
             >
-              <div class="timeline-event__card rounded-lg border border-default bg-default/96 px-3 py-2 shadow-sm">
-                <p class="text-[11px] font-semibold text-highlighted">
+              <div class="timeline-event__card rounded-lg border border-default bg-tree-panel-item-bg px-3 py-2 shadow-sm">
+                <p class="text-xs font-semibold text-highlighted">
                   {{ formatEventTypeLabel(event.event_type_id) }}
                 </p>
-                <p class="mt-1 text-[10px] text-muted">
+                <p class="mt-1 text-[11px] text-muted">
                   {{ formatTimelineDate(event) }}
                 </p>
-                <p class="mt-1 text-[10px] text-muted">
+                <p class="mt-1 text-[11px] text-muted">
                   Primary: {{ formatPeople(event.primary_person_ids) }}
                 </p>
               </div>
@@ -809,7 +815,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section class="rounded-[2rem] border border-default bg-default/90 p-4 shadow-sm sm:p-6">
+      <section class="rounded-xl border border-default bg-default p-4 sm:p-6">
         <div class="flex flex-col gap-4">
           <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <UInput
@@ -837,9 +843,6 @@ onBeforeUnmount(() => {
               variant="subtle"
               class="lg:col-span-2"
             />
-            <UButton color="neutral" variant="soft" icon="i-lucide-save" :disabled="pending" @click="saveTimeline">
-              Save PNG
-            </UButton>
           </div>
 
           <div v-if="timelinePersonIds.length" class="flex flex-wrap items-center gap-2">
@@ -854,7 +857,7 @@ onBeforeUnmount(() => {
             </UBadge>
           </div>
 
-          <div v-if="undatedTimelineEvents.length" class="rounded-xl border border-default bg-default/90 p-4">
+          <div v-if="undatedTimelineEvents.length" class="rounded-xl border border-default bg-default p-4">
             <p class="text-sm font-semibold text-highlighted">
               Undated or unknown-date events
             </p>
@@ -862,7 +865,7 @@ onBeforeUnmount(() => {
               <article
                 v-for="event in undatedTimelineEvents"
                 :key="`undated-${event.id || event.event_id}`"
-                class="group rounded-lg border border-default px-3 py-3"
+                class="group rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3"
                 :class="{ 'timeline-event__card--approximate': isApproximateEvent(event) }"
               >
                 <div class="flex items-start justify-between gap-3">
@@ -889,18 +892,6 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" @click="navigateTo(`/trees/${treeId}/main`)">
-              Back
-            </UButton>
-
-            <div class="flex flex-wrap items-center gap-2 text-xs text-muted">
-              <UBadge color="neutral" variant="subtle">
-                {{ filteredTimelineEvents.length }} events
-              </UBadge>
-              <span>Approximate dates use striped cards.</span>
-            </div>
-          </div>
         </div>
       </section>
     </div>
@@ -1042,13 +1033,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .timeline-page {
-  background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--ui-primary) 10%, transparent 90%), transparent 26%),
-    linear-gradient(180deg, color-mix(in srgb, var(--ui-bg) 96%, white 4%), var(--ui-bg));
+  background: var(--ui-bg);
 }
 
 .timeline-canvas {
   min-height: 32rem;
+  background: color-mix(in srgb, var(--ui-bg) 90%, white 10%);
+  box-shadow: 0 20px 40px color-mix(in srgb, black 14%, transparent 86%);
 }
 
 .timeline-canvas__nav {
@@ -1056,8 +1047,6 @@ onBeforeUnmount(() => {
   top: 50%;
   z-index: 20;
   transform: translateY(-50%);
-  backdrop-filter: blur(8px);
-  background: color-mix(in srgb, var(--ui-bg) 68%, transparent 32%);
 }
 
 .timeline-canvas__nav--left {
@@ -1068,6 +1057,22 @@ onBeforeUnmount(() => {
   right: 1rem;
 }
 
+.timeline-canvas__controls {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--ui-bg) 92%, white 8%);
+  padding: 0.5rem;
+  box-shadow: 0 20px 40px color-mix(in srgb, black 14%, transparent 86%);
+  backdrop-filter: blur(8px);
+}
+
 .timeline-scene {
   min-height: 28rem;
   transform-origin: left bottom;
@@ -1075,8 +1080,9 @@ onBeforeUnmount(() => {
 }
 
 .timeline-axis {
+  position: absolute;
   bottom: 4rem;
-  border-top: 1px dashed color-mix(in srgb, var(--ui-border) 76%, transparent 24%);
+  border-top: 1px dashed color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
 }
 
 .timeline-year-marker {
@@ -1100,33 +1106,25 @@ onBeforeUnmount(() => {
 
 .timeline-event {
   bottom: 4rem;
-  width: 8rem;
+  width: 9.5rem;
   transform: translateX(-50%);
 }
 
 .timeline-event__card {
-  background: color-mix(in srgb, var(--ui-bg) 98%, white 2%);
   margin-bottom: 0.4rem;
+  box-shadow: 0 12px 28px color-mix(in srgb, black 12%, transparent 88%);
 }
 
 .timeline-event__stem {
   margin: 0.35rem auto 0;
-  height: calc(2.05rem + var(--timeline-level, 0) * 5rem);
+  height: calc(2.4rem + var(--timeline-level, 0) * 6.6rem);
   width: 1px;
   border-left: 1px dashed color-mix(in srgb, var(--ui-border) 80%, transparent 20%);
 }
 
 .timeline-event--approximate .timeline-event__card,
 .timeline-event__card--approximate {
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      color-mix(in srgb, var(--ui-warning) 10%, transparent 90%) 0,
-      color-mix(in srgb, var(--ui-warning) 10%, transparent 90%) 8px,
-      transparent 8px,
-      transparent 16px
-    ),
-    color-mix(in srgb, var(--ui-bg) 96%, var(--ui-warning) 4%) !important;
+  background: var(--tree-panel-item-bg) !important;
 }
 
 </style>

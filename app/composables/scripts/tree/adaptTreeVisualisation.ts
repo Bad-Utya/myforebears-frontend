@@ -43,7 +43,7 @@ const NODE_WIDTH = 224
 const NODE_HEIGHT = 96
 const SCENE_PADDING = 160
 const LEVEL_GAP = 176
-const COLUMN_GAP = 284
+const COLUMN_GAP = 332
 const COLUMN_UNIT_GAP = COLUMN_GAP / 2
 
 function isRecord(value: unknown): value is Record<string, unknown> {

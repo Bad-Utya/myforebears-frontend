@@ -89,6 +89,7 @@
   --color-sidebar-bg: rgb(16 16 16);
   --color-card-bg: rgb(16 16 16);
   --color-settings-section-bg: rgb(16 16 16);
+  --color-tree-panel-item-bg: rgb(16 16 16);
   --color-sidebar-border: rgb(255 255 255 / 0.06);
   --color-sidebar-hover: rgb(255 255 255 / 0.08);
   --color-sidebar-active: rgb(255 255 255 / 0.14);
@@ -107,6 +108,7 @@
   --sidebar-bg: var(--color-sidebar-bg);
   --card-bg: var(--color-card-bg);
   --settings-section-bg: var(--color-settings-section-bg);
+  --tree-panel-item-bg: var(--color-tree-panel-item-bg);
   --sidebar-border: var(--color-sidebar-border);
   --sidebar-hover: var(--color-sidebar-hover);
   --sidebar-active: var(--color-sidebar-active);
