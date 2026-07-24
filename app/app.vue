@@ -6,6 +6,10 @@ const colorMode = useColorMode()
 
 const { setLocale, locale } = useI18n()
 
+useHead({
+  title: 'Rooots'
+})
+
 watch(() => preferences.value.theme, (newTheme) => {
   if (colorMode.preference !== newTheme) {
     colorMode.preference = newTheme

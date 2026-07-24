@@ -111,8 +111,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UMain class="flex">
-    <UContainer class="m-auto w-full max-w-xl px-4 py-8">
+  <UMain class="flex min-h-dvh px-4 py-6 sm:py-8">
+    <UContainer class="m-auto w-full max-w-xl px-0">
       <div class="flex flex-col gap-4">
         <UButton
           color="neutral"
@@ -124,9 +124,9 @@ onMounted(async () => {
           {{ $t('settings.back') }}
         </UButton>
 
-        <div class="flex flex-col gap-4 rounded-2xl p-4 shadow-xl shadow-carbon-950/50">
+        <div class="flex flex-col gap-4 rounded-2xl p-4 shadow-xl shadow-carbon-950/50 sm:p-6">
           <div>
-            <h1 class="text-left text-3xl font-bold">{{ $t('settings.title') }}</h1>
+            <h1 class="text-left text-2xl font-bold sm:text-3xl">{{ $t('settings.title') }}</h1>
           </div>
 
           <div v-if="isPageLoading" class="flex flex-col gap-4">
@@ -159,7 +159,7 @@ onMounted(async () => {
               <p class="text-sm font-semibold text-muted uppercase tracking-wider">
                 {{ $t('settings.nickname') }}
               </p>
-              <div class="flex gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UInput
                   v-model="nickname"
                   :disabled="!isEditingNickname"
@@ -174,7 +174,7 @@ onMounted(async () => {
                   @click="isEditingNickname = true"
                 />
 
-                <div v-else class="flex flex-row gap-2">
+                <div v-else class="flex flex-wrap gap-2">
                   <UButton
                     color="neutral"
                     variant="soft"
@@ -197,8 +197,8 @@ onMounted(async () => {
                 {{ $t('settings.update_password') }}
               </p>
               <section class="flex flex-col gap-2 w-full">
-                <div class="flex gap-2 w-full">
-                  <div class="flex flex-row gap-2 w-full">
+                <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-start">
+                  <div class="flex w-full flex-col gap-2 sm:flex-row">
                     <PasswordInput
                       v-model="password"
                       :placeholder="$t('settings.new_password')"
@@ -222,15 +222,15 @@ onMounted(async () => {
                   />
                 </div>
 
-                <div class="flex gap-2 items-center pt-2">
-                  <p v-if="!passwordsMatch && passwordConfirm.length > 0" class="truncate text-error text-sm">
+                <div class="flex flex-wrap items-center gap-2 pt-2">
+                  <p v-if="!passwordsMatch && passwordConfirm.length > 0" class="text-error text-sm">
                     {{ $t('settings.passwords_dont_match') }}
                   </p>
 
                   <UButton
                     :loading="passwordPending"
                     :disabled="!passwordsMatch || password.length == 0"
-                    class="ml-auto w-full sm:w-auto"
+                    class="sm:ml-auto"
                     @click="savePassword"
                   >
                     {{ $t('settings.update_password') }}
@@ -244,7 +244,7 @@ onMounted(async () => {
             </p>
 
             <div class="grid grid-cols gap-4">
-              <section class="flex items-center justify-between gap-4">
+              <section class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
                 <p class="text-sm font-medium">{{ $t('settings.theme') }}</p>
                 <UColorModeSwitch
                   size="lg"
@@ -252,7 +252,7 @@ onMounted(async () => {
                 />
               </section>
 
-              <section class="flex items-center justify-between gap-4">
+              <section class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
                 <p class="text-sm font-medium">{{ $t('settings.language') }}</p>
                 <div class="inline-flex rounded-lg border border-default">
                   <UButton

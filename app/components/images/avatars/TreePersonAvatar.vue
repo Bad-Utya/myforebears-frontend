@@ -19,6 +19,10 @@ const { t } = useI18n();
 const props = defineProps<Props>()
 const imgError = ref(false)
 
+watch(() => props.avatarUrl, () => {
+  imgError.value = false
+})
+
 const fullName = computed(() => {
   const parts = [props.person.first_name, props.person.last_name].filter(Boolean)
   return parts.length ? parts.join(' ') : t('tree.person.unknown')

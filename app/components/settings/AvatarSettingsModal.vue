@@ -55,7 +55,7 @@ function close() {
     v-model:open="isModalVisible"
     @close="close"
     :title="t('settings.avatar_modal.title')"
-    :ui="{ content: 'sm:max-w-md' }"
+    :ui="{ content: 'max-h-[90dvh] overflow-y-auto sm:max-w-md' }"
   >
     <template #body>
       <div class="flex flex-col gap-4">
@@ -80,7 +80,7 @@ function close() {
             @change="handleFileChange"
           >
 
-          <div class="flex gap-2 pt-2">
+          <div class="flex flex-wrap items-center gap-2 pt-2">
             <UButton
               variant="soft"
               color="neutral"
@@ -93,7 +93,7 @@ function close() {
             <UButton
               color="neutral"
               variant="ghost"
-              class="ml-auto"
+              class="sm:ml-auto"
               @click="close">
               {{ t('common.cancel') }}
             </UButton>

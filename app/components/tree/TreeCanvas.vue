@@ -3,20 +3,20 @@ import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
 import type RelationshipDTO from '~/services/familytree/dtos/inner/RelationshipDTO'
 
 import TreeCanvasViewport from '~/components/tree/TreeCanvasViewport.vue'
-import TreeCanvasSummary from "~/components/tree/panels/TreeCanvasSummary.vue";
-import TreeCanvasConnectionLayer from "~/components/tree/layers/TreeCanvasConnectionLayer.vue";
-import TreeCanvasNodeLayer from "~/components/tree/layers/TreeCanvasNodeLayer.vue";
-import TreeCanvasEmptyState from "~/components/tree/placeholders/TreeCanvasEmptyState.vue";
-import TreeCanvasLoading from "~/components/tree/panels/TreeCanvasLoading.vue";
-import TreeCanvasControls from "~/components/tree/panels/TreeCanvasControls.vue";
-import TreeCanvasActionLayer from "~/components/tree/layers/TreeCanvasActionLayer.vue";
+import TreeCanvasSummary from '~/components/tree/panels/TreeCanvasSummary.vue'
+import TreeCanvasConnectionLayer from '~/components/tree/layers/TreeCanvasConnectionLayer.vue'
+import TreeCanvasNodeLayer from '~/components/tree/layers/TreeCanvasNodeLayer.vue'
+import TreeCanvasEmptyState from '~/components/tree/placeholders/TreeCanvasEmptyState.vue'
+import TreeCanvasLoading from '~/components/tree/panels/TreeCanvasLoading.vue'
+import TreeCanvasControls from '~/components/tree/panels/TreeCanvasControls.vue'
+import TreeCanvasActionLayer from '~/components/tree/layers/TreeCanvasActionLayer.vue'
 
-import {useTreeCanvasViewport} from '~/composables/trees/useTreeCanvasViewport'
-import {useTreeRelationshipActions} from '~/composables/trees/useTreeRelationshipActions'
+import { useTreeCanvasViewport } from '~/composables/trees/useTreeCanvasViewport'
+import { useTreeRelationshipActions } from '~/composables/trees/useTreeRelationshipActions'
 
-import type {TreeVisualNode} from "~/utils/ui/tree/coordinates/computeNodes";
-import type {TreeVisualConnection} from "~/utils/ui/tree/coordinates/computeConnections";
-import TreeCreatePersonModal from "~/components/tree/modals/person/TreeCreatePersonModal.vue";
+import type { TreeVisualNode } from '~/utils/ui/tree/coordinates/computeNodes'
+import type { TreeVisualConnection } from '~/utils/ui/tree/coordinates/computeConnections'
+import TreeCreatePersonModal from '~/components/tree/modals/person/TreeCreatePersonModal.vue'
 
 const props = defineProps<{
   treeId: string
@@ -46,11 +46,11 @@ const availableParentRoles = ref<('FATHER' | 'MOTHER')[]>([])
 const person = ref<PersonDTO | null>(null)
 
 function openCreateModal({
-                           nodeId,
-                           action,
-                           relatedPersonIds,
-                           event
-                         }: {
+  nodeId,
+  action,
+  relatedPersonIds,
+  event
+}: {
   nodeId: string
   action: 'child' | 'parent' | 'partner'
   relatedPersonIds?: string[]
@@ -116,7 +116,10 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="viewportRef" class="relative w-full h-full min-h-0 overflow-hidden">
+  <div
+    ref="viewportRef"
+    class="relative w-full h-full min-h-0 overflow-hidden"
+  >
     <TreeCanvasViewport
       :scene-style="sceneStyle"
       :is-dragging="isDragging"
@@ -183,10 +186,11 @@ defineExpose({
     </TreeCanvasViewport>
 
     <TreeCreatePersonModal
+      v-if="person"
       v-model:open="createModalOpen"
       :tree-id="props.treeId"
-      :person="person!"
-      :partner-id="partnerId!"
+      :person="person"
+      :partner-id="partnerId ?? undefined"
       :available-parent-roles="availableParentRoles"
       :action="activeCreateAction"
       :related-person-ids="createRelatedPersonIds"

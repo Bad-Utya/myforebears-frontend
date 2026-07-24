@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type EventDTO from '~/services/events/dtos/inner/EventDTO'
 import type EventTypeDTO from '~/services/eventTypes/dtos/inner/EventTypeDTO'
-import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
-import { getTreePersonId } from '~/utils/ui/tree/resolveTreePersonId'
+import type { EventParticipant } from '~/utils/ui/events/eventParticipants'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   events: EventDTO[]
   eventTypes: EventTypeDTO[]
-  persons: PersonDTO[]
+  participants: EventParticipant[]
   editable: boolean
   loading?: boolean
 }>()
@@ -22,12 +21,8 @@ const emit = defineEmits<{
 
 const personNameMap = computed(() => {
   const map = new Map<string, string>()
-  props.persons.forEach(p => {
-    const id = getTreePersonId(p)
-    if (id) {
-      const name = [p.first_name, p.last_name].filter(Boolean).join(' ')
-      map.set(id, name || t('tree.events_list.unnamed_person'))
-    }
+  props.participants.forEach((participant) => {
+    map.set(participant.id, participant.name || t('tree.events_list.unnamed_person'))
   })
   return map
 })
@@ -80,11 +75,21 @@ function formatEventDate(event: EventDTO) {
       </UButton>
     </div>
 
-    <div v-if="loading" class="mt-4 flex flex-col gap-2">
-      <USkeleton class="h-20 rounded-lg" v-for="i in 3" :key="i" />
+    <div
+      v-if="loading"
+      class="mt-4 flex flex-col gap-2"
+    >
+      <USkeleton
+        v-for="i in 3"
+        :key="i"
+        class="h-20 rounded-lg"
+      />
     </div>
 
-    <div v-else-if="events.length" class="mt-4 flex flex-col gap-2">
+    <div
+      v-else-if="events.length"
+      class="mt-4 flex flex-col gap-2"
+    >
       <article
         v-for="event in events"
         :key="event.id || event.event_id"
@@ -95,7 +100,9 @@ function formatEventDate(event: EventDTO) {
             <p class="truncate text-sm font-medium text-highlighted">
               {{ getTypeName(event.event_type_id) }}
             </p>
-            <p class="mt-1 text-xs text-muted">{{ formatEventDate(event) }}</p>
+            <p class="mt-1 text-xs text-muted">
+              {{ formatEventDate(event) }}
+            </p>
 
             <div class="mt-2 space-y-0.5">
               <p class="text-[11px] text-muted">
@@ -133,7 +140,10 @@ function formatEventDate(event: EventDTO) {
       </article>
     </div>
 
-    <p v-else class="mt-4 rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3 text-sm text-muted">
+    <p
+      v-else
+      class="mt-4 rounded-lg border border-default bg-tree-panel-item-bg px-3 py-3 text-sm text-muted"
+    >
       {{ t('tree.events_list.empty_state') }}
     </p>
   </section>

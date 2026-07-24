@@ -2,20 +2,19 @@
 import { treeFieldUi, treeSelectUi, treeSelectMenuUi } from '~/utils/ui/theme/treeTheme'
 import type EventDTO from '~/services/events/dtos/inner/EventDTO'
 import type EventTypeDTO from '~/services/eventTypes/dtos/inner/EventTypeDTO'
-import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
 import CreateEventRequest from '~/services/events/dtos/requests/CreateEventRequest'
 import UpdateEventRequest from '~/services/events/dtos/requests/UpdateEventRequest'
 import sendCreateEventRequest from '~/services/events/createEvent'
 import sendUpdateEventRequest from '~/services/events/updateEvent'
-import { getTreePersonId } from '~/utils/ui/tree/resolveTreePersonId'
-import showApiErrorToast from "~/utils/ui/notifications/showApiErrorToast";
+import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import type { EventParticipant } from '~/utils/ui/events/eventParticipants'
 
 const props = defineProps<{
   open: boolean
   treeId: string
   event: EventDTO | null
   eventTypes: EventTypeDTO[]
-  persons: PersonDTO[]
+  participants: EventParticipant[]
 }>()
 
 const { t } = useI18n()
@@ -24,7 +23,7 @@ const emit = defineEmits(['update:open', 'saved'])
 
 const isModalVisible = computed({
   get: () => props.open,
-  set: (value) => emit('update:open', value)
+  set: value => emit('update:open', value)
 })
 
 const toast = useToast()
@@ -55,10 +54,10 @@ const boundOptions = computed(() => [
   { value: 'NOT_AFTER', label: t('tree.events.modal.bounds.not_after') }
 ])
 
-const personOptions = computed(() => props.persons.map(p => ({
-  label: [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unnamed person',
-  value: getTreePersonId(p) ?? ''
-})).filter(p => p.value))
+const personOptions = computed(() => props.participants.map(participant => ({
+  label: participant.name,
+  value: participant.id
+})))
 
 const additionalOptions = computed(() =>
   personOptions.value.filter(p => !form.primaryIds.includes(p.value))
@@ -100,7 +99,7 @@ function fillFormFromEvent(event: EventDTO) {
   form.additionalIds = [...(event.additional_person_ids ?? [])]
 
   if (event.date_iso) {
-    const [y, m, d] = event.date_iso.split('-')
+    const [y, m] = event.date_iso.split('-')
     form.dateYear = y ?? ''
     form.dateMonth = m ?? ''
     form.dateDay = event.date_iso.slice(0, 10)
@@ -144,7 +143,11 @@ async function handleSave() {
 
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
-    props.event ? fillFormFromEvent(props.event) : resetForm()
+    if (props.event) {
+      fillFormFromEvent(props.event)
+    } else {
+      resetForm()
+    }
   }
 })
 
@@ -156,9 +159,9 @@ function close() {
 <template>
   <UModal
     v-model:open="isModalVisible"
-    @close="close"
     :title="form.id ? t('tree.events.modal.edit_title') : t('tree.events.modal.create_title')"
     :ui="{ content: 'bg-default' }"
+    @close="close"
   >
     <template #body>
       <div class="flex flex-col gap-4">
@@ -171,12 +174,26 @@ function close() {
           />
         </UFormField>
 
-        <UCheckbox v-model="form.isUnknown" :label="t('tree.events.modal.unknown_date')" />
+        <UCheckbox
+          v-model="form.isUnknown"
+          :label="t('tree.events.modal.unknown_date')"
+        />
 
-        <div v-if="!form.isUnknown" class="grid gap-3">
-          <UInput v-if="form.precision === 'DAY'" v-model="form.dateDay" type="date" :ui="treeFieldUi" />
+        <div
+          v-if="!form.isUnknown"
+          class="grid gap-3"
+        >
+          <UInput
+            v-if="form.precision === 'DAY'"
+            v-model="form.dateDay"
+            type="date"
+            :ui="treeFieldUi"
+          />
 
-          <div v-else class="flex gap-2">
+          <div
+            v-else
+            class="flex gap-2"
+          >
             <UInput
               v-if="form.precision === 'MONTH'"
               v-model="form.dateMonth"
@@ -195,18 +212,43 @@ function close() {
           </div>
 
           <div class="grid grid-cols-2 gap-2">
-            <USelect v-model="form.precision" :items="precisionOptions" value-key="value" :ui="treeSelectUi" />
-            <USelect v-model="form.bound" :items="boundOptions" value-key="value" :ui="treeSelectUi" />
+            <USelect
+              v-model="form.precision"
+              :items="precisionOptions"
+              value-key="value"
+              :ui="treeSelectUi"
+            />
+            <USelect
+              v-model="form.bound"
+              :items="boundOptions"
+              value-key="value"
+              :ui="treeSelectUi"
+            />
           </div>
         </div>
 
         <div class="space-y-4">
-          <UFormField :label="t('tree.events.modal.primary_people')" :error="primaryCountError">
-            <USelectMenu v-model="form.primaryIds" multiple :items="personOptions" value-key="value" :ui="treeSelectMenuUi" />
+          <UFormField
+            :label="t('tree.events.modal.primary_people')"
+            :error="primaryCountError"
+          >
+            <USelectMenu
+              v-model="form.primaryIds"
+              multiple
+              :items="personOptions"
+              value-key="value"
+              :ui="treeSelectMenuUi"
+            />
           </UFormField>
 
           <UFormField :label="t('tree.events.modal.additional_people')">
-            <USelectMenu v-model="form.additionalIds" multiple :items="additionalOptions" value-key="value" :ui="treeSelectMenuUi" />
+            <USelectMenu
+              v-model="form.additionalIds"
+              multiple
+              :items="additionalOptions"
+              value-key="value"
+              :ui="treeSelectMenuUi"
+            />
           </UFormField>
         </div>
       </div>
@@ -214,10 +256,18 @@ function close() {
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton variant="ghost" color="neutral" @click="close">
+        <UButton
+          variant="ghost"
+          color="neutral"
+          @click="close"
+        >
           {{ t('common.cancel') }}
         </UButton>
-        <UButton :loading="isSaving" :disabled="!!primaryCountError" @click="handleSave">
+        <UButton
+          :loading="isSaving"
+          :disabled="!!primaryCountError"
+          @click="handleSave"
+        >
           {{ form.id ? t('tree.events.modal.submit_save') : t('tree.events.modal.submit_create') }}
         </UButton>
       </div>

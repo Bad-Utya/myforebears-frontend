@@ -1,6 +1,8 @@
 import type TreeDTO from '~/services/familytree/dtos/inner/TreeDTO'
 import sendGetTreeAvatarRequest from '~/services/photos/getTreeAvatar'
 import mapTreeToTreeCardItem, { getTreeCardId, type TreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
+import type CustomTreeDTO from '~/services/customTrees/dtos/inner/CustomTreeDTO'
+import { mapCustomTreeToTreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
 
 export async function mapTreeToTreeCardItemWithAvatar(tree: TreeDTO, index: number): Promise<TreeCardItem> {
   const item = mapTreeToTreeCardItem(tree, index)
@@ -29,4 +31,8 @@ export function revokeTreeCardItems(items: TreeCardItem[]) {
       URL.revokeObjectURL(item.avatar)
     }
   }
+}
+
+export async function loadCustomTreeCardItems(trees: CustomTreeDTO[]): Promise<TreeCardItem[]> {
+  return trees.map(mapCustomTreeToTreeCardItem)
 }

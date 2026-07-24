@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="absolute left-4 top-4 z-10 border border-default rounded-2xl bg-neutral p-4 backdrop-blur-lg max-w-72 select-none">
+  <div class="absolute left-4 top-20 z-10 max-w-72 select-none rounded-2xl border border-default bg-neutral p-4 backdrop-blur-lg lg:top-4">
     <div
       v-if="pending"
       class="flex flex-col gap-2"

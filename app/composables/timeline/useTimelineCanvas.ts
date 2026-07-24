@@ -4,6 +4,8 @@ export function useTimelineCanvas(
   viewportRef: Ref<HTMLElement | null>,
   contentWidth: Ref<number>
 ) {
+  const MOBILE_BREAKPOINT = 768
+  const MIN_MOBILE_SCALE = 0.4
   const scale = ref(1)
   const translateX = ref(0)
   const isDragging = ref(false)
@@ -12,7 +14,14 @@ export function useTimelineCanvas(
 
   const clampTranslate = (val: number, currentScale: number) => {
     if (!viewportRef.value) return val
-    const min = viewportRef.value.clientWidth - (contentWidth.value * currentScale)
+    const viewportWidth = viewportRef.value.clientWidth
+    const scaledWidth = contentWidth.value * currentScale
+
+    if (scaledWidth <= viewportWidth) {
+      return viewportWidth < MOBILE_BREAKPOINT ? (viewportWidth - scaledWidth) / 2 : 0
+    }
+
+    const min = viewportWidth - scaledWidth
     return Math.min(0, Math.max(min, val))
   }
 
@@ -34,8 +43,24 @@ export function useTimelineCanvas(
 
   const fitTimeline = (yearsCount: number) => {
     contentWidth.value = Math.max(1600, yearsCount * 120)
-    scale.value = 1
-    translateX.value = 0
+
+    if (!viewportRef.value) {
+      scale.value = 1
+      translateX.value = 0
+      return
+    }
+
+    const viewportWidth = viewportRef.value.clientWidth
+    const isMobileViewport = viewportWidth < MOBILE_BREAKPOINT
+
+    if (isMobileViewport) {
+      const fittedScale = Math.min(1, Math.max(MIN_MOBILE_SCALE, viewportWidth / contentWidth.value))
+      scale.value = fittedScale
+    } else {
+      scale.value = 1
+    }
+
+    translateX.value = clampTranslate(0, scale.value)
   }
 
   const startDragging = (e: PointerEvent) => {

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import TreeCardCover from "~/components/images/avatars/TreeCardCover.vue";
+import TreeCardCover from '~/components/images/avatars/TreeCardCover.vue'
 
 const props = withDefaults(defineProps<{
   pending?: boolean
   title: string
   author?: string
+  tagsText?: string
   description?: string
   avatar: string
   coverSeed?: string
@@ -28,6 +29,7 @@ const props = withDefaults(defineProps<{
       <div class="min-w-0 space-y-2">
         <USkeleton class="h-4 w-40 rounded bg-sidebar-skeleton" />
         <USkeleton class="h-2 w-24 rounded bg-sidebar-skeleton" />
+        <USkeleton class="h-2 w-32 rounded bg-sidebar-skeleton" />
         <USkeleton class="h-2 w-28 rounded bg-sidebar-skeleton" />
       </div>
     </div>
@@ -55,6 +57,12 @@ const props = withDefaults(defineProps<{
           v-if="props.author?.trim()"
           class="text-xs text-muted mt-0 truncate"
         >{{ props.author }}</p>
+        <p
+          v-if="props.tagsText"
+          class="mt-1 line-clamp-2 break-words text-[11px] text-toned"
+        >
+          {{ props.tagsText }}
+        </p>
         <p
           v-if="props.description"
           class="text-xs text-toned mt-2 line-clamp-2 max-h-10 overflow-hidden"

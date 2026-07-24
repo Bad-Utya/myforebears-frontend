@@ -28,21 +28,21 @@ async function sendRequest() {
 </script>
 
 <template>
-  <UMain class="flex">
-    <div class="flex flex-col gap-4 m-auto w-lg h-auto">
+  <UMain class="flex min-h-dvh px-4 py-6 sm:py-8">
+    <div class="m-auto flex h-auto w-full max-w-lg flex-col gap-4">
       <UButton
         color="neutral"
         variant="link"
         icon="i-lucide-arrow-left"
-        class="w-fit cursor-pointer"
+        class="w-fit cursor-pointer px-0"
         @click="$router.back()"
       >
         {{ t('common.back') }}
       </UButton>
 
-      <div class="flex flex-col gap-4 m-auto w-lg h-auto p-4 rounded-xl shadow-lg shadow-carbon-800">
+      <div class="flex h-auto w-full flex-col gap-4 rounded-xl p-4 shadow-lg shadow-carbon-800 sm:p-6">
         <div>
-          <h1 class="text-left text-3xl font-bold">
+          <h1 class="text-left text-2xl font-bold sm:text-3xl">
             {{ t('auth.register.title') }}
           </h1>
           <p class="text-left text-md text-muted max-w-md">
@@ -61,9 +61,9 @@ async function sendRequest() {
           />
         </div>
 
-        <div class="flex flex-row">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
           <UButton
-            class="w-min"
+            class="w-full sm:w-min"
             loading-auto
             :disabled="!isDataCorrect"
             :variant="isDataCorrect ? 'solid' : 'outline'"
@@ -73,7 +73,7 @@ async function sendRequest() {
           </UButton>
 
           <UButton
-            class="ml-auto"
+            class="px-0 sm:ml-auto"
             variant="link"
             color="neutral"
             to="./login"

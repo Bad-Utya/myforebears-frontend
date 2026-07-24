@@ -3,6 +3,19 @@ import AvatarCropper from '~/components/common/AvatarCropper.vue'
 import { treeFieldUi, treeTextareaUi } from '~/utils/ui/theme/treeTheme'
 import type TreeDTO from '~/services/familytree/dtos/inner/TreeDTO'
 
+type TreeMainSettingsSavePayload = {
+  name: string
+  description: string
+  isPublic: boolean
+  isRestricted: boolean
+  avatar: File | null
+  tagCodes: string[]
+}
+
+type AvatarCropperHandle = {
+  exportFile: (fileName: string, size: number) => Promise<File | null>
+}
+
 const { t } = useI18n()
 
 const props = defineProps<{
@@ -12,16 +25,17 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  save: [data: { name: string, description: string, isPublic: boolean, isRestricted: boolean, avatar: File | null }]
+  save: [data: TreeMainSettingsSavePayload]
 }>()
 
 const treeName = ref('')
 const treeDescription = ref('')
 const isPublicOnMainPage = ref(false)
 const isViewRestricted = ref(false)
+const selectedTagCodes = ref<string[]>([])
 
 const avatarFileInput = ref<HTMLInputElement | null>(null)
-const avatarCropper = ref<any>(null)
+const avatarCropper = ref<AvatarCropperHandle | null>(null)
 const avatarSourceUrl = ref<string | null>(null)
 const avatarChanged = ref(false)
 
@@ -30,10 +44,19 @@ const sync = () => {
   treeDescription.value = props.tree?.description ?? ''
   isPublicOnMainPage.value = Boolean(props.tree?.is_public_on_main_page)
   isViewRestricted.value = Boolean(props.tree?.is_view_restricted)
+  selectedTagCodes.value = Array.isArray(props.tree?.tags)
+    ? props.tree.tags
+        .map(tag => tag.code)
+        .filter((code): code is string => Boolean(code))
+    : []
 }
 
 watch(() => props.tree, sync, { immediate: true })
-watch(isPublicOnMainPage, (val) => { if (val) isViewRestricted.value = false })
+watch(isPublicOnMainPage, (val) => {
+  if (val) {
+    isViewRestricted.value = false
+  }
+})
 
 async function handleFileChange(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -54,7 +77,8 @@ async function onSaveClick() {
     description: treeDescription.value,
     isPublic: isPublicOnMainPage.value,
     isRestricted: isViewRestricted.value,
-    avatar: avatarFile
+    avatar: avatarFile,
+    tagCodes: selectedTagCodes.value
   })
 }
 </script>
@@ -97,19 +121,38 @@ async function onSaveClick() {
         <UButton
           variant="subtle"
           color="neutral"
-          size="xs"
+          size="sm"
           :disabled="!editable"
           @click="avatarFileInput?.click()"
         >
           {{ t('tree.settings.choose_image') }}
         </UButton>
       </div>
-      <input ref="avatarFileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange">
+      <input
+        ref="avatarFileInput"
+        type="file"
+        accept="image/*"
+        class="hidden"
+        @change="handleFileChange"
+      >
 
-      <div v-if="avatarSourceUrl" class="tree-avatar-cropper overflow-hidden">
-        <AvatarCropper ref="avatarCropper" :src="avatarSourceUrl" :aspect-ratio="3/4" />
+      <div
+        v-if="avatarSourceUrl"
+        class="tree-avatar-cropper overflow-hidden"
+      >
+        <AvatarCropper
+          ref="avatarCropper"
+          :src="avatarSourceUrl"
+          :aspect-ratio="3 / 4"
+        />
       </div>
     </div>
+
+    <TagsEditor
+      v-model="selectedTagCodes"
+      :current-tags="tree?.tags"
+      :editable="editable"
+    />
 
     <UButton
       color="primary"

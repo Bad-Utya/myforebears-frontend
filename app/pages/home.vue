@@ -23,10 +23,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UHeader title="Rooots">
-    <template #right>
-      <div class="flex items-center gap-2">
+  <header class="border-b border-default">
+    <UContainer class="flex items-center justify-between gap-3 py-4">
+      <NuxtLink to="/home" class="text-lg font-semibold tracking-wide text-highlighted">
+        Rooots
+      </NuxtLink>
+
+      <div class="flex items-center justify-end gap-2">
         <UButton
+          class="hidden sm:inline-flex"
           color="neutral"
           variant="subtle"
           to="/main"
@@ -34,7 +39,15 @@ onMounted(async () => {
           {{ t('landing.header.open_app') }}
         </UButton>
 
-        <!-- Выплывающее меню настроек -->
+        <UButton
+          class="sm:hidden"
+          color="neutral"
+          variant="subtle"
+          to="/main"
+          icon="i-lucide-arrow-up-right"
+          aria-label="Open app"
+        />
+
         <UPopover :popper="{ placement: 'bottom-end' }">
           <UButton
             color="neutral"
@@ -45,7 +58,6 @@ onMounted(async () => {
 
           <template #content>
             <div class="p-4 w-48 flex flex-col gap-4">
-              <!-- Настройка темы -->
               <div class="flex items-center justify-between gap-4">
                 <span class="text-sm font-medium text-toned">
                   {{ colorMode.value === 'dark' ? t('landing.header.dark_mode') : t('landing.header.light_mode') }}
@@ -59,7 +71,6 @@ onMounted(async () => {
 
               <UDivider />
 
-              <!-- Настройка языка -->
               <div class="flex items-center justify-between gap-4">
                 <span class="text-sm font-medium text-toned">
                   {{ preferences.language === 'ru' ? 'Русский' : 'English' }}
@@ -76,8 +87,8 @@ onMounted(async () => {
           </template>
         </UPopover>
       </div>
-    </template>
-  </UHeader>
+    </UContainer>
+  </header>
 
   <UMain>
     <UPageHero
@@ -86,22 +97,24 @@ onMounted(async () => {
       :description="t('landing.hero.description')"
     >
       <template #links>
-        <UButton
-          size="xl"
-          color="neutral"
-          variant="soft"
-          to="/auth/login"
-        >
-          {{ t('landing.hero.login') }}
-        </UButton>
-        <UButton
-          size="xl"
-          color="primary"
-          variant="solid"
-          to="/auth/register"
-        >
-          {{ t('landing.hero.register') }}
-        </UButton>
+        <div class="flex flex-row items-center justify-center gap-2">
+          <UButton
+            size="lg"
+            color="neutral"
+            variant="soft"
+            to="/auth/login"
+          >
+            {{ t('landing.hero.login') }}
+          </UButton>
+          <UButton
+            size="lg"
+            color="primary"
+            variant="solid"
+            to="/auth/register"
+          >
+            {{ t('landing.hero.register') }}
+          </UButton>
+        </div>
       </template>
     </UPageHero>
 
@@ -122,8 +135,8 @@ onMounted(async () => {
           </div>
 
           <!-- Карточки -->
-          <div class="flex flex-col md:flex-row gap-8">
-            <div class="rounded-2xl border border-default bg-card-bg p-8 max-w-md">
+          <div class="flex flex-col gap-8 md:flex-row">
+            <div class="max-w-md rounded-2xl border border-default bg-card-bg p-6 sm:p-8">
               <p class="text-xl font-semibold text-highlighted">
                 {{ t('landing.features.card_worldbuilding_title') }}
               </p>
@@ -132,7 +145,7 @@ onMounted(async () => {
               </p>
             </div>
 
-            <div class="rounded-2xl border border-default bg-card-bg p-8 max-w-md">
+            <div class="max-w-md rounded-2xl border border-default bg-card-bg p-6 sm:p-8">
               <p class="text-xl font-semibold text-highlighted">
                 {{ t('landing.features.card_scale_title') }}
               </p>

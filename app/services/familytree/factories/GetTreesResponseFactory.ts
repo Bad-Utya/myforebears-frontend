@@ -1,4 +1,4 @@
-import DataResponseFactory from "~/services/api/factories/DataResponseFactory";
-import type {GetPersonResponse} from "~/services/familytree/dtos/responses/GetPersonResponse";
+import DataResponseFactory from '~/services/api/factories/DataResponseFactory'
+import type { ListTreesResponse } from '~/services/familytree/dtos/responses/ListTreesResponse'
 
-export default class GetPersonResponseFactory extends DataResponseFactory<GetTree> {}
+export default class GetTreesResponseFactory extends DataResponseFactory<ListTreesResponse> {}

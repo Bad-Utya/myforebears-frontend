@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type PersonDTO from "~/services/familytree/dtos/inner/PersonDTO";
-import type TreeDTO from "~/services/familytree/dtos/inner/TreeDTO";
-import type EventDTO from "~/services/events/dtos/inner/EventDTO";
-import TreeEventTypesList from "~/components/tree/sidebar/events/TreeEventTypesList.vue";
-import EventFormModal from "~/components/tree/modals/event/EventFormModal.vue";
-import EventTypeFormModal from "~/components/tree/modals/event/EventTypeFormModal.vue";
-import TreeEventsList from "~/components/tree/sidebar/events/TreeEventsList.vue";
-import {useEventTypes} from "~/composables/trees/events/useEventsType";
-import {useEvents} from "~/composables/trees/events/useEvents";
+import type TreeDTO from '~/services/familytree/dtos/inner/TreeDTO'
+import type EventDTO from '~/services/events/dtos/inner/EventDTO'
+import TreeEventTypesList from '~/components/tree/sidebar/events/TreeEventTypesList.vue'
+import EventFormModal from '~/components/tree/modals/event/EventFormModal.vue'
+import EventTypeFormModal from '~/components/tree/modals/event/EventTypeFormModal.vue'
+import TreeEventsList from '~/components/tree/sidebar/events/TreeEventsList.vue'
+import { useEventTypes } from '~/composables/trees/events/useEventsType'
+import { useEvents } from '~/composables/trees/events/useEvents'
+import type { EventParticipant } from '~/utils/ui/events/eventParticipants'
 
 const props = defineProps<{
   treeId: string
   tree: TreeDTO | null
-  persons: PersonDTO[]
+  participants: EventParticipant[]
   editable: boolean
 }>()
 
@@ -52,16 +52,17 @@ function openCreate() {
       :events="events"
       :event-types="eventTypes"
       :editable="editable"
+      :participants="participants"
       @create="openCreate"
       @edit="openEdit"
       @delete="removeEvent"
-     :persons="persons"/>
+    />
 
     <EventFormModal
       v-model:open="isEventModalOpen"
       :event="selectedEvent"
       :event-types="eventTypes"
-      :persons="persons"
+      :participants="participants"
       :tree-id="treeId"
       @saved="fetchEvents"
     />

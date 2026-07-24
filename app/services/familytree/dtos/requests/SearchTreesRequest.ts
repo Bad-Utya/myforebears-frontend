@@ -1,16 +1,18 @@
-import type IApiRequest from "~/services/api/interfaces/IApiRequest";
+import type IApiRequest from '~/services/api/interfaces/IApiRequest'
 
 export default class SearchTreesRequest implements IApiRequest {
   constructor(
-    public name: string,
-    public limit: number = 10
+    public q: string,
+    public limit: number = 10,
+    public tags?: string[]
   ) {
   }
 
   toPayload() {
     return {
-      name: this.name,
-      limit: this.limit
+      q: this.q,
+      limit: this.limit,
+      tags: this.tags
     }
   }
 }

@@ -19,11 +19,13 @@ import sendRenderCoordinatesForClientRequest from '~/services/visualisations/ren
 import type { GetUserInfoResponse } from '~/services/users/dtos/responses/GetUserInfoResponse'
 import TreeSettingsSidebar from '~/components/tree/sidebar/TreeSettingsSidebar.vue'
 import TreeEventsSidebar from '~/components/tree/sidebar/TreeEventsSidebar.vue'
-import type {TreeVisualNode} from "~/utils/ui/tree/coordinates/computeNodes";
-import type {TreeVisualConnection} from "~/utils/ui/tree/coordinates/computeConnections";
-import TreeVisualizationsSidebar from "~/components/tree/sidebar/TreeVisualizationsSidebar.vue";
+import type { TreeVisualNode } from '~/utils/ui/tree/coordinates/computeNodes'
+import type { TreeVisualConnection } from '~/utils/ui/tree/coordinates/computeConnections'
+import TreeVisualizationsSidebar from '~/components/tree/sidebar/TreeVisualizationsSidebar.vue'
+import TreePersonsSidebar from '~/components/tree/sidebar/TreePersonsSidebar.vue'
+import { familyPersonToEventParticipant } from '~/utils/ui/events/eventParticipants'
 
-type TreeSidebarSection = 'settings' | 'events' | 'export'
+type TreeSidebarSection = 'settings' | 'events' | 'export' | 'persons'
 type TreeSidebarNavKey = TreeSidebarSection | 'timeline'
 
 const { t } = useI18n()
@@ -72,11 +74,16 @@ const isEditable = computed(() => {
   return String(treeCreatorId.value) === String(currentUserId)
 })
 
+const eventParticipants = computed(() => persons.value
+  .map(familyPersonToEventParticipant)
+  .filter((participant): participant is NonNullable<typeof participant> => Boolean(participant)))
+
 const sidebarItems = computed<SidebarButtonListItem<TreeSidebarNavKey>[]>(() => [
   { key: 'settings', label: t('tree.navigation.settings'), icon: 'i-lucide-settings-2' },
+  { key: 'persons', label: t('tree.navigation.persons'), icon: 'i-lucide-users' },
   { key: 'events', label: t('tree.navigation.events'), icon: 'i-lucide-calendar-days' },
   { key: 'export', label: t('tree.navigation.visualizations'), icon: 'i-lucide-external-link' },
-  { key: 'timeline', label: t('tree.navigation.timeline'), icon: 'i-lucide-history' },
+  { key: 'timeline', label: t('tree.navigation.timeline'), icon: 'i-lucide-history' }
 ])
 
 async function loadTreeData() {
@@ -157,7 +164,7 @@ function fitCanvas() {
 async function openSidebarSection(section: TreeSidebarNavKey) {
   if (section === 'timeline') {
     await navigateTo(`/trees/${treeId.value}/timeline`)
-    return;
+    return
   }
 
   sidebarSection.value = section
@@ -185,7 +192,7 @@ function handlePersonUpdated(updatedPerson: PersonDTO) {
   rootPerson.value = persons.value.find(person => getTreePersonId(person) === updatedPersonId) ?? rootPerson.value
   layout.value = {
     ...layout.value,
-    nodes: layout.value.nodes.map((node: any) => { // TODO: fix any
+    nodes: layout.value.nodes.map((node) => {
       return node.id === updatedPersonId
         ? { ...node, person: updatedPerson }
         : node
@@ -275,12 +282,20 @@ onMounted(async () => {
           v-else-if="sidebarSection === 'events'"
           :tree-id="treeId ?? ''"
           :tree="tree"
-          :persons="persons"
+          :participants="eventParticipants"
           :editable="isEditable"
           :pending="pending"
           :section="sidebarSection"
           @tree-updated="handleTreeUpdated"
           @tree-deleted="handleTreeDeleted"
+        />
+        <TreePersonsSidebar
+          v-else-if="sidebarSection === 'persons'"
+          :tree-id="treeId ?? ''"
+          :persons="persons"
+          :editable="isEditable"
+          @updated="handlePersonUpdated"
+          @structure-changed="handleStructureChanged"
         />
         <TreeVisualizationsSidebar
           v-else
@@ -295,7 +310,5 @@ onMounted(async () => {
         />
       </template>
     </USlideover>
-
-
   </div>
 </template>

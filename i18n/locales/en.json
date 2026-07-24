@@ -7,6 +7,17 @@
     "event_removed": "Event removed successfully",
     "event_removed_desc": "Event {type} removed successfully"
   },
+  "photo_gallery": {
+    "title": "Photo gallery",
+    "description": "Photos attached to this person.",
+    "open": "Gallery",
+    "view": "View full size",
+    "add": "Add photos",
+    "delete": "Delete photo",
+    "confirm_delete": "Delete this photo?",
+    "empty": "No photos have been added yet.",
+    "photo_alt": "Gallery photo"
+  },
   "auth": {
     "logout_modal": {
       "title": "Confirm logout",
@@ -112,13 +123,15 @@
     "navigation": {
       "main": "Main",
       "feed": "Feed",
-      "my_trees": "My trees"
+      "my_trees": "My creations"
     }
   },
   "main": {
     "feeds": {
       "trees_title": "Trees for you",
-      "users_title": "Recommended users"
+      "custom_trees_title": "Custom trees for you",
+      "users_title": "Recommended users",
+      "public_persons_title": "Public persons"
     },
     "empty_states": {
       "no_trees_found": "Trees matching the selected parameters were not found."
@@ -129,16 +142,57 @@
       "user_prefix": "Welcome back,"
     },
     "search": {
-      "button_label": "Search users...",
-      "placeholder": "Type to search users or trees...",
+      "title": "Search",
+      "description": "Search trees, users, and public persons.",
+      "button_label": "Open search",
+      "placeholder": "Search users, trees, and public persons...",
+      "new_public_person": "New",
+      "loading": "Loading...",
+      "start_typing": "Type at least 2 characters to search",
+      "groups": {
+        "users": "Users",
+        "trees": "Trees",
+        "persons": "Public persons"
+      },
+      "placeholders": {
+        "trees": "Search trees...",
+        "users": "Search users...",
+        "persons": "Search public persons..."
+      },
+      "tabs": {
+        "trees": "Trees",
+        "users": "Users",
+        "persons": "Persons"
+      },
       "no_results": "No results found"
     }
   },
   "feed": {
-    "title": "Feed"
+    "title": "Feed",
+    "search": {
+      "tags_title": "Filter by tags",
+      "tree_type_title": "Tree type",
+      "family_trees": "Family trees",
+      "custom_trees": "Custom trees",
+      "clear_tags": "Clear",
+      "no_tags": "No tags available yet"
+    }
   },
   "my": {
-    "title": "My trees",
+    "title": "My creations",
+    "trees_title": "My trees",
+    "custom_trees_title": "My custom trees",
+    "public_persons": {
+      "title": "My public persons",
+      "actions": {
+        "new_person": "New person"
+      },
+      "empty_state": {
+        "title": "No public persons yet",
+        "description": "Create your first public person to add them to your catalog.",
+        "create_button": "Create person"
+      }
+    },
     "actions": {
       "new_tree": "New tree"
     },
@@ -152,6 +206,13 @@
       "form": {
         "name_label": "Tree name",
         "name_placeholder": "My family tree",
+        "type_label": "Tree type",
+        "family_type": "Family tree",
+        "custom_type": "Custom tree",
+        "relation_up_label": "Upward relationship name",
+        "relation_up_placeholder": "For example, teacher",
+        "relation_down_label": "Downward relationship name",
+        "relation_down_placeholder": "For example, student",
         "desc_label": "Description",
         "desc_placeholder": "Describe your tree here",
         "avatar_label": "Tree avatar",
@@ -187,6 +248,93 @@
       "my_trees": "My trees",
       "public_trees": "Public trees",
       "not_found": "Public trees were not found."
+    },
+    "persons": {
+      "my_persons": "My persons",
+      "public_persons": "Public persons",
+      "not_found": "Public persons were not found."
+    },
+    "custom_trees": {
+      "my_trees": "My custom trees",
+      "public_trees": "Custom trees",
+      "not_found": "No custom trees found."
+    }
+  },
+  "custom_tree": {
+    "fallback_name": "Custom tree",
+    "relation_up": "Upward relation",
+    "relation_down": "Downward relation",
+    "root_entity": "Root entity",
+    "navigation": { "entities": "Entities" },
+    "entity": {
+      "unnamed": "Unnamed",
+      "name": "Name",
+      "description": "Description",
+      "modal_description": "Custom tree entity details",
+      "choose_avatar": "Choose avatar",
+      "image_only": "Please choose an image file",
+      "updated": "Entity updated",
+      "delete": "Delete",
+      "confirm_delete": "Delete “{name}” from the tree?",
+      "add_parent": "Add parent entity",
+      "add_child": "Add child entity"
+    }
+  },
+  "public_persons": {
+    "unknown_person": "Unknown person",
+    "modal_description": "Public person details",
+    "biography": "Biography",
+    "avatar": {
+      "label": "Avatar",
+      "choose": "Choose image"
+    },
+    "tags": {
+      "title": "Person tags",
+      "description": "Search tags.",
+      "add_button": "Tag",
+      "add_button_inner": "Add tag",
+      "select_placeholder": "Select tag",
+      "empty": "No tags selected yet"
+    },
+    "actions": {
+      "close": "Close",
+      "edit": "Edit",
+      "save": "Save",
+      "delete": "Delete",
+      "create_tree": "Create tree",
+      "updated": "Public person updated",
+      "deleted": "Public person deleted",
+      "confirm_delete": "Delete public person \"{name}\"?"
+    },
+    "create": {
+      "title": "New public person",
+      "description": "Add a public person to your catalog.",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "patronymic": "Patronymic",
+      "gender": "Gender",
+      "biography": "Biography",
+      "biography_placeholder": "Add a short biography",
+      "submit": "Create person"
+    },
+    "import": {
+      "title": "Choose public person",
+      "description": "Find a person in the catalog and add them to the tree.",
+      "loading": "Loading...",
+      "search_placeholder": "Search public persons...",
+      "add_button": "Add to tree",
+      "success_title": "Public person added",
+      "no_results": "No matching public persons were found."
+    },
+    "genders": {
+      "male": "Male",
+      "female": "Female",
+      "unspecified": "Gender unspecified"
+    },
+    "events": {
+      "title": "Events",
+      "unknown_type": "Unknown event",
+      "unknown_date": "Unknown date"
     }
   },
   "tree": {
@@ -210,6 +358,7 @@
     },
     "navigation": {
       "settings": "Tree settings",
+      "persons": "Persons",
       "events": "Events",
       "visualizations": "Visualizations",
       "timeline": "Timeline"
@@ -301,6 +450,9 @@
       "submit": "Create",
       "success_title": "Child added",
       "success_description": "A new child has been successfully added to the tree."
+    },
+    "browse_public": {
+      "button": "Browse public"
     },
     "add_parent": {
       "title": "Add parent",
@@ -417,7 +569,32 @@
       "restricted_checkbox": "Restricted view",
       "avatar_label": "Tree avatar",
       "choose_image": "Choose image",
+      "tags_title": "Tree tags",
+      "tags_description": "Manage search tags.",
+      "tags_loading_placeholder": "Tags are loading",
+      "add_tag_button": "Tag",
+      "add_tag_button_inner": "Add tag",
+      "tag_select_placeholder": "Select tag",
+      "no_tags": "No tags selected yet",
       "save_button": "Save changes"
+    },
+    "persons": {
+      "search_placeholder": "Search by first or last name",
+      "no_results": "No persons matched the selected filters.",
+      "filters": {
+        "title": "Filters",
+        "reset": "Reset",
+        "gender": "Gender",
+        "both": "Both",
+        "male": "Male",
+        "female": "Female",
+        "age_from": "Age from",
+        "age_to": "Age to",
+        "year_from": "Year from",
+        "year_to": "Year to"
+      },
+      "gender_male": "Male",
+      "gender_female": "Female"
     },
     "visualizations": {
       "title": "Generated data",

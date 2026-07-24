@@ -4,15 +4,19 @@ import sendListRandomPublicTreesRequest from '~/services/familytree/listRandomPu
 import type DataDTO from '~/services/api/dtos/DataDTO'
 import type { ListTreesResponse } from '~/services/familytree/dtos/responses/ListTreesResponse'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
-import { loadTreeCardItems, revokeTreeCardItems } from '~/utils/ui/tree/loadTreeCardItems'
+import { loadTreeCardItems, revokeTreeCardItems, loadCustomTreeCardItems } from '~/utils/ui/tree/loadTreeCardItems'
 import type { TreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
+import sendListRandomPublicCustomTreesRequest from '~/services/customTrees/listRandomPublicCustomTrees'
+import type { ListCustomTreesResponse } from '~/services/customTrees/dtos/responses/ListCustomTreesResponse'
 
 const props = withDefaults(defineProps<{
   title?: string
   limit?: number
+  treeKind?: 'family' | 'custom'
 }>(), {
   title: '',
-  limit: 10
+  limit: 10,
+  treeKind: 'family'
 })
 
 const pending = ref(true)
@@ -34,9 +38,13 @@ function replaceItems(nextItems: TreeCardItem[]) {
 onMounted(async () => {
   pending.value = true
   try {
-    const response = await sendListRandomPublicTreesRequest(props.limit) as DataDTO<ListTreesResponse>
+    const response = props.treeKind === 'custom'
+      ? await sendListRandomPublicCustomTreesRequest(props.limit) as DataDTO<ListCustomTreesResponse>
+      : await sendListRandomPublicTreesRequest(props.limit) as DataDTO<ListTreesResponse>
     const trees = Array.isArray(response.data?.trees) ? response.data.trees : []
-    replaceItems(await loadTreeCardItems(trees))
+    replaceItems(props.treeKind === 'custom'
+      ? await loadCustomTreeCardItems(trees as import('~/services/customTrees/dtos/inner/CustomTreeDTO').default[])
+      : await loadTreeCardItems(trees as import('~/services/familytree/dtos/inner/TreeDTO').default[]))
   } catch (err) {
     showApiErrorToast(err)
     replaceItems([])
@@ -52,7 +60,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="py-4">
-    <div class="flex items-center justify-between mb-4">
+    <div class="mb-4 flex items-center justify-between gap-3">
       <h1 class="text-left text-md font-semibold text-neutral">
         {{ props.title }}
       </h1>
@@ -65,7 +73,7 @@ onBeforeUnmount(() => {
       :loop="false"
       :ui="{
         viewport: 'overflow-hidden',
-        item: 'basis-sm shrink-0'
+        item: 'basis-[84%] shrink-0 sm:basis-sm'
       }"
       :prev="{ variant: 'subtle', color: 'neutral', class: 'rounded-full backdrop-blur disabled:hidden' }"
       :next="{ variant: 'subtle', color: 'neutral', class: 'rounded-full backdrop-blur disabled:hidden' }"
@@ -75,6 +83,7 @@ onBeforeUnmount(() => {
           :pending="pending"
           :title="item.title"
           :author="item.author"
+          :tags-text="item.tagsText"
           :description="item.description"
           :avatar="item.avatar"
           :cover-seed="item.coverSeed"

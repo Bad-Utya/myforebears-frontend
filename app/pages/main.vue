@@ -4,13 +4,13 @@ import CreateTreeSuggestion from '~/components/common/suggestions/CreateTreeSugg
 import SideBar from '~/components/common/sidebar/SideBar.vue'
 import InlineTreeFeed from '~/components/common/inline/InlineTreeFeed.vue'
 import MainUserWelcome from '~/components/main/MainUserWelcome.vue'
-import type DataDTO from '~/services/api/dtos/DataDTO'
 import sendListTreesRequest from '~/services/familytree/listTrees'
 import useUserDataHandler from '~/utils/scripts/storages/get/userDataHandler'
-import type { ListTreesResponse } from '~/services/familytree/dtos/responses/ListTreesResponse'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
 import InlineUserFeed from '~/components/common/inline/InlineUserFeed.vue'
 import TreeSearchFast from '~/components/main/TreeSearchFast.vue'
+import InlinePublicPersonFeed from '~/components/common/inline/InlinePublicPersonFeed.vue'
+import sendListCustomTreesRequest from '~/services/customTrees/listCustomTrees'
 
 const { t } = useI18n()
 
@@ -20,9 +20,12 @@ const hasNoTrees = ref(false)
 
 async function loadMyTreesState() {
   try {
-    const response = await sendListTreesRequest() as DataDTO<ListTreesResponse>
-    const trees = Array.isArray(response.data?.trees) ? response.data.trees : []
-    hasNoTrees.value = trees.length === 0
+    const [familyResponse, customResponse] = await Promise.all([
+      sendListTreesRequest(), sendListCustomTreesRequest()
+    ])
+    const familyTrees = Array.isArray(familyResponse.data?.trees) ? familyResponse.data.trees : []
+    const customTrees = Array.isArray(customResponse.data?.trees) ? customResponse.data.trees : []
+    hasNoTrees.value = familyTrees.length === 0 && customTrees.length === 0
   } catch (error) {
     hasNoTrees.value = false
     showApiErrorToast(error)
@@ -42,9 +45,9 @@ onMounted(async () => {
   <div class="flex min-h-screen">
     <SideBar active-tab="main" />
 
-    <UMain class="w-full p-4 lg:p-8">
+    <UMain class="w-full p-4 pt-20 lg:p-8 lg:pt-8">
       <UContainer>
-        <div class="flex w-full items-start justify-between flex-col lg:flex-row">
+        <div class="flex w-full flex-col items-stretch justify-between gap-4 lg:flex-row lg:items-start">
           <MainUserWelcome />
 
           <TreeSearchFast />
@@ -66,6 +69,18 @@ onMounted(async () => {
           </template>
         </InlineTreeFeed>
 
+        <InlineTreeFeed
+          :title="t('main.feeds.custom_trees_title')"
+          :limit="10"
+          tree-kind="custom"
+        >
+          <template #fallback>
+            <p class="py-12 text-center text-md text-muted">
+              {{ t('common.no_data') }}
+            </p>
+          </template>
+        </InlineTreeFeed>
+
         <InlineUserFeed
           :title="t('main.feeds.users_title')"
           :limit="10"
@@ -76,6 +91,17 @@ onMounted(async () => {
             </p>
           </template>
         </InlineUserFeed>
+
+        <InlinePublicPersonFeed
+          :title="t('main.feeds.public_persons_title')"
+          :limit="10"
+        >
+          <template #fallback>
+            <p class="py-12 text-center text-md text-muted">
+              {{ t('common.no_data') }}
+            </p>
+          </template>
+        </InlinePublicPersonFeed>
 
         <CreateTreeSuggestion
           v-if="!isGuest && hasNoTrees"

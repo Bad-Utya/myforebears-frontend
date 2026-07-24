@@ -5,6 +5,7 @@ import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
 import sendAddPartnerRequest from '~/services/familytree/addPartner'
 import AddPartnerRequest from '~/services/familytree/dtos/requests/AddPartnerRequest'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import PublicPersonImportModal from '~/components/publicPersons/PublicPersonImportModal.vue'
 
 const { t } = useI18n()
 
@@ -27,6 +28,7 @@ const modalOpen = computed({
 })
 
 const isCreating = ref(false)
+const isBrowsePublicModalOpen = ref(false)
 
 const createFirstName = ref('')
 const createLastName = ref('')
@@ -38,7 +40,7 @@ function resetForm() {
   createPatronymic.value = ''
 }
 
-watch(() => props.open, (v) => v && resetForm(), { immediate: true })
+watch(() => props.open, v => v && resetForm(), { immediate: true })
 
 function closeModal() {
   modalOpen.value = false
@@ -78,12 +80,14 @@ async function createPartner() {
     v-model:open="modalOpen"
     :title="t('tree.add_partner.title')"
     :description="t('tree.add_partner.description', { name: person.first_name || '...' })"
+    :ui="{ content: 'max-h-[90dvh] overflow-y-auto sm:max-w-2xl' }"
   >
     <template #body>
-      <form class="mx-auto flex w-full max-w-3xl flex-col gap-6" @submit.prevent="createPartner">
-
-        <div class="grid grid-cols-2 gap-4">
-
+      <form
+        class="mx-auto flex w-full max-w-3xl flex-col gap-6"
+        @submit.prevent="createPartner"
+      >
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1">
             <p class="text-xs font-semibold text-muted uppercase tracking-wider">
               {{ t('tree.add_partner.first_name') }}
@@ -127,7 +131,17 @@ async function createPartner() {
           </div>
         </div>
 
-        <div class="mt-4 flex justify-end gap-2 items-center">
+        <div class="mt-4 flex flex-wrap items-center justify-end gap-2">
+          <UButton
+            type="button"
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-book-open"
+            class="mr-auto"
+            @click="isBrowsePublicModalOpen = true"
+          >
+            {{ t('tree.browse_public.button') }}
+          </UButton>
           <UButton
             type="button"
             color="neutral"
@@ -147,4 +161,12 @@ async function createPartner() {
       </form>
     </template>
   </UModal>
+
+  <PublicPersonImportModal
+    v-model:open="isBrowsePublicModalOpen"
+    :tree-id="props.treeId"
+    :attach-to-person-id="props.person.id"
+    attachment="PARTNER"
+    @imported="closeModal(); emit('created')"
+  />
 </template>

@@ -130,6 +130,9 @@
   --color-tree-node-female-avatar-text: var(--tree-node-female-avatar-text);
   --color-tree-node-unspecified-bg: var(--tree-node-unspecified-bg);
   --color-tree-node-unspecified-bg-hover: var(--tree-node-unspecified-bg-hover);
+  --color-custom-tree-node-bg: var(--custom-tree-node-bg);
+  --color-custom-tree-node-bg-hover: var(--custom-tree-node-bg-hover);
+  --color-custom-tree-node-border: var(--custom-tree-node-border);
   --color-tree-node-unspecified-avatar-bg: var(--tree-node-unspecified-avatar-bg);
   --color-tree-node-unspecified-avatar-text: var(--tree-node-unspecified-avatar-text);
   --color-tree-modal-input-bg: var(--tree-modal-input-bg);
@@ -194,6 +197,9 @@
   --tree-node-female-avatar-text: var(--color-coral-50);
   --tree-node-unspecified-bg: color-mix(in srgb, var(--color-pine-950) 60%, var(--color-carbon-950) 40%);
   --tree-node-unspecified-bg-hover: color-mix(in srgb, var(--color-pine-950) 60%, var(--color-carbon-500) 40%);
+  --custom-tree-node-bg: color-mix(in srgb, var(--color-pine-950) 32%, var(--color-carbon-700) 68%);
+  --custom-tree-node-bg-hover: color-mix(in srgb, var(--color-pine-900) 30%, var(--color-carbon-600) 70%);
+  --custom-tree-node-border: color-mix(in srgb, var(--color-pine-200) 34%, transparent 66%);
   --tree-node-unspecified-avatar-bg: color-mix(in srgb, var(--color-pine-700) 24%, var(--color-carbon-300) 76%);
   --tree-node-unspecified-avatar-text: var(--color-pine-50);
   --tree-modal-input-bg: color-mix(in srgb, white 8%, transparent 92%);
@@ -251,6 +257,9 @@
   --tree-node-female-avatar-bg: color-mix(in srgb, var(--color-coral-500) 54%, white 46%);
   --tree-node-female-avatar-text: var(--color-coral-50);
   --tree-node-unspecified-bg: color-mix(in srgb, var(--color-pine-950) 60%, var(--color-carbon-950) 40%);
+  --custom-tree-node-bg: color-mix(in srgb, var(--color-pine-200) 20%, var(--color-carbon-300) 80%);
+  --custom-tree-node-bg-hover: color-mix(in srgb, var(--color-pine-300) 22%, var(--color-carbon-300) 78%);
+  --custom-tree-node-border: color-mix(in srgb, var(--color-pine-800) 38%, transparent 62%);
   --tree-node-unspecified-avatar-bg: color-mix(in srgb, var(--color-pine-700) 24%, var(--color-carbon-300) 76%);
   --tree-node-unspecified-avatar-text: var(--color-pine-50);
   --tree-modal-input-bg: color-mix(in srgb, white 96%, var(--ui-bg) 4%);

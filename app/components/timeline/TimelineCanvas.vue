@@ -52,14 +52,14 @@ const handleWheel = (event: WheelEvent) => {
     :class="{ 'cursor-grabbing': isDragging, 'cursor-grab': !isDragging }"
     @pointerdown="emit('pointerdown', $event)"
   >
-    <div class="absolute inset-y-0 left-0 right-0 pointer-events-none flex items-center justify-between px-2 z-20">
+    <div class="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 flex items-center justify-between px-2">
       <UButton
-        class="pointer-events-auto"
+        class="pointer-events-auto hidden sm:inline-flex"
         color="neutral" variant="subtle" icon="i-lucide-chevron-left"
         @click.stop="emit('shift', 1)"
       />
       <UButton
-        class="pointer-events-auto"
+        class="pointer-events-auto hidden sm:inline-flex"
         color="neutral" variant="subtle" icon="i-lucide-chevron-right"
         @click.stop="emit('shift', -1)"
       />
@@ -77,7 +77,7 @@ const handleWheel = (event: WheelEvent) => {
     <TimelineLoadingPanel :pending="pending" />
 
     <div
-      class="relative min-h-[400px] touch-none select-none"
+      class="relative min-h-[320px] touch-none select-none sm:min-h-[400px]"
       :style="{
         width: `${contentWidth}px`,
         transform: `translateX(${translateX}px) scale(${scale})`,

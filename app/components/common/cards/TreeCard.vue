@@ -1,12 +1,13 @@
 <script setup lang="ts">
 // TODO: comments??
 // TODO: amount of trees to render
-import TreeCardCover from "~/components/images/avatars/TreeCardCover.vue";
+import TreeCardCover from '~/components/images/avatars/TreeCardCover.vue'
 
 const props = withDefaults(defineProps<{
   pending?: boolean
   title: string
   author?: string
+  tagsText?: string
   description?: string
   avatar: string
   coverSeed?: string
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<{
     <div class="absolute inset-x-0 bottom-0 p-4 space-y-2">
       <USkeleton class="h-6 w-40 rounded" />
       <USkeleton class="h-4 w-24 rounded" />
+      <USkeleton class="h-4 w-36 rounded" />
       <USkeleton class="h-4 w-28 rounded" />
     </div>
   </div>
@@ -57,6 +59,12 @@ const props = withDefaults(defineProps<{
           class="text-xs text-white/70 mt-0 truncate"
         >
           {{ props.author }}
+        </p>
+        <p
+          v-if="props.tagsText"
+          class="mt-1 line-clamp-2 break-words text-[11px] text-white/70"
+        >
+          {{ props.tagsText }}
         </p>
         <p
           v-if="props.description"

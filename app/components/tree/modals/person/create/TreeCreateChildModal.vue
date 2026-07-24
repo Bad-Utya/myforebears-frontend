@@ -5,6 +5,7 @@ import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
 import sendAddChildRequest from '~/services/familytree/addChild'
 import AddChildRequest from '~/services/familytree/dtos/requests/AddChildRequest'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import PublicPersonImportModal from '~/components/publicPersons/PublicPersonImportModal.vue'
 
 const { t } = useI18n()
 
@@ -31,6 +32,7 @@ const modalOpen = computed({
 })
 
 const isCreating = ref(false)
+const isBrowsePublicModalOpen = ref(false)
 
 const createFirstName = ref('')
 const createLastName = ref('')
@@ -56,7 +58,7 @@ function resetForm() {
   }
 }
 
-watch(() => props.open, (v) => v && resetForm(), { immediate: true })
+watch(() => props.open, v => v && resetForm(), { immediate: true })
 
 function closeModal() {
   modalOpen.value = false
@@ -100,11 +102,14 @@ async function createChild() {
     v-model:open="modalOpen"
     :title="t('tree.add_child.title')"
     :description="t('tree.add_child.description')"
+    :ui="{ content: 'max-h-[90dvh] overflow-y-auto sm:max-w-2xl' }"
   >
     <template #body>
-      <form class="mx-auto flex w-full max-w-3xl flex-col gap-6" @submit.prevent="createChild">
-
-        <div class="grid grid-cols-2 grid-rows-2 gap-4">
+      <form
+        class="mx-auto flex w-full max-w-3xl flex-col gap-6"
+        @submit.prevent="createChild"
+      >
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1">
             <p class="text-xs font-semibold text-muted uppercase tracking-wider">
               {{ t('tree.add_child.first_name') }}
@@ -148,8 +153,8 @@ async function createChild() {
           </div>
         </div>
 
-        <div class="flex flex-row w-full justify-between items-center">
-          <div class="inline-flex text-center w-fit rounded-lg border border-default bg-neutral-900/5">
+        <div class="flex w-full flex-wrap items-center justify-between gap-3">
+          <div class="inline-flex rounded-lg border border-default bg-neutral-900/5">
             <UButton
               type="button"
               size="md"
@@ -173,7 +178,17 @@ async function createChild() {
             </UButton>
           </div>
 
-          <div class="flex justify-end gap-2 items-center">
+          <div class="flex flex-wrap items-center justify-end gap-2">
+            <UButton
+              type="button"
+              color="neutral"
+              size="md"
+              variant="ghost"
+              icon="i-lucide-book-open"
+              @click="isBrowsePublicModalOpen = true"
+            >
+              {{ t('tree.browse_public.button') }}
+            </UButton>
             <UButton
               type="button"
               color="neutral"
@@ -196,4 +211,12 @@ async function createChild() {
       </form>
     </template>
   </UModal>
+
+  <PublicPersonImportModal
+    v-model:open="isBrowsePublicModalOpen"
+    :tree-id="props.treeId"
+    :attach-to-person-id="props.person.id"
+    attachment="CHILD"
+    @imported="closeModal(); emit('created')"
+  />
 </template>

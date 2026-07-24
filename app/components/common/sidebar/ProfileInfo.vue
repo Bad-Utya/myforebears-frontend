@@ -96,13 +96,14 @@ onMounted(async () => {
 
     <CommonSidebarCreateAccountSuggestionInline v-else-if="isGuest" />
 
-    <div v-else class="flex items-center gap-4">
+    <div v-else class="flex w-full items-center">
       <UDropdownMenu
         :items="dropdownItems"
         :content="{ side: 'top', align: 'start', sideOffset: 12 }"
         size="lg"
+        class="w-full"
         :ui="{
-          content: 'w-72 -ml-4 rounded-2xl border border-sidebar-border bg-sidebar-bg p-2',
+          content: 'w-(--reka-dropdown-menu-trigger-width) rounded-2xl border border-sidebar-border bg-sidebar-bg p-2',
           viewport: 'space-y-2 divide-y-0',
           group: 'p-0',
           item: 'items-center rounded-xl p-4 text-sm text-sidebar-text before:rounded-xl cursor-pointer data-highlighted:before:bg-sidebar-hover',
@@ -110,14 +111,13 @@ onMounted(async () => {
         }"
       >
         <UButton
-          block
           color="neutral"
           variant="ghost"
-          class="gap-4 justify-start rounded-2xl p-2 text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text"
+          class="w-full justify-start gap-4 rounded-2xl p-2 text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text"
           :ui="{ base: 'w-full', leadingIcon: 'hidden', trailingIcon: 'hidden' }"
         >
           <UserAvatar :user="userData" :size="12" class="shrink-0" />
-          <span class="min-w-0 flex flex-col items-start">
+          <span class="min-w-0 flex-1 overflow-hidden flex flex-col items-start">
             <span class="text-sm font-semibold text-sidebar-text truncate">
               {{ displayName }}
             </span>
@@ -134,7 +134,7 @@ onMounted(async () => {
       v-model:open="isLogoutModalOpen"
       :title="t('auth.logout_modal.title')"
       :description="t('auth.logout_modal.description')"
-      :ui="{ content: 'bg-default flex flex-col' }"
+      :ui="{ content: 'bg-default flex max-h-[90dvh] flex-col overflow-y-auto' }"
     >
       <template #body>
         <div class="space-y-4">
@@ -144,7 +144,7 @@ onMounted(async () => {
             :label="t('auth.logout_modal.all_devices_label')"
           />
 
-          <div class="flex justify-end gap-2">
+          <div class="flex flex-wrap items-center justify-end gap-2">
             <UButton
               color="neutral"
               variant="ghost"

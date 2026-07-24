@@ -1,3 +1,5 @@
+import type TagDTO from '~/services/tags/dtos/inner/TagDTO'
+
 export default interface TreeDTO {
   id?: string
   tree_id?: string
@@ -12,4 +14,6 @@ export default interface TreeDTO {
   node_count?: number
   is_public_on_main_page?: boolean
   is_view_restricted?: boolean
+  similarity_score?: number
+  tags?: TagDTO[]
 }

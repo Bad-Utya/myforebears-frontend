@@ -96,7 +96,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="py-4">
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between gap-3">
       <h1 class="text-left text-md font-semibold text-neutral">
         {{ displayTitle }}
       </h1>
@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
       :loop="false"
       :ui="{
         viewport: 'overflow-hidden',
-        item: 'basis-sm shrink-0'
+        item: 'basis-[84%] shrink-0 sm:basis-sm'
       }"
       :prev="{ variant: 'subtle', color: 'neutral', class: 'rounded-full backdrop-blur disabled:hidden' }"
       :next="{ variant: 'subtle', color: 'neutral', class: 'rounded-full backdrop-blur disabled:hidden' }"

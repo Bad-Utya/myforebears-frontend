@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import {treeFieldUi} from '~/utils/ui/theme/treeTheme'
+import { treeFieldUi } from '~/utils/ui/theme/treeTheme'
 import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
 
 import sendAddParentRequest from '~/services/familytree/addParent'
 import AddParentRequest from '~/services/familytree/dtos/requests/AddParentRequest'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import PublicPersonImportModal from '~/components/publicPersons/PublicPersonImportModal.vue'
 
-const {t} = useI18n()
+const { t } = useI18n()
 
 export type ParentRole = 'FATHER' | 'MOTHER'
 
@@ -30,15 +31,12 @@ const modalOpen = computed({
 })
 
 const isCreating = ref(false)
+const isBrowsePublicModalOpen = ref(false)
 
 const createFirstName = ref('')
 const createLastName = ref('')
 const createPatronymic = ref('')
 const selectedParentRole = ref<ParentRole>('FATHER')
-
-const canAddParent = computed(() =>
-  (props.availableParentRoles?.length ?? 0) > 0
-)
 
 function resetForm() {
   createFirstName.value = ''
@@ -47,7 +45,7 @@ function resetForm() {
   selectedParentRole.value = props.availableParentRoles?.[0] ?? 'FATHER'
 }
 
-watch(() => props.open, (v) => v && resetForm(), {immediate: true})
+watch(() => props.open, v => v && resetForm(), { immediate: true })
 
 function closeModal() {
   modalOpen.value = false
@@ -57,7 +55,7 @@ async function createParent() {
   isCreating.value = true
 
   if (!props.person.id) {
-    return;
+    return
   }
 
   try {
@@ -93,12 +91,14 @@ async function createParent() {
     v-model:open="modalOpen"
     :title="t('tree.add_parent.title')"
     :description="t('tree.add_parent.description', { name: person.first_name || '...' })"
+    :ui="{ content: 'max-h-[90dvh] overflow-y-auto sm:max-w-2xl' }"
   >
     <template #body>
-      <form class="mx-auto flex w-full max-w-3xl flex-col gap-6" @submit.prevent="createParent">
-
-        <div class="grid grid-cols-2 grid-rows-2 gap-4">
-
+      <form
+        class="mx-auto flex w-full max-w-3xl flex-col gap-6"
+        @submit.prevent="createParent"
+      >
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1">
             <p class="text-xs font-semibold text-muted uppercase tracking-wider">
               {{ t('tree.add_parent.first_name') }}
@@ -142,22 +142,32 @@ async function createParent() {
           </div>
         </div>
 
-        <div class="flex flex-row w-full justify-between items-center">
-            <div class="inline-flex w-fit rounded-lg border border-default bg-neutral-900/5">
-              <UButton
-                v-for="role in props.availableParentRoles"
-                :key="role"
-                type="button"
-                size="md"
-                :variant="selectedParentRole === role ? 'soft' : 'ghost'"
-                :color="selectedParentRole === role ? 'primary' : 'neutral'"
-                class="px-4 transition-all"
-                @click="selectedParentRole = role"
-              >
-                {{ role === 'FATHER' ? t('tree.add_parent.father') : t('tree.add_parent.mother') }}
-              </UButton>
+        <div class="flex w-full flex-wrap items-center justify-between gap-3">
+          <div class="inline-flex rounded-lg border border-default bg-neutral-900/5">
+            <UButton
+              v-for="role in props.availableParentRoles"
+              :key="role"
+              type="button"
+              size="md"
+              :variant="selectedParentRole === role ? 'soft' : 'ghost'"
+              :color="selectedParentRole === role ? 'primary' : 'neutral'"
+              class="px-4 transition-all"
+              @click="selectedParentRole = role"
+            >
+              {{ role === 'FATHER' ? t('tree.add_parent.father') : t('tree.add_parent.mother') }}
+            </UButton>
           </div>
-          <div class="flex justify-end gap-2 items-center">
+          <div class="flex flex-wrap items-center justify-end gap-2">
+            <UButton
+              type="button"
+              color="neutral"
+              size="md"
+              variant="ghost"
+              icon="i-lucide-book-open"
+              @click="isBrowsePublicModalOpen = true"
+            >
+              {{ t('tree.browse_public.button') }}
+            </UButton>
             <UButton
               type="button"
               color="neutral"
@@ -180,4 +190,12 @@ async function createParent() {
       </form>
     </template>
   </UModal>
+
+  <PublicPersonImportModal
+    v-model:open="isBrowsePublicModalOpen"
+    :tree-id="props.treeId"
+    :attach-to-person-id="props.person.id"
+    :attachment="selectedParentRole"
+    @imported="closeModal(); emit('created')"
+  />
 </template>

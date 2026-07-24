@@ -37,6 +37,7 @@ const hasItems = computed(() => props.items.length > 0)
         :pending="props.pending"
         :title="item.title"
         :author="item.author"
+        :tags-text="item.tagsText"
         :description="item.description"
         :avatar="item.avatar"
         :cover-seed="item.coverSeed"
