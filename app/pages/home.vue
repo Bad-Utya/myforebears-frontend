@@ -1,71 +1,98 @@
 <script setup lang="ts">
-import useAppPreferencesHandler from '~/composables/scripts/storages/get/appPreferencesHandler'
+import useAppPreferencesHandler from '~/utils/scripts/storages/get/appPreferencesHandler'
+import useUserDataHandler from "~/utils/scripts/storages/get/userDataHandler";
+
+const { t } = useI18n()
+const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
 
 const colorMode = useColorMode()
-const { language, ensureLoaded, setLanguage } = useAppPreferencesHandler()
+const {
+  preferences,
+  updatePreferences,
+  switchTheme
+} = useAppPreferencesHandler()
+
 const isRussianLanguage = computed({
-  get: () => language.value === 'ru',
-  set: (value: boolean) => setLanguage(value ? 'ru' : 'en')
+  get: () => preferences.value.language === 'ru',
+  set: (value: boolean) => updatePreferences({ language: value ? 'ru' : 'en' })
 })
 
-onMounted(() => {
-  ensureLoaded()
+onMounted(async () => {
+  await ensureLoaded()
 })
 </script>
 
 <template>
   <UHeader title="Rooots">
     <template #right>
-      <div class="flex items-center gap-3">
-        <UButton color="neutral" variant="subtle" to="/main">Open app</UButton>
+      <div class="flex items-center gap-2">
+        <UButton
+          color="neutral"
+          variant="subtle"
+          to="/main"
+        >
+          {{ t('landing.header.open_app') }}
+        </UButton>
 
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-muted">
-              {{ colorMode.value === 'dark' ? 'Dark' : 'Light' }}
-            </span>
+        <!-- Выплывающее меню настроек -->
+        <UPopover :popper="{ placement: 'bottom-end' }">
+          <UButton
+            color="neutral"
+            variant="subtle"
+            icon="i-lucide-settings"
+            aria-label="Settings"
+          />
 
-            <UColorModeSwitch
-              class="ml-auto"
-              size="md"
-              color="primary"
-            />
-          </div>
+          <template #content>
+            <div class="p-4 w-48 flex flex-col gap-4">
+              <!-- Настройка темы -->
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-sm font-medium text-toned">
+                  {{ colorMode.value === 'dark' ? t('landing.header.dark_mode') : t('landing.header.light_mode') }}
+                </span>
+                <UColorModeSwitch
+                  size="md"
+                  color="primary"
+                  @click="switchTheme"
+                />
+              </div>
 
-          <div class="flex items-center gap-2 width-max">
-            <span class="text-sm font-medium text-muted">
-              {{ language === 'ru' ? 'RU' : 'EN' }}
-            </span>
+              <UDivider />
 
-            <USwitch
-              class="ml-auto"
-              v-model="isRussianLanguage"
-              size="md"
-              color="primary"
-              checked-icon="i-lucide-languages"
-              unchecked-icon="i-lucide-languages"
-              aria-label="Toggle language"
-            />
-          </div>
-        </div>
-
+              <!-- Настройка языка -->
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-sm font-medium text-toned">
+                  {{ preferences.language === 'ru' ? 'Русский' : 'English' }}
+                </span>
+                <USwitch
+                  v-model="isRussianLanguage"
+                  size="md"
+                  color="primary"
+                  checked-icon="i-lucide-languages"
+                  unchecked-icon="i-lucide-languages"
+                />
+              </div>
+            </div>
+          </template>
+        </UPopover>
       </div>
     </template>
   </UHeader>
 
   <UMain>
     <UPageHero
-      title="Whole worlds described by genealogical trees"
-      description="Build lineages for families, dynasties, pantheons, invented houses, and entire fictional worlds."
+      class="bg-accented"
+      :title="t('landing.hero.title')"
+      :description="t('landing.hero.description')"
     >
       <template #links>
         <UButton
           size="xl"
           color="neutral"
-          variant="subtle"
+          variant="soft"
           to="/auth/login"
         >
-          Login
+          {{ t('landing.hero.login') }}
         </UButton>
         <UButton
           size="xl"
@@ -73,42 +100,44 @@ onMounted(() => {
           variant="solid"
           to="/auth/register"
         >
-          Register
+          {{ t('landing.hero.register') }}
         </UButton>
       </template>
     </UPageHero>
 
+    <!-- Секция преимуществ -->
     <section class="border-t border-default">
-      <UContainer class="py-12 sm:py-16">
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-12">
-          <div class="space-y-5">
+      <UContainer class="py-16 sm:py-24">
+        <div class="flex flex-col gap-12">
+          <div class="space-y-6">
             <p class="text-sm font-medium uppercase tracking-[0.16em] text-primary">
-              Beyond family archives
+              {{ t('landing.features.overline') }}
             </p>
-            <h2 class="max-w-3xl text-3xl font-semibold text-highlighted sm:text-4xl">
-              Rooots is built for mythologies, dynasties, fandom canons, and worlds that never fit inside ordinary family tree tools.
+            <h2 class="max-w-4xl text-3xl font-semibold text-highlighted sm:text-5xl">
+              {{ t('landing.features.main_title') }}
             </h2>
-            <p class="max-w-3xl text-base leading-7 text-toned">
-              Map royal succession, divine ancestry, rival bloodlines, hidden heirs, marriage politics, and branches of entire fictional civilizations in one place. Whether you are documenting a fantasy empire, a tabletop campaign setting, a legendary house, or your own long-form worldbuilding project, the structure stays readable even when the lore gets dense.
+            <p class="max-w-4xl text-lg leading-8 text-toned">
+              {{ t('landing.features.main_description') }}
             </p>
           </div>
 
-          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <div class="rounded-xl border border-default bg-card-bg p-5">
-              <p class="text-sm font-semibold text-highlighted">
-                Worldbuilding-first
+          <!-- Карточки -->
+          <div class="flex flex-col md:flex-row gap-8">
+            <div class="rounded-2xl border border-default bg-card-bg p-8 max-w-md">
+              <p class="text-xl font-semibold text-highlighted">
+                {{ t('landing.features.card_worldbuilding_title') }}
               </p>
-              <p class="mt-2 text-sm leading-6 text-muted">
-                Track invented lineages, sacred genealogies, cadet branches, mythic founders, and power transitions without pretending every tree is a modern household.
+              <p class="mt-3 text-base leading-7 text-muted">
+                {{ t('landing.features.card_worldbuilding_desc') }}
               </p>
             </div>
 
-            <div class="rounded-xl border border-default bg-card-bg p-5">
-              <p class="text-sm font-semibold text-highlighted">
-                Built for lore at scale
+            <div class="rounded-2xl border border-default bg-card-bg p-8 max-w-md">
+              <p class="text-xl font-semibold text-highlighted">
+                {{ t('landing.features.card_scale_title') }}
               </p>
-              <p class="mt-2 text-sm leading-6 text-muted">
-                Organize complex relationship webs for houses, clans, pantheons, and alternate histories with a layout that stays legible as your canon expands.
+              <p class="mt-3 text-base leading-7 text-muted">
+                {{ t('landing.features.card_scale_desc') }}
               </p>
             </div>
           </div>
@@ -119,14 +148,15 @@ onMounted(() => {
 
   <UFooter class="border-t border-default bg-sidebar-bg">
     <template #left>
-      <p class="text-sm">All rights reserved</p>
+      <p class="text-sm">
+        {{ t('landing.footer.rights') }}
+      </p>
     </template>
 
     <template #right>
-      <UButton variant="link">rooots.help@gmail.com</UButton>
+      <UButton variant="link" color="neutral" to="mailto:rooots.help@gmail.com">
+        rooots.help@gmail.com
+      </UButton>
     </template>
   </UFooter>
 </template>
-
-<style scoped>
-</style>

@@ -3,5 +3,3 @@ definePageMeta({
   middleware: 'base'
 })
 </script>
-
-<template />

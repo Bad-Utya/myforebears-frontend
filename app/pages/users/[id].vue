@@ -1,86 +1,88 @@
 <script setup lang="ts">
-import SideBar from "~/components/common/SideBar.vue";
-import TreeCardGrid from "~/components/common/TreeCardGrid.vue";
-import useUserDataHandler from "~/composables/scripts/storages/get/userDataHandler";
-import createAvatarPlaceholder from "~/composables/scripts/ui/createAvatarPlaceholder";
-import sendGetUserInfoRequest from "~/composables/scripts/users/getUserInfo";
-import sendGetUserAvatarRequest from "~/composables/scripts/photos/getUserAvatar";
-import sendListPublicUserTreesRequest from "~/composables/scripts/familytree/listPublicUserTrees";
-import sendListTreesRequest from "~/composables/scripts/familytree/listTrees";
-import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
-import type {GetUserInfoResponse} from "~/composables/scripts/users/dtos/responses/GetUserInfoResponse";
-import type {ListTreesResponse} from "~/composables/scripts/familytree/dtos/responses/ListTreesResponse";
-import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
-import {loadTreeCardItems, revokeTreeCardItems} from "~/composables/scripts/ui/loadTreeCardItems";
-import type {TreeCardItem} from "~/composables/scripts/ui/mapTreeToTreeCardItem";
+import SideBar from '~/components/common/sidebar/SideBar.vue'
+import TreeCardGrid from '~/components/common/cards/TreeCardGrid.vue'
+import useUserDataHandler from '~/utils/scripts/storages/get/userDataHandler'
+import sendGetUserInfoRequest from '~/services/users/getUserInfo'
+import sendGetUserAvatarRequest from '~/services/photos/getUserAvatar'
+import sendListPublicUserTreesRequest from '~/services/familytree/listPublicUserTrees'
+import sendListTreesRequest from '~/services/familytree/listTrees'
+import type DataDTO from '~/services/api/dtos/DataDTO'
+import type { GetUserInfoResponse } from '~/services/users/dtos/responses/GetUserInfoResponse'
+import type { ListTreesResponse } from '~/services/familytree/dtos/responses/ListTreesResponse'
+import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import { loadTreeCardItems, revokeTreeCardItems } from '~/utils/ui/tree/loadTreeCardItems'
+import type { TreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
+import UserAvatar from '~/components/images/avatars/UserAvatar.vue'
 
-const route = useRoute();
-const {userData, ensureLoaded} = useUserDataHandler();
+// TODO: check if thats ok
+const { t, locale } = useI18n()
+const route = useRoute()
+const { userData, ensureLoaded } = useUserDataHandler()
 
 const userId = computed(() => {
-  const routeId = route.params.id;
-  const normalizedRouteId = Array.isArray(routeId) ? routeId[0] : routeId;
+  const routeId = route.params.id
+  const normalizedRouteId = Array.isArray(routeId) ? routeId[0] : routeId
 
   if (!normalizedRouteId) {
-    return undefined;
+    return undefined
   }
 
-  const parsedUserId = Number(normalizedRouteId);
-  return Number.isFinite(parsedUserId) ? parsedUserId : undefined;
-});
+  const parsedUserId = Number(normalizedRouteId)
+  return Number.isFinite(parsedUserId) ? parsedUserId : undefined
+})
 
 const isOwnProfile = computed(() => {
-  return typeof userId.value === 'number' && userId.value === userData.value?.id;
-});
+  return typeof userId.value === 'number' && userId.value === userData.value?.id
+})
 
 const registeredLabel = computed(() => {
   if (!createdAtUnix.value) {
-    return 'Registration date unavailable';
+    return 'Registration date unavailable'
   }
 
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(locale.value, {
     month: 'long',
     day: 'numeric',
-    year: 'numeric',
-  }).format(createdAtUnix.value * 1000);
-});
+    year: 'numeric'
+  }).format(createdAtUnix.value * 1000)
+})
 
-const profilePending = ref(true);
-const treesPending = ref(true);
-const nickname = ref('User');
-const createdAtUnix = ref<number | undefined>(undefined);
-const avatarUrl = ref<string | null>(null);
-const treeItems = ref<TreeCardItem[]>([]);
-const avatarPlaceholder = computed(() => createAvatarPlaceholder(nickname.value, userId.value));
-const treesTitle = computed(() => isOwnProfile.value ? 'All Trees' : 'Public Trees');
-
+const profilePending = ref(true)
+const treesPending = ref(true)
+const nickname = ref(t('profile.nickname_fallback'))
+const createdAtUnix = ref<number | undefined>(undefined)
+const avatarUrl = ref<string | null>(null)
+const treeItems = ref<TreeCardItem[]>([])
+const treesTitle = computed(() =>
+  isOwnProfile.value ? t('profile.trees.my_trees') : t('profile.trees.public_trees')
+)
 function revokeProfileAvatarUrl() {
   if (avatarUrl.value?.startsWith('blob:')) {
-    URL.revokeObjectURL(avatarUrl.value);
+    URL.revokeObjectURL(avatarUrl.value)
   }
 }
 
 function replaceTreeItems(nextItems: TreeCardItem[]) {
-  revokeTreeCardItems(treeItems.value);
-  treeItems.value = nextItems;
+  revokeTreeCardItems(treeItems.value)
+  treeItems.value = nextItems
 }
 
 async function loadUserProfile(targetUserId: number) {
-  const response = await sendGetUserInfoRequest(targetUserId) as DataDTO<GetUserInfoResponse>;
-  const user = response.data?.user;
+  const response = await sendGetUserInfoRequest(targetUserId) as DataDTO<GetUserInfoResponse>
+  const user = response.data?.user
 
-  nickname.value = user?.nickname ?? `User ${targetUserId}`;
-  createdAtUnix.value = user?.created_at_unix;
+  nickname.value = user?.nickname ?? `User ${targetUserId}`
+  createdAtUnix.value = user?.created_at_unix
 
   try {
-    const avatarBlob = await sendGetUserAvatarRequest(targetUserId);
-    const nextAvatarUrl = URL.createObjectURL(avatarBlob);
+    const avatarBlob = await sendGetUserAvatarRequest(targetUserId)
+    const nextAvatarUrl = URL.createObjectURL(avatarBlob)
 
-    revokeProfileAvatarUrl();
-    avatarUrl.value = nextAvatarUrl;
+    revokeProfileAvatarUrl()
+    avatarUrl.value = nextAvatarUrl
   } catch {
-    revokeProfileAvatarUrl();
-    avatarUrl.value = null;
+    revokeProfileAvatarUrl()
+    avatarUrl.value = null
   }
 }
 
@@ -89,75 +91,77 @@ async function loadTrees(targetUserId: number) {
     isOwnProfile.value
       ? await sendListTreesRequest()
       : await sendListPublicUserTreesRequest(targetUserId)
-  ) as DataDTO<ListTreesResponse>;
-  const trees = Array.isArray(response.data?.trees) ? response.data.trees : [];
+  ) as DataDTO<ListTreesResponse>
+  const trees = Array.isArray(response.data?.trees) ? response.data.trees : []
 
-  replaceTreeItems(await loadTreeCardItems(trees));
+  replaceTreeItems(await loadTreeCardItems(trees))
 }
 
 onMounted(async () => {
-  await ensureLoaded();
+  await ensureLoaded()
 
   if (typeof userId.value !== 'number') {
-    profilePending.value = false;
-    treesPending.value = false;
-    return;
+    profilePending.value = false
+    treesPending.value = false
+    return
   }
 
   try {
     await Promise.all([
       (async () => {
-        profilePending.value = true;
-        await loadUserProfile(userId.value as number);
-        profilePending.value = false;
+        profilePending.value = true
+        await loadUserProfile(userId.value as number)
+        profilePending.value = false
       })(),
       (async () => {
-        treesPending.value = true;
-        await loadTrees(userId.value as number);
-        treesPending.value = false;
+        treesPending.value = true
+        await loadTrees(userId.value as number)
+        treesPending.value = false
       })()
-    ]);
+    ])
   } catch (error) {
-    showApiErrorToast(error);
-    profilePending.value = false;
-    treesPending.value = false;
+    showApiErrorToast(error)
+    profilePending.value = false
+    treesPending.value = false
   }
-});
+})
 
 onBeforeUnmount(() => {
-  revokeProfileAvatarUrl();
-  revokeTreeCardItems(treeItems.value);
-});
+  revokeProfileAvatarUrl()
+  revokeTreeCardItems(treeItems.value)
+})
 </script>
 
 <template>
   <div class="flex min-h-screen">
     <SideBar :active-tab="null" />
 
-    <UMain class="w-full p-6 lg:p-10">
+    <UMain class="w-full p-4 lg:p-8">
       <UContainer>
-        <div class="mb-6 rounded-t-4xl rounded-b-none border border-default bg-elevated/60 p-8">
-          <div v-if="profilePending" class="flex items-center gap-4">
-            <USkeleton class="size-20 rounded-full" />
-            <div class="space-y-3">
-              <USkeleton class="h-5 w-28 rounded" />
-              <USkeleton class="h-8 w-56 rounded" />
-              <USkeleton class="h-4 w-24 rounded" />
+        <div class="rounded-t-4xl rounded-b-none bg-elevated p-8">
+          <div
+            v-if="profilePending"
+            class="flex items-center gap-4"
+          >
+            <USkeleton class="size-20 rounded-full bg-sidebar-skeleton" />
+            <div class="space-y-4">
+              <USkeleton class="h-6 w-40 rounded bg-sidebar-skeleton" />
+              <USkeleton class="h-4 w-56 rounded bg-sidebar-skeleton" />
             </div>
           </div>
 
-          <div v-else class="flex items-center gap-4">
-            <UAvatar v-if="avatarUrl" :src="avatarUrl" class="size-20 shrink-0" />
-            <div
-              v-else
-              :style="avatarPlaceholder.style"
-              class="size-20 shrink-0 rounded-full flex items-center justify-center text-xl font-semibold select-none"
-            >
-              {{ avatarPlaceholder.label }}
-            </div>
+          <div
+            v-else
+            class="flex items-center gap-4"
+          >
+            <UserAvatar
+              :user="{ nickname: nickname, avatarUrl: avatarUrl! }"
+              :size="20"
+              class="shrink-0"
+            />
 
-            <div class="min-w-0 space-y-1">
-              <div class="flex items-center gap-3">
+            <div class="min-w-0 space-y-2">
+              <div class="flex items-center gap-2">
                 <h1 class="truncate text-3xl font-semibold leading-none">
                   {{ nickname }}
                 </h1>
@@ -165,26 +169,36 @@ onBeforeUnmount(() => {
                   v-if="isOwnProfile"
                   icon="i-lucide-settings-2"
                   color="neutral"
-                  variant="ghost"
+                  variant="link"
                   size="md"
-                  class="shrink-0 self-center rounded-full"
+                  class="self-center rounded-full"
                   to="/settings"
                 />
               </div>
               <p class="text-sm text-toned">
-                Registered on {{ registeredLabel }}
+                {{ t('profile.registered_at', { date: registeredLabel }) }}
               </p>
             </div>
           </div>
         </div>
 
-        <TreeCardGrid :title="treesTitle" :items="treeItems" :pending="treesPending" :limit="12">
-          <template #fallback>
-            <p class="py-12 text-center text-sm text-muted">
-              Public trees were not found.
-            </p>
-          </template>
-        </TreeCardGrid>
+        <div class="w-full px-8 pb-4 mb-0 h-12 flex items-end bg-linear-to-b from-elevated to-transparent">
+          <h1 class="text-left text-lg font-semibold text-neutral">
+            {{ treesTitle }}
+          </h1>
+        </div>
+        <div class="w-full px-4">
+          <TreeCardGrid
+            :items="treeItems"
+            :pending="treesPending"
+          >
+            <template #fallback>
+              <p class="py-12 text-center text-md text-muted">
+                {{ t('profile.trees.not_found') }}
+              </p>
+            </template>
+          </TreeCardGrid>
+        </div>
       </UContainer>
     </UMain>
   </div>

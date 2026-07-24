@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import getPasswordHardnessLevel from "~/composables/scripts/filters/isPasswordEasy";
+import getPasswordHardnessLevel from "~/utils/scripts/filters/isPasswordEasy";
 import PasswordInput from "~/components/auth/PasswordInput.vue";
+
+const { t } = useI18n();
 
 const password = defineModel<string>('data');
 const isRight = defineModel<boolean>('isRight');
@@ -12,7 +14,7 @@ const passwordCheck = computed({
       return {hardness: 0, hint: ''}
     }
 
-    let dto = getPasswordHardnessLevel(password.value);
+    let dto = getPasswordHardnessLevel(password.value, t);
     isRight.value = dto.hardness >= 3;
 
     return dto;

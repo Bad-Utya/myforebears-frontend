@@ -1,44 +1,58 @@
 <script setup lang="ts">
-import useUserDataHandler from "~/composables/scripts/storages/get/userDataHandler";
-import createAvatarPlaceholder from "~/composables/scripts/ui/createAvatarPlaceholder";
+import useUserDataHandler from '~/utils/scripts/storages/get/userDataHandler'
+import UserAvatar from '~/components/images/avatars/UserAvatar.vue'
 
-const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
+const { t } = useI18n()
 
-const displayName = computed(() => userData.value?.nickname ?? userData.value?.email ?? 'User');
-const avatarPlaceholder = computed(() => createAvatarPlaceholder(displayName.value, userData.value?.id));
-const isLoading = computed(() => pending.value || !initialized.value);
-const isGuest = computed(() => initialized.value && !userData.value);
+const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
+
+const displayName = computed(() => userData.value?.nickname ?? userData.value?.email)
+const isLoading = computed(() => pending.value || !initialized.value)
+const isGuest = computed(() => initialized.value && !userData.value)
 
 onMounted(async () => {
-  await ensureLoaded();
-});
+  await ensureLoaded()
+})
 </script>
 
 <template>
-  <div v-if="isGuest" class="space-y-2">
-    <p class="text-left text-sm text-muted">Welcome,</p>
+  <div
+    v-if="isGuest"
+    class="space-y-2"
+  >
+    <p class="text-left text-sm text-muted">
+      {{ t('main.welcome.guest_prefix') }}
+    </p>
     <p class="text-left text-xl font-semibold truncate">
-      Guest visitor
+      {{ t('main.welcome.guest_name') }}
     </p>
   </div>
 
-  <div v-else class="space-y-2">
-    <p class="text-left text-sm text-muted">Welcome back,</p>
+  <div
+    v-else
+    class="space-y-2"
+  >
+    <p class="text-left text-sm text-muted">
+      {{ t('main.welcome.user_prefix') }}
+    </p>
 
-    <div v-if="isLoading" class="flex items-center gap-3">
-      <USkeleton class="size-10 rounded-full" />
-      <USkeleton class="h-5 w-40 rounded" />
+    <div
+      v-if="isLoading"
+      class="flex items-center gap-4"
+    >
+      <USkeleton class="size-12 rounded-full" />
+      <USkeleton class="h-5 w-32 rounded" />
     </div>
 
-    <div v-else class="flex gap-3 items-center min-w-0">
-      <UAvatar v-if="userData?.avatarUrl" :src="userData.avatarUrl" class="size-10 shrink-0" />
-      <div
-        v-else
-        :style="avatarPlaceholder.style"
-        class="size-10 shrink-0 rounded-full flex items-center justify-center text-sm font-semibold select-none"
-      >
-        {{ avatarPlaceholder.label }}
-      </div>
+    <div
+      v-else
+      class="flex gap-4 items-center"
+    >
+      <UserAvatar
+        :user="userData"
+        :size="12"
+        class="shrink-0"
+      />
 
       <p class="text-left text-xl font-semibold truncate">
         {{ displayName }}
@@ -48,5 +62,4 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
 </style>

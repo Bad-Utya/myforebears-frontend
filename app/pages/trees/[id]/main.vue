@@ -1,26 +1,32 @@
 <script setup lang="ts">
-import SideBar from '~/components/common/SideBar.vue'
-import SidebarButtonList, { type SidebarButtonListItem } from '~/components/common/SidebarButtonList.vue'
-import TreeSidebarPanel from '~/components/tree/TreeSidebarPanel.vue'
-
-type TreeSidebarSection = 'settings' | 'events'
-type TreeSidebarNavKey = TreeSidebarSection | 'timeline'
+import SideBar from '~/components/common/sidebar/SideBar.vue'
+import SidebarButtonList, { type SidebarButtonListItem } from '~/components/common/sidebar/SidebarButtonList.vue'
 import TreeCanvas from '~/components/tree/TreeCanvas.vue'
-import type DataDTO from '~/composables/scripts/api/dtos/DataDTO'
-import type TreeDTO from '~/composables/scripts/familytree/dtos/inner/TreeDTO'
-import sendGetTreeContentRequest from '~/composables/scripts/familytree/getTreeContent'
-import sendGetTreeRequest from '~/composables/scripts/familytree/getTree'
-import type PersonDTO from '~/composables/scripts/familytree/dtos/inner/PersonDTO'
-import type RelationshipDTO from '~/composables/scripts/familytree/dtos/inner/RelationshipDTO'
-import type { GetTreeContentResponse } from '~/composables/scripts/familytree/dtos/responses/GetTreeContentResponse'
-import type { GetTreeResponse } from '~/composables/scripts/familytree/dtos/responses/GetTreeResponse'
-import adaptTreeVisualisation, { type TreeVisualLayout } from '~/composables/scripts/tree/adaptTreeVisualisation'
-import resolveTreeRootPersonId, { getTreePersonId } from '~/composables/scripts/tree/resolveTreeRootPersonId'
-import useUserDataHandler from '~/composables/scripts/storages/get/userDataHandler'
-import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
-import sendGetUserInfoRequest from '~/composables/scripts/users/getUserInfo'
-import sendRenderCoordinatesForClientRequest from '~/composables/scripts/visualisations/renderCoordinatesForClient'
-import type { GetUserInfoResponse } from '~/composables/scripts/users/dtos/responses/GetUserInfoResponse'
+import type DataDTO from '~/services/api/dtos/DataDTO'
+import type TreeDTO from '~/services/familytree/dtos/inner/TreeDTO'
+import sendGetTreeContentRequest from '~/services/familytree/getTreeContent'
+import sendGetTreeRequest from '~/services/familytree/getTree'
+import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
+import type RelationshipDTO from '~/services/familytree/dtos/inner/RelationshipDTO'
+import type { GetTreeContentResponse } from '~/services/familytree/dtos/responses/GetTreeContentResponse'
+import type { GetTreeResponse } from '~/services/familytree/dtos/responses/GetTreeResponse'
+import adaptTreeVisualisation from '~/utils/ui/tree/coordinates/adaptTreeVisualisation'
+import resolveTreeRootPersonId, { getTreePersonId } from '~/utils/ui/tree/resolveTreePersonId'
+import useUserDataHandler from '~/utils/scripts/storages/get/userDataHandler'
+import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import sendGetUserInfoRequest from '~/services/users/getUserInfo'
+import sendRenderCoordinatesForClientRequest from '~/services/visualisations/renderCoordinatesForClient'
+import type { GetUserInfoResponse } from '~/services/users/dtos/responses/GetUserInfoResponse'
+import TreeSettingsSidebar from '~/components/tree/sidebar/TreeSettingsSidebar.vue'
+import TreeEventsSidebar from '~/components/tree/sidebar/TreeEventsSidebar.vue'
+import type {TreeVisualNode} from "~/utils/ui/tree/coordinates/computeNodes";
+import type {TreeVisualConnection} from "~/utils/ui/tree/coordinates/computeConnections";
+import TreeVisualizationsSidebar from "~/components/tree/sidebar/TreeVisualizationsSidebar.vue";
+
+type TreeSidebarSection = 'settings' | 'events' | 'export'
+type TreeSidebarNavKey = TreeSidebarSection | 'timeline'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const { userData, ensureLoaded } = useUserDataHandler()
@@ -28,6 +34,13 @@ const treeId = computed(() => {
   const routeId = route.params.id
   return Array.isArray(routeId) ? routeId[0] : routeId
 })
+
+interface TreeLayout {
+  nodes: TreeVisualNode[]
+  connections: TreeVisualConnection[]
+  width: number
+  height: number
+}
 
 const treeCanvasRef = ref<InstanceType<typeof TreeCanvas> | null>(null)
 const pending = ref(true)
@@ -42,7 +55,7 @@ const persons = ref<PersonDTO[]>([])
 const relationships = ref<RelationshipDTO[]>([])
 const sidebarPanelOpen = ref(false)
 const sidebarSection = ref<TreeSidebarSection>('settings')
-const layout = ref<TreeVisualLayout>({
+const layout = ref<TreeLayout>({
   nodes: [],
   connections: [],
   width: 320,
@@ -52,7 +65,7 @@ const layout = ref<TreeVisualLayout>({
 const isEditable = computed(() => {
   const currentUserId = userData.value?.id
 
-  if (currentUserId == null || treeCreatorId.value == null) {
+  if (!currentUserId || treeCreatorId.value == null) {
     return false
   }
 
@@ -60,9 +73,10 @@ const isEditable = computed(() => {
 })
 
 const sidebarItems = computed<SidebarButtonListItem<TreeSidebarNavKey>[]>(() => [
-  { key: 'settings', label: 'Tree settings', icon: 'i-lucide-settings-2' },
-  { key: 'events', label: 'Events', icon: 'i-lucide-calendar-days' },
-  { key: 'timeline', label: 'Timeline', icon: 'i-lucide-history' }
+  { key: 'settings', label: t('tree.navigation.settings'), icon: 'i-lucide-settings-2' },
+  { key: 'events', label: t('tree.navigation.events'), icon: 'i-lucide-calendar-days' },
+  { key: 'export', label: t('tree.navigation.visualizations'), icon: 'i-lucide-external-link' },
+  { key: 'timeline', label: t('tree.navigation.timeline'), icon: 'i-lucide-history' },
 ])
 
 async function loadTreeData() {
@@ -78,7 +92,7 @@ async function loadTreeData() {
   const treeContent = treeContentResponse.data
 
   tree.value = treeDto ?? null
-  treeName.value = treeDto?.name ?? treeDto?.title ?? `Tree ${treeId.value}`
+  treeName.value = treeDto?.name ?? treeDto?.title ?? `${t('tree.canvas.fallback_name')} ${treeId.value}`
   treeDescription.value = treeDto?.description?.trim() ?? ''
   treeCreatorId.value = treeDto?.creator_id ?? null
   persons.value = Array.isArray(treeContent?.persons) ? treeContent.persons : []
@@ -128,8 +142,8 @@ async function loadTreeAuthor() {
   const response = await sendGetUserInfoRequest(creatorId) as DataDTO<GetUserInfoResponse>
   const author = response.data?.user
 
-  treeAuthorName.value = author?.nickname?.trim() || `User ${creatorId}`
-  treeAuthorHref.value = `/users/${creatorId}`
+  treeAuthorName.value = author?.nickname?.trim() || t('tree.canvas.author_fallback', { id: creatorId })
+  treeAuthorHref.value = `/users/${creatorId}` // TODO: fix shitcode
 }
 
 function getVisualisationMaxDepth() {
@@ -143,7 +157,7 @@ function fitCanvas() {
 async function openSidebarSection(section: TreeSidebarNavKey) {
   if (section === 'timeline') {
     await navigateTo(`/trees/${treeId.value}/timeline`)
-    return
+    return;
   }
 
   sidebarSection.value = section
@@ -171,7 +185,7 @@ function handlePersonUpdated(updatedPerson: PersonDTO) {
   rootPerson.value = persons.value.find(person => getTreePersonId(person) === updatedPersonId) ?? rootPerson.value
   layout.value = {
     ...layout.value,
-    nodes: layout.value.nodes.map((node) => {
+    nodes: layout.value.nodes.map((node: any) => { // TODO: fix any
       return node.id === updatedPersonId
         ? { ...node, person: updatedPerson }
         : node
@@ -220,7 +234,7 @@ onMounted(async () => {
       </template>
     </SideBar>
 
-    <UMain class="tree-page relative h-screen min-w-0 flex-1 overflow-hidden p-0">
+    <UMain class="bg-ui-bg relative h-screen flex-1 overflow-hidden">
       <TreeCanvas
         ref="treeCanvasRef"
         :tree-id="treeId ?? ''"
@@ -243,14 +257,33 @@ onMounted(async () => {
     <USlideover
       v-model:open="sidebarPanelOpen"
       side="right"
-      :title="sidebarSection === 'settings' ? 'Tree settings' : 'Events'"
-      :description="sidebarSection === 'settings'
-        ? 'Configure this tree and manage access.'
-        : 'Create and manage tree events.'"
-      :ui="{ content: 'bg-default sm:max-w-xl' }"
+      :title="sidebarItems.find(i => i.key === sidebarSection)?.label ?? t('tree.panels.unknown')"
+      :ui="{ content: 'bg-default' }"
     >
       <template #body>
-        <TreeSidebarPanel
+        <TreeSettingsSidebar
+          v-if="sidebarSection === 'settings'"
+          :tree-id="treeId ?? ''"
+          :tree="tree"
+          :persons="persons"
+          :editable="isEditable"
+          :pending="pending"
+          @tree-updated="handleTreeUpdated"
+          @tree-deleted="handleTreeDeleted"
+        />
+        <TreeEventsSidebar
+          v-else-if="sidebarSection === 'events'"
+          :tree-id="treeId ?? ''"
+          :tree="tree"
+          :persons="persons"
+          :editable="isEditable"
+          :pending="pending"
+          :section="sidebarSection"
+          @tree-updated="handleTreeUpdated"
+          @tree-deleted="handleTreeDeleted"
+        />
+        <TreeVisualizationsSidebar
+          v-else
           :tree-id="treeId ?? ''"
           :tree="tree"
           :persons="persons"
@@ -262,11 +295,7 @@ onMounted(async () => {
         />
       </template>
     </USlideover>
+
+
   </div>
 </template>
-
-<style scoped>
-.tree-page {
-  background: var(--ui-bg);
-}
-</style>

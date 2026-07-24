@@ -3,11 +3,13 @@ import { Cropper, RectangleStencil } from 'vue-advanced-cropper'
 import type { CropperResult } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css'
 
+const { t } = useI18n()
+
 const props = withDefaults(defineProps<{
   src: string
   aspectRatio?: number
 }>(), {
-  aspectRatio: 1,
+  aspectRatio: 1
 })
 
 type CropperInstance = {
@@ -17,7 +19,7 @@ type CropperInstance = {
 
 const cropper = ref<CropperInstance | null>(null)
 
-function defaultSize({ visibleArea, imageSize }: { visibleArea?: { width: number; height: number } | null; imageSize: { width: number; height: number } }) {
+function defaultSize({ visibleArea, imageSize }: { visibleArea?: { width: number, height: number } | null, imageSize: { width: number, height: number } }) {
   const area = visibleArea ?? imageSize
   const maxWidth = area.width * 0.85
   const maxHeight = area.height * 0.85
@@ -25,10 +27,7 @@ function defaultSize({ visibleArea, imageSize }: { visibleArea?: { width: number
   const height = Math.min(maxHeight, maxHeightFromWidth)
   const width = height * props.aspectRatio
 
-  return {
-    width,
-    height,
-  }
+  return { width, height }
 }
 
 function getCanvas(size = 512) {
@@ -36,7 +35,7 @@ function getCanvas(size = 512) {
   const canvas = result?.canvas
 
   if (!canvas) {
-    throw new Error('Avatar export failed')
+    throw new Error(t('errors.avatar.export_failed'))
   }
 
   const output = document.createElement('canvas')
@@ -46,7 +45,7 @@ function getCanvas(size = 512) {
   const context = output.getContext('2d')
 
   if (!context) {
-    throw new Error('Canvas context is unavailable')
+    throw new Error(t('errors.avatar.context_unavailable'))
   }
 
   context.clearRect(0, 0, output.width, output.height)
@@ -61,7 +60,7 @@ async function exportBlob(type: string = 'image/png', size = 512) {
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) {
-        reject(new Error('Avatar export failed'))
+        reject(new Error(t('errors.avatar.export_failed')))
         return
       }
 
@@ -72,7 +71,6 @@ async function exportBlob(type: string = 'image/png', size = 512) {
 
 async function exportFile(fileName = 'avatar.png', size = 512) {
   const blob = await exportBlob('image/png', size)
-
   return new File([blob], fileName, { type: 'image/png' })
 }
 
@@ -84,7 +82,7 @@ defineExpose({
   exportBlob,
   exportFile,
   getCanvas,
-  refresh,
+  refresh
 })
 </script>
 

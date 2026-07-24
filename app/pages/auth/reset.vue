@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import RegisterPasswordInput from '~/components/auth/RegisterPasswordInput.vue'
 import PasswordInput from '~/components/auth/PasswordInput.vue'
-import sendResetByLinkRequest from '~/composables/scripts/auth/resetPasswordByLink'
-import sendResetByTokenRequest from '~/composables/scripts/auth/resetPasswordByToken'
-import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
+import sendResetByLinkRequest from '~/services/auth/resetPasswordByLink'
+import sendResetByTokenRequest from '~/services/auth/resetPasswordByToken'
+import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
 
-definePageMeta({ middleware: 'guest' })
+const {t} = useI18n()
+
+definePageMeta({middleware: 'guest'})
 
 const route = useRoute()
 
@@ -36,30 +38,26 @@ const isConfirmationCorrect = computed(() => {
 const canSubmit = computed(() => {
   return isPasswordCorrect.value && isConfirmationCorrect.value && hasResetCredentials.value
 })
-
 const helperText = computed(() => {
   if (!hasResetCredentials.value) {
-    return 'Reset data was not found in the link.'
+    return t('auth.reset.helpers.no_credentials')
   }
 
   if (!passwordConfirmation.value.length) {
-    return 'Repeat the new password to continue.'
+    return t('auth.reset.helpers.repeat_new')
   }
 
   if (!isConfirmationCorrect.value) {
-    return 'Passwords do not match.'
+    return t('auth.reset.helpers.mismatch')
   }
 
-  return 'Set a new password for your account.'
+  return t('auth.reset.helpers.set_new')
 })
 
 async function sendRequest() {
-  if (isSubmitting.value || !canSubmit.value) {
-    return
-  }
+  if (isSubmitting.value || !canSubmit.value) return
 
   isSubmitting.value = true
-
   try {
     if (resetToken.value) {
       await sendResetByTokenRequest(password.value)
@@ -67,7 +65,6 @@ async function sendRequest() {
       const currentLink = resetLink.value || (import.meta.client ? window.location.href : '')
       await sendResetByLinkRequest(currentLink, password.value)
     }
-
     isCompleted.value = true
   } catch (err: unknown) {
     showApiErrorToast(err)
@@ -87,24 +84,27 @@ async function sendRequest() {
         class="w-fit cursor-pointer"
         @click="$router.back()"
       >
-        Back
+        {{ t('common.back') }}
       </UButton>
 
       <div class="flex flex-col gap-4 rounded-xl p-4 shadow-lg shadow-carbon-800">
         <div>
           <h1 class="text-left text-3xl font-bold">
-            Reset password
+            {{ t('auth.reset.title') }}
           </h1>
           <p class="text-left text-md text-muted max-w-md">
-            {{ isCompleted ? 'Password changed successfully.' : 'Enter a new password for your account.' }}
+            {{ isCompleted ? t('auth.reset.success_subtitle') : t('auth.reset.subtitle') }}
           </p>
         </div>
 
-        <div v-if="!isCompleted" class="flex flex-col gap-3">
-          <RegisterPasswordInput v-model:data="password" v-model:is-right="isPasswordCorrect" />
+        <div v-if="!isCompleted" class="flex flex-col gap-4">
+          <RegisterPasswordInput v-model:data="password" v-model:is-right="isPasswordCorrect"/>
 
           <div class="flex flex-col gap-2">
-            <PasswordInput v-model="passwordConfirmation" placeholder="Repeat new password" />
+            <PasswordInput
+              v-model="passwordConfirmation"
+              :placeholder="t('auth.reset.placeholders.repeat_password')"
+            />
             <p
               class="text-sm"
               :class="isConfirmationCorrect || !passwordConfirmation.length ? 'text-muted' : 'text-error'"
@@ -119,8 +119,8 @@ async function sendRequest() {
           color="success"
           variant="subtle"
           icon="i-lucide-badge-check"
-          title="Password updated"
-          description="You can now sign in with the new password."
+          :title="t('auth.reset.alert.title')"
+          :description="t('auth.reset.alert.description')"
         />
 
         <div class="flex flex-row items-center gap-2">
@@ -132,7 +132,7 @@ async function sendRequest() {
             :variant="canSubmit ? 'solid' : 'outline'"
             @click="sendRequest"
           >
-            Submit
+            {{ t('common.submit') }}
           </UButton>
 
           <UButton
@@ -141,7 +141,7 @@ async function sendRequest() {
             color="neutral"
             to="./login"
           >
-            Go to login
+            {{ t('auth.reset.go_to_login') }}
           </UButton>
         </div>
       </div>

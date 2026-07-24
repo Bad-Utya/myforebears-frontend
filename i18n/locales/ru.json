@@ -1,0 +1,508 @@
+{
+  "notifications": {
+    "email_missing": "Email не указан",
+    "nickname_empty": "Никнейм не может быть пустым",
+    "password_mismatch": "Пароли не совпадают",
+    "password_updated": "Пароль успешно обновлен",
+    "event_removed": "Событие удалено",
+    "event_removed_desc": "Событие {type} успешно удалено"
+  },
+  "auth": {
+    "logout_modal": {
+      "title": "Подтвердите выход",
+      "description": "Выберите, хотите ли вы завершить остальные сессии",
+      "all_devices_label": "Выйти на всех устройствах",
+      "submit": "Выйти"
+    },
+    "actions": {
+      "sign_up": "Регистрация",
+      "log_in": "Войти"
+    },
+    "validation": {
+      "password": {
+        "too_short": "Пароль слишком короткий (минимум 8 символов)",
+        "add_numbers": "Добавьте цифры в пароль",
+        "add_special": "Добавьте специальные символы в пароль",
+        "add_uppercase": "Добавьте заглавные буквы в пароль",
+        "perfect": "Отличный пароль"
+      }
+    },
+    "placeholders": {
+      "email": "Email"
+    },
+    "account_required": "Требуется авторизация",
+    "signin_to_edit": "Войдите, чтобы редактировать свой профиль.",
+    "verify_code": {
+      "title": "Введите код",
+      "subtitle": "Проверьте почту {email}, мы отправили письмо",
+      "send_again": "Отправить код повторно"
+    },
+    "recovery": {
+      "title": "Восстановление пароля",
+      "subtitle": "Сброс пароля для существующего аккаунта"
+    },
+    "login": {
+      "title": "Вход",
+      "subtitle": "С возвращением",
+      "no_account": "У меня нет аккаунта",
+      "forgot_password": "Забыли пароль?"
+    },
+    "register": {
+      "title": "Регистрация",
+      "subtitle": "Создайте новый аккаунт",
+      "already_have_account": "Уже есть аккаунт? Войти"
+    },
+    "reset": {
+      "title": "Сброс пароля",
+      "subtitle": "Введите новый пароль для вашего аккаунта.",
+      "success_subtitle": "Пароль успешно изменен.",
+      "go_to_login": "Перейти ко входу",
+      "placeholders": {
+        "repeat_password": "Повторите новый пароль"
+      },
+      "helpers": {
+        "no_credentials": "Данные для сброса не найдены в ссылке.",
+        "repeat_new": "Повторите новый пароль, чтобы продолжить.",
+        "mismatch": "Пароли не совпадают.",
+        "set_new": "Установите новый пароль для вашего аккаунта."
+      },
+      "alert": {
+        "title": "Пароль обновлен",
+        "description": "Теперь вы можете войти с новым паролем."
+      }
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "back": "Назад",
+    "nickname": "Никнейм",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "update_password": "Обновить пароль",
+    "new_password": "Новый пароль",
+    "confirm_password": "Подтвердите пароль",
+    "passwords_dont_match": "Пароли не совпадают",
+    "preferences": "Предпочтения",
+    "theme": "Тема",
+    "language": "Язык",
+    "avatar_modal": {
+      "title": "Редактировать аватар",
+      "no_image": "Изображение не выбрано",
+      "select_image": "Выбрать изображение",
+      "change_image": "Сменить изображение",
+      "apply": "Применить"
+    }
+  },
+  "common": {
+    "no_data": "Данные не найдены.",
+    "dates": {
+      "unavailable": "Дата регистрации недоступна"
+    },
+    "back": "Назад",
+    "submit": "Отправить",
+    "search_placeholder": "Поиск...",
+    "cancel": "Отмена",
+    "create": "Создать",
+    "import": "Импорт",
+    "profile_menu": {
+      "my_profile": "Мой профиль",
+      "settings": "Настройки",
+      "logout": "Выйти"
+    },
+    "navigation": {
+      "main": "Главная",
+      "feed": "Лента",
+      "my_trees": "Мои деревья"
+    }
+  },
+  "main": {
+    "feeds": {
+      "trees_title": "Деревья для вас",
+      "users_title": "Рекомендованные пользователи"
+    },
+    "empty_states": {
+      "no_trees_found": "Деревья с выбранными параметрами не найдены."
+    },
+    "welcome": {
+      "guest_prefix": "Добро пожаловать,",
+      "guest_name": "Гость",
+      "user_prefix": "С возвращением,"
+    },
+    "search": {
+      "button_label": "Поиск пользователей...",
+      "placeholder": "Введите для поиска людей или деревьев...",
+      "no_results": "Ничего не найдено"
+    }
+  },
+  "feed": {
+    "title": "Лента"
+  },
+  "my": {
+    "title": "Мои деревья",
+    "actions": {
+      "new_tree": "Новое дерево"
+    },
+    "new_tree_modal": {
+      "title": "Добавить семейное дерево",
+      "description": "Создайте вручную или импортируйте файл",
+      "tabs": {
+        "create": "Новое дерево",
+        "import": "Импорт файла"
+      },
+      "form": {
+        "name_label": "Название дерева",
+        "name_placeholder": "Моя семья",
+        "desc_label": "Описание",
+        "desc_placeholder": "Опишите ваше дерево здесь",
+        "avatar_label": "Аватар дерева",
+        "choose_image": "Выбрать изображение",
+        "submit": "Создать дерево"
+      },
+      "import": {
+        "click_to_upload": "Нажмите, чтобы загрузить файл",
+        "support_text": "Поддерживаются стандартные файлы .ged",
+        "submit": "Импортировать дерево"
+      }
+    },
+    "empty_state": {
+      "title": "Деревьев пока нет",
+      "description": "Создайте свое первое дерево, чтобы начать заполнение страницы.",
+      "create_button": "Создать дерево"
+    }
+  },
+  "suggestions": {
+    "create_account": {
+      "title": "Создайте аккаунт, чтобы сохранить деревья",
+      "description": "Гости могут просматривать публичные страницы, но для создания своих деревьев нужен аккаунт."
+    },
+    "create_account_default": {
+      "title": "Создать аккаунт",
+      "description": "Сохраняйте свои деревья, синхронизируйте профиль и продолжайте строить историю семьи."
+    }
+  },
+  "profile": {
+    "nickname_fallback": "Пользователь",
+    "registered_at": "Регистрация: {date}",
+    "trees": {
+      "my_trees": "Мои деревья",
+      "public_trees": "Публичные деревья",
+      "not_found": "Публичные деревья не найдены."
+    }
+  },
+  "tree": {
+    "actions": {
+      "parent": "Родитель",
+      "partner": "Партнер",
+      "child": "Ребенок"
+    },
+    "roles": {
+      "member": "Член семьи",
+      "father": "Отец",
+      "mother": "Мать",
+      "parent": "Родитель"
+    },
+    "person": {
+      "unknown": "Неизвестно"
+    },
+    "canvas": {
+      "fallback_name": "Дерево",
+      "author_fallback": "Пользователь {id}"
+    },
+    "navigation": {
+      "settings": "Настройки",
+      "events": "События",
+      "visualizations": "Визуализации",
+      "timeline": "Хронология"
+    },
+    "panels": {
+      "unknown": "Неизвестный раздел"
+    },
+    "events": {
+      "type_modal": {
+        "title": "Создать тип события",
+        "description": "Добавьте шаблон события для повторного использования.",
+        "name_label": "Название типа",
+        "name_placeholder": "например: Свадьба, Рождение, Перепись",
+        "count_label": "Кол-во основных участников",
+        "rule_label": "Правило выбора",
+        "submit_button": "Создать тип",
+        "success_notification": "Тип события создан",
+        "rules": {
+          "exact": "Точное количество",
+          "at_least": "Как минимум"
+        }
+      },
+      "modal": {
+        "create_title": "Создать событие",
+        "edit_title": "Редактировать событие",
+        "type_label": "Тип события",
+        "unknown_date": "Дата неизвестна",
+        "primary_people": "Основные участники",
+        "additional_people": "Дополнительные участники",
+        "unnamed_person": "Человек без имени",
+        "submit_create": "Создать событие",
+        "submit_save": "Сохранить изменения",
+        "placeholders": {
+          "month": "ММ",
+          "year": "ГГГГ"
+        },
+        "errors": {
+          "exactly_primary": "Выберите ровно {count} основных участников.",
+          "at_least_primary": "Выберите как минимум {count} основных участников."
+        },
+        "precisions": {
+          "day": "День",
+          "month": "Месяц",
+          "year": "Год"
+        },
+        "bounds": {
+          "exact": "Точно",
+          "not_before": "Не ранее",
+          "not_after": "Не позднее"
+        }
+      }
+    },
+    "export": {
+      "open_button": "Создать экспорт",
+      "modal_title": "Экспорт семейного дерева",
+      "modal_description": "Скачайте данные или сгенерируйте график",
+      "tabs": {
+        "gedcom": "GEDCOM",
+        "svg": "График"
+      },
+      "gedcom": {
+        "description": "Экспорт в стандартном формате {format}.",
+        "warning": "Почти все события будут потеряны.",
+        "submit": "Экспортировать"
+      },
+      "svg": {
+        "type_label": "Тип визуализации",
+        "type_description": "Выберите структуру дерева",
+        "type_placeholder": "Выберите тип",
+        "root_label": "Корневой человек",
+        "root_description": "Центральный узел дерева",
+        "root_placeholder": "Выберите корень",
+        "excluded_label": "Исключенные люди",
+        "excluded_description": "Эти люди будут скрыты на графике",
+        "excluded_placeholder": "Никто не исключен",
+        "submit": "Сгенерировать"
+      }
+    },
+    "add_child": {
+      "title": "Добавить ребенка",
+      "description": "Создать новый узел ребенка в дереве.",
+      "first_name": "Имя",
+      "last_name": "Фамилия",
+      "patronymic": "Отчество",
+      "gender": "Пол",
+      "male": "Мужской",
+      "female": "Женский",
+      "submit": "Создать",
+      "success_title": "Ребенок добавлен",
+      "success_description": "Новый ребенок успешно добавлен в дерево."
+    },
+    "add_parent": {
+      "title": "Добавить родителя",
+      "description": "Создать новый узел родителя для {name}.",
+      "first_name": "Имя",
+      "last_name": "Фамилия",
+      "patronymic": "Отчество",
+      "role": "Роль",
+      "father": "Отец",
+      "mother": "Мать",
+      "submit": "Создать",
+      "success_title": "Родитель добавлен",
+      "success_description": "Новый родитель добавлен в дерево."
+    },
+    "add_partner": {
+      "title": "Добавить партнера",
+      "description": "Добавить супруга(у) или партнера для {name}",
+      "first_name": "Имя",
+      "last_name": "Фамилия",
+      "patronymic": "Отчество",
+      "submit": "Создать",
+      "success_title": "Партнер добавлен",
+      "success_description": "Новый партнер успешно добавлен."
+    },
+    "person_modal": {
+      "description": "Детали участника",
+      "unknown_person": "Неизвестный человек",
+      "born_on": "Род. {year}",
+      "roles": {
+        "label": "Роль",
+        "default": "Член семьи"
+      },
+      "info": {
+        "gender": "Пол",
+        "first_name": "Имя",
+        "last_name": "Фамилия",
+        "patronymic": "Отчество",
+        "none": "—"
+      },
+      "genders": {
+        "male": "Мужской",
+        "female": "Женский",
+        "unspecified": "Не указан"
+      },
+      "avatar": {
+        "label": "Аватар",
+        "choose": "Выбрать изображение"
+      },
+      "actions": {
+        "edit": "Редактировать",
+        "save": "Сохранить",
+        "delete": "Удалить",
+        "set_root": "Сделать корнем",
+        "close": "Закрыть"
+      }
+    },
+    "loading": "Загрузка дерева",
+    "info_card": {
+      "by": "От",
+      "unknown_author": "Неизвестный автор"
+    },
+    "empty_state": "Контент дерева недоступен для {name}",
+    "events_list": {
+      "title": "События",
+      "description": "История событий этого дерева.",
+      "add_button": "Событие",
+      "empty_state": "Событий пока нет.",
+      "unnamed_person": "Без имени",
+      "unknown_type": "Неизвестный тип",
+      "participants": {
+        "primary": "Основные",
+        "additional": "Дополнительные",
+        "none": "Нет",
+        "unknown": "Неизвестно"
+      },
+      "dates": {
+        "unknown": "Дата неизвестна",
+        "undated": "Без даты"
+      },
+      "date_bounds": {
+        "before": "до",
+        "after": "после",
+        "about": "около",
+        "exact": ""
+      }
+    },
+    "event_types": {
+      "title": "Типы событий",
+      "description": "Шаблоны для создания событий.",
+      "add_button": "Тип",
+      "empty_state": "Типы событий не найдены.",
+      "unnamed_type": "Тип без названия",
+      "people_count": "Кол-во людей: {count}",
+      "rules": {
+        "any": "любое"
+      }
+    },
+    "access_list": {
+      "title": "Список доступа",
+      "description": "Управление доступом по email.",
+      "placeholder": "user{'@'}example.com",
+      "add_button": "Добавить"
+    },
+    "danger_zone": {
+      "title": "Опасная зона",
+      "description": "Это действие навсегда удалит дерево.",
+      "delete_button": "Удалить дерево",
+      "confirm_delete": "Удалить дерево \"{name}\"?"
+    },
+    "settings": {
+      "name_placeholder": "Название дерева",
+      "description_placeholder": "Описание",
+      "public_checkbox": "Публиковать на главной",
+      "restricted_checkbox": "Ограниченный просмотр",
+      "avatar_label": "Аватар дерева",
+      "choose_image": "Выбрать изображение",
+      "save_button": "Сохранить изменения"
+    },
+    "visualizations": {
+      "title": "Сгенерированные данные",
+      "description": "Готовые файлы визуализаций",
+      "empty_state": "Визуализации не найдены.",
+      "created_at": "Создано: {date}",
+      "pending": "В процессе...",
+      "root_person": "Корень",
+      "persons_count": "Люди",
+      "members": "{count} чел.",
+      "unknown": "Неизвестно",
+      "unnamed": "Без имени",
+      "error_label": "Ошибка: {message}",
+      "types": {
+        "svg": "SVG График",
+        "pdf": "PDF Документ",
+        "png": "PNG Изображение"
+      },
+      "statuses": {
+        "ready": "Готово",
+        "error": "Ошибка",
+        "pending": "Ожидание"
+      }
+    }
+  },
+  "timeline": {
+    "fallback_title": "Хронология",
+    "no_dated_events": "Нет событий с датами",
+    "undated_list": {
+      "unknown_event": "Неизвестно",
+      "none_people": "Нет"
+    },
+    "loading_tree": "Загрузка дерева",
+    "no_content": "Контент хронологии недоступен для этого дерева",
+    "unknown_event": "Неизвестное событие",
+    "no_people": "Нет людей",
+    "undated": "Без даты",
+    "filters": {
+      "date_from": "С",
+      "date_to": "По",
+      "included_persons": "Участники",
+      "choose_people": "Выбрать людей"
+    },
+    "undated_events_title": "События без даты или с неизвестной датой",
+    "roles": {
+      "primary": "Основные",
+      "additional": "Дополнительные"
+    }
+  },
+  "users": {
+    "feed": {
+      "nickname_fallback": "Пользователь {id}"
+    },
+    "info_card": {
+      "registration_date": "Присоединился {date}"
+    }
+  },
+  "errors": {
+    "avatar": {
+      "export_failed": "Ошибка экспорта аватара",
+      "context_unavailable": "Контекст Canvas недоступен"
+    }
+  },
+  "landing": {
+    "header": {
+      "open_app": "Открыть приложение",
+      "dark_mode": "Темная тема",
+      "light_mode": "Светлая тема"
+    },
+    "hero": {
+      "title": "Целые миры, описанные генеалогическими древами",
+      "description": "Создавайте родословные для семей, династий, пантеонов, вымышленных домов и целых игровых вселенных.",
+      "login": "Войти",
+      "register": "Регистрация"
+    },
+    "features": {
+      "overline": "Больше чем семейный архив",
+      "main_title": "Rooots создан для мифологий, династий, фэндом-канонов и миров, которые не вписываются в обычные инструменты.",
+      "main_description": "Прописывайте престолонаследие, божественные родословные, соперничающие линии крови, тайных наследников и брачную политику целых цивилизаций в одном месте. Документируете ли вы фэнтези-империю, сеттинг для настольной кампании или легендарный дом — структура остается понятной даже при самом глубоком погружении в лор.",
+      "card_worldbuilding_title": "Приоритет миростроению",
+      "card_worldbuilding_desc": "Отслеживайте вымышленные линии, священные генеалогии, побочные ветви и мифических основателей, не притворяясь, что каждое дерево — это современная семья.",
+      "card_scale_title": "Для масштабных историй",
+      "card_scale_desc": "Организуйте сложные сети взаимоотношений кланов, пантеонов и альтернативных историй с макетом, который остается читаемым по мере расширения вашего канона."
+    },
+    "footer": {
+      "rights": "Все права защищены"
+    }
+  }
+}

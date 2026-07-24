@@ -1,69 +1,81 @@
 <script setup lang="ts">
-import CreateAccountSuggestion from "~/components/common/CreateAccountSuggestion.vue";
-import CreateTreeSuggestion from "~/components/common/CreateTreeSuggestion.vue";
-import SideBar from "~/components/common/SideBar.vue";
-import InlineFeed from "~/components/common/inline/InlineFeed.vue";
-import MainUserWelcome from "~/components/main/MainUserWelcome.vue";
-import type DataDTO from "~/composables/scripts/api/dtos/DataDTO";
-import sendListTreesRequest from "~/composables/scripts/familytree/listTrees";
-import useUserDataHandler from "~/composables/scripts/storages/get/userDataHandler";
-import type { ListTreesResponse } from "~/composables/scripts/familytree/dtos/responses/ListTreesResponse";
-import showApiErrorToast from "~/composables/scripts/ui/showApiErrorToast";
-import InlineUserFeed from "~/components/common/inline/InlineUserFeed.vue";
+import CreateAccountSuggestion from '~/components/common/suggestions/CreateAccountSuggestion.vue'
+import CreateTreeSuggestion from '~/components/common/suggestions/CreateTreeSuggestion.vue'
+import SideBar from '~/components/common/sidebar/SideBar.vue'
+import InlineTreeFeed from '~/components/common/inline/InlineTreeFeed.vue'
+import MainUserWelcome from '~/components/main/MainUserWelcome.vue'
+import type DataDTO from '~/services/api/dtos/DataDTO'
+import sendListTreesRequest from '~/services/familytree/listTrees'
+import useUserDataHandler from '~/utils/scripts/storages/get/userDataHandler'
+import type { ListTreesResponse } from '~/services/familytree/dtos/responses/ListTreesResponse'
+import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import InlineUserFeed from '~/components/common/inline/InlineUserFeed.vue'
+import TreeSearchFast from '~/components/main/TreeSearchFast.vue'
 
-const {userData, pending, initialized, ensureLoaded} = useUserDataHandler();
-const isGuest = computed(() => initialized.value && !pending.value && !userData.value);
-const hasNoTrees = ref(false);
+const { t } = useI18n()
+
+const { userData, pending, initialized, ensureLoaded } = useUserDataHandler()
+const isGuest = computed(() => initialized.value && !pending.value && !userData.value)
+const hasNoTrees = ref(false)
 
 async function loadMyTreesState() {
   try {
-    const response = await sendListTreesRequest() as DataDTO<ListTreesResponse>;
-    const trees = Array.isArray(response.data?.trees) ? response.data.trees : [];
-    hasNoTrees.value = trees.length === 0;
+    const response = await sendListTreesRequest() as DataDTO<ListTreesResponse>
+    const trees = Array.isArray(response.data?.trees) ? response.data.trees : []
+    hasNoTrees.value = trees.length === 0
   } catch (error) {
-    hasNoTrees.value = false;
-    showApiErrorToast(error);
+    hasNoTrees.value = false
+    showApiErrorToast(error)
   }
 }
 
 onMounted(async () => {
-  await ensureLoaded();
+  await ensureLoaded()
 
   if (userData.value) {
-    await loadMyTreesState();
+    await loadMyTreesState()
   }
-});
+})
 </script>
 
 <template>
   <div class="flex min-h-screen">
-    <SideBar activeTab="main"/>
+    <SideBar active-tab="main" />
 
-    <UMain class="w-full p-4 lg:p-6">
-      <UContainer class="">
-        <div class="flex w-full items-start gap-4 flex-col lg:flex-row">
-          <MainUserWelcome/>
+    <UMain class="w-full p-4 lg:p-8">
+      <UContainer>
+        <div class="flex w-full items-start justify-between flex-col lg:flex-row">
+          <MainUserWelcome />
+
+          <TreeSearchFast />
         </div>
 
         <CreateAccountSuggestion
           v-if="isGuest"
-          class="mt-6"
-          title="Build your family tree with an account"
-          description="Register to save your progress, keep your profile in sync, and start creating trees."
-          button-label="Create account"
+          class="mt-4"
         />
 
+        <InlineTreeFeed
+          :title="t('main.feeds.trees_title')"
+          :limit="10"
+        >
+          <template #fallback>
+            <p class="py-12 text-center text-md text-muted">
+              {{ t('common.no_data') }}
+            </p>
+          </template>
+        </InlineTreeFeed>
 
-        <InlineFeed title="Trees for you" :limit="10">
-          <!--todo refacttor add a fallback slot-->
-          <!--          <template slot="fallback">-->
-          <!--          <p class="py-12 text-center text-sm text-muted">-->
-          <!--            Trees matching the selected parameters were not found.-->
-          <!--          </p>-->
-          <!--          </template>-->
-        </InlineFeed>
-
-        <InlineUserFeed title="Recommended users" :limit="10"/>
+        <InlineUserFeed
+          :title="t('main.feeds.users_title')"
+          :limit="10"
+        >
+          <template #fallback>
+            <p class="py-12 text-center text-md text-muted">
+              {{ t('common.no_data') }}
+            </p>
+          </template>
+        </InlineUserFeed>
 
         <CreateTreeSuggestion
           v-if="!isGuest && hasNoTrees"
@@ -73,7 +85,3 @@ onMounted(async () => {
     </UMain>
   </div>
 </template>
-
-<style scoped>
-
-</style>

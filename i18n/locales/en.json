@@ -1,0 +1,509 @@
+{
+  "notifications": {
+    "email_missing": "Email is missing",
+    "nickname_empty": "Nickname cannot be empty",
+    "password_mismatch": "Passwords do not match",
+    "password_updated": "Password updated successfully",
+    "event_removed": "Event removed successfully",
+    "event_removed_desc": "Event {type} removed successfully"
+  },
+  "auth": {
+    "logout_modal": {
+      "title": "Confirm logout",
+      "description": "Choose if you want to end other sessions",
+      "all_devices_label": "Logout from all devices",
+      "submit": "Logout"
+    },
+    "actions": {
+      "sign_up": "Sign up",
+      "log_in": "Log in"
+    },
+    "validation": {
+      "password": {
+        "too_short": "Try longer passwords (min 8 characters)",
+        "add_numbers": "Add numbers to your password",
+        "add_special": "Add special symbols to your password",
+        "add_uppercase": "Add uppercase letters to your password",
+        "perfect": "Your password is great"
+      }
+    },
+    "placeholders": {
+      "email": "Email"
+    },
+    "account_required": "An account is required",
+    "signin_to_edit": "Sign in to edit your profile.",
+    "verify_code": {
+      "title": "Enter the code",
+      "subtitle": "Check {email} for the message",
+      "send_again": "Send code again"
+    },
+    "recovery": {
+      "title": "Recover password",
+      "subtitle": "Reset password of the existing account"
+    },
+    "login": {
+      "title": "Login",
+      "subtitle": "Welcome back",
+      "no_account": "I don't have an account",
+      "forgot_password": "Forgot password"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Create a new account",
+      "already_have_account": "Already have an account, login instead"
+    },
+    "reset": {
+      "title": "Reset password",
+      "subtitle": "Enter a new password for your account.",
+      "success_subtitle": "Password changed successfully.",
+      "go_to_login": "Go to login",
+      "placeholders": {
+        "repeat_password": "Repeat new password"
+      },
+      "helpers": {
+        "no_credentials": "Reset data was not found in the link.",
+        "repeat_new": "Repeat the new password to continue.",
+        "mismatch": "Passwords do not match.",
+        "set_new": "Set a new password for your account."
+      },
+      "alert": {
+        "title": "Password updated",
+        "description": "You can now sign in with the new password."
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "back": "Back",
+    "nickname": "Nickname",
+    "cancel": "Cancel",
+    "save": "Save",
+    "update_password": "Update Password",
+    "new_password": "New password",
+    "confirm_password": "Confirm password",
+    "passwords_dont_match": "Passwords don't match",
+    "preferences": "Preferences",
+    "theme": "Theme",
+    "language": "Language",
+    "avatar_modal": {
+      "title": "Edit avatar",
+      "no_image": "No image selected",
+      "select_image": "Select image",
+      "change_image": "Change Image",
+      "apply": "Apply"
+    }
+  },
+  "common": {
+    "no_data": "No matching data.",
+    "dates": {
+      "unavailable": "Registration date unavailable"
+    },
+    "back": "Back",
+    "submit": "Submit",
+    "search_placeholder": "Search...",
+    "cancel": "Cancel",
+    "create": "Create",
+    "import": "Import",
+    "profile_menu": {
+      "my_profile": "My profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "navigation": {
+      "main": "Main",
+      "feed": "Feed",
+      "my_trees": "My trees"
+    }
+  },
+  "main": {
+    "feeds": {
+      "trees_title": "Trees for you",
+      "users_title": "Recommended users"
+    },
+    "empty_states": {
+      "no_trees_found": "Trees matching the selected parameters were not found."
+    },
+    "welcome": {
+      "guest_prefix": "Welcome,",
+      "guest_name": "Dear guest",
+      "user_prefix": "Welcome back,"
+    },
+    "search": {
+      "button_label": "Search users...",
+      "placeholder": "Type to search users or trees...",
+      "no_results": "No results found"
+    }
+  },
+  "feed": {
+    "title": "Feed"
+  },
+  "my": {
+    "title": "My trees",
+    "actions": {
+      "new_tree": "New tree"
+    },
+    "new_tree_modal": {
+      "title": "Add Family Tree",
+      "description": "Create manually or import file",
+      "tabs": {
+        "create": "New tree",
+        "import": "Import file"
+      },
+      "form": {
+        "name_label": "Tree name",
+        "name_placeholder": "My family tree",
+        "desc_label": "Description",
+        "desc_placeholder": "Describe your tree here",
+        "avatar_label": "Tree avatar",
+        "choose_image": "Choose image",
+        "submit": "Create Tree"
+      },
+      "import": {
+        "click_to_upload": "Click to upload your file",
+        "support_text": "Standard .ged files are supported",
+        "submit": "Import Tree"
+      }
+    },
+    "empty_state": {
+      "title": "No trees yet",
+      "description": "Create your first family tree to start filling this page.",
+      "create_button": "Create tree"
+    }
+  },
+  "suggestions": {
+    "create_account": {
+      "title": "Create an account to keep your trees",
+      "description": "Guest visitors can browse public pages, but your own trees require an account and saved session."
+    },
+    "create_account_default": {
+      "title": "Create an account",
+      "description": "Save your trees, sync your profile, and continue building your family history."
+    }
+  },
+  "profile": {
+    "nickname_fallback": "User",
+    "registered_at": "Registered on {date}",
+    "trees": {
+      "my_trees": "My trees",
+      "public_trees": "Public trees",
+      "not_found": "Public trees were not found."
+    }
+  },
+  "tree": {
+    "actions": {
+      "parent": "Parent",
+      "partner": "Partner",
+      "child": "Child"
+    },
+    "roles": {
+      "member": "Family member",
+      "father": "Father",
+      "mother": "Mother",
+      "parent": "Parent"
+    },
+    "person": {
+      "unknown": "Unknown person"
+    },
+    "canvas": {
+      "fallback_name": "Tree",
+      "author_fallback": "User {id}"
+    },
+    "navigation": {
+      "settings": "Tree settings",
+      "events": "Events",
+      "visualizations": "Visualizations",
+      "timeline": "Timeline"
+    },
+    "panels": {
+      "unknown": "Unknown section"
+    },
+    "events": {
+      "type_modal": {
+        "title": "Create event type",
+        "description": "Add a reusable event template.",
+        "name_label": "Type Name",
+        "name_placeholder": "e.g. Wedding, Birth, Census",
+        "count_label": "Primary People Count",
+        "rule_label": "Selection Rule",
+        "submit_button": "Create type",
+        "success_notification": "Event type created",
+        "rules": {
+          "exact": "Exact count",
+          "at_least": "At least"
+        }
+      },
+      "modal": {
+        "create_title": "Create Event",
+        "edit_title": "Edit Event",
+        "type_label": "Event Type",
+        "unknown_date": "Unknown date",
+        "primary_people": "Primary People",
+        "additional_people": "Additional People",
+        "unnamed_person": "Unnamed person",
+        "submit_create": "Create Event",
+        "submit_save": "Save Changes",
+        "placeholders": {
+          "month": "MM",
+          "year": "YYYY"
+        },
+        "errors": {
+          "exactly_primary": "Choose exactly {count} primary people.",
+          "at_least_primary": "Choose at least {count} primary people."
+        },
+        "precisions": {
+          "day": "Day",
+          "month": "Month",
+          "year": "Year"
+        },
+        "bounds": {
+          "exact": "Exact",
+          "not_before": "Not before",
+          "not_after": "Not after"
+        }
+      }
+    },
+    "export": {
+      "open_button": "Create export",
+
+      "modal_title": "Export Family Tree",
+      "modal_description": "Download your data or generate a visual graph",
+      "tabs": {
+        "gedcom": "GEDCOM",
+        "svg": "Visual Graph"
+      },
+      "gedcom": {
+        "description": "Export file using default {format} format.",
+        "warning": "Almost all events will be lost.",
+        "submit": "Export"
+      },
+      "svg": {
+        "type_label": "Visualisation type",
+        "type_description": "Choose how the tree should be structured",
+        "type_placeholder": "Select type",
+        "root_label": "Root Person",
+        "root_description": "The central node of the tree",
+        "root_placeholder": "Select root person",
+        "excluded_label": "Excluded persons",
+        "excluded_description": "These people will be hidden from the graph",
+        "excluded_placeholder": "Nobody excluded",
+        "submit": "Generate"
+      }
+    },
+    "add_child": {
+      "title": "Add child",
+      "description": "Create a new child node in the tree.",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "patronymic": "Patronymic",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "submit": "Create",
+      "success_title": "Child added",
+      "success_description": "A new child has been successfully added to the tree."
+    },
+    "add_parent": {
+      "title": "Add parent",
+      "description": "Create a new parent node for {name}.",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "patronymic": "Patronymic",
+      "role": "Role",
+      "father": "Father",
+      "mother": "Mother",
+      "submit": "Create",
+      "success_title": "Parent added",
+      "success_description": "A new parent has been added to the tree."
+    },
+    "add_partner": {
+      "title": "Add partner",
+      "description": "Add a spouse or partner for {name}",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "patronymic": "Patronymic",
+      "submit": "Create",
+      "success_title": "Partner added",
+      "success_description": "A new partner has been successfully added."
+    },
+    "person_modal": {
+      "description": "Family member details",
+      "unknown_person": "Unknown person",
+      "born_on": "Born {year}",
+      "roles": {
+        "label": "Role",
+        "default": "Family member"
+      },
+      "info": {
+        "gender": "Gender",
+        "first_name": "First name",
+        "last_name": "Last name",
+        "patronymic": "Patronymic",
+        "none": "—"
+      },
+      "genders": {
+        "male": "Male",
+        "female": "Female",
+        "unspecified": "Unspecified"
+      },
+      "avatar": {
+        "label": "Avatar",
+        "choose": "Choose image"
+      },
+      "actions": {
+        "edit": "Edit",
+        "save": "Save",
+        "delete": "Delete",
+        "set_root": "Set as root",
+        "close": "Close"
+      }
+    },
+    "loading": "Loading tree",
+    "info_card": {
+      "by": "By",
+      "unknown_author": "Unknown author"
+    },
+    "empty_state": "No tree content available for {name}",
+    "events_list": {
+      "title": "Events",
+      "description": "History of events for this tree.",
+      "add_button": "Event",
+      "empty_state": "No events created yet.",
+      "unnamed_person": "Unnamed",
+      "unknown_type": "Unknown type",
+      "participants": {
+        "primary": "Primary",
+        "additional": "Additional",
+        "none": "None",
+        "unknown": "Unknown"
+      },
+      "dates": {
+        "unknown": "Unknown date",
+        "undated": "Undated"
+      },
+      "date_bounds": {
+        "before": "before",
+        "after": "after",
+        "about": "about",
+        "exact": ""
+      }
+    },
+    "event_types": {
+      "title": "Event types",
+      "description": "Reusable templates for event creation.",
+      "add_button": "Type",
+      "empty_state": "No event types available.",
+      "unnamed_type": "Unnamed type",
+      "people_count": "People count: {count}",
+      "rules": {
+        "any": "any"
+      }
+    },
+    "access_list": {
+      "title": "Access list",
+      "description": "Manage email-based access.",
+      "placeholder": "user{'@'}example.com",
+      "add_button": "Add"
+    },
+    "danger_zone": {
+      "title": "Danger zone",
+      "description": "This action permanently removes the tree.",
+      "delete_button": "Delete tree",
+      "confirm_delete": "Delete tree \"{name}\"?"
+    },
+    "settings": {
+      "name_placeholder": "Tree name",
+      "description_placeholder": "Description",
+      "public_checkbox": "Public on main page",
+      "restricted_checkbox": "Restricted view",
+      "avatar_label": "Tree avatar",
+      "choose_image": "Choose image",
+      "save_button": "Save changes"
+    },
+    "visualizations": {
+      "title": "Generated data",
+      "description": "Ready to go and pending visualisation files",
+      "empty_state": "No visualizations found.",
+      "created_at": "Created: {date}",
+      "pending": "Pending...",
+      "root_person": "Root",
+      "persons_count": "Persons",
+      "members": "{count} members",
+      "unknown": "Unknown",
+      "unnamed": "Unnamed",
+      "error_label": "Error: {message}",
+      "types": {
+        "svg": "SVG Graphic",
+        "pdf": "PDF Document",
+        "png": "PNG Image"
+      },
+      "statuses": {
+        "ready": "Ready",
+        "error": "Error",
+        "pending": "Pending"
+      }
+    }
+  },
+  "timeline": {
+    "fallback_title": "Timeline",
+    "no_dated_events": "No dated events",
+    "undated_list": {
+      "unknown_event": "Unknown",
+      "none_people": "None"
+    },
+    "loading_tree": "Loading tree",
+    "no_content": "No timeline content available for this tree",
+    "unknown_event": "Unknown event",
+    "no_people": "No people",
+    "undated": "Undated",
+    "filters": {
+      "date_from": "From",
+      "date_to": "To",
+      "included_persons": "Included persons",
+      "choose_people": "Choose people"
+    },
+    "undated_events_title": "Undated or unknown-date events",
+    "roles": {
+      "primary": "Primary",
+      "additional": "Additional"
+    }
+  },
+  "users": {
+    "feed": {
+      "nickname_fallback": "User {id}"
+    },
+    "info_card": {
+      "registration_date": "Joined {date}"
+    }
+  },
+  "errors": {
+    "avatar": {
+      "export_failed": "Avatar export failed",
+      "context_unavailable": "Canvas context is unavailable"
+    }
+  },
+  "landing": {
+    "header": {
+      "open_app": "Open app",
+      "dark_mode": "Dark Mode",
+      "light_mode": "Light Mode"
+    },
+    "hero": {
+      "title": "Whole worlds described by genealogical trees",
+      "description": "Build lineages for families, dynasties, pantheons, invented houses, and entire fictional worlds.",
+      "login": "Login",
+      "register": "Register"
+    },
+    "features": {
+      "overline": "Beyond family archives",
+      "main_title": "Rooots is built for mythologies, dynasties, fandom canons, and worlds that never fit inside ordinary family tree tools.",
+      "main_description": "Map royal succession, divine ancestry, rival bloodlines, hidden heirs, marriage politics, and branches of entire fictional civilizations in one place. Whether you are documenting a fantasy empire, a tabletop campaign setting, a legendary house, or your own long-form worldbuilding project, the structure stays readable even when the lore gets dense.",
+      "card_worldbuilding_title": "Worldbuilding-first",
+      "card_worldbuilding_desc": "Track invented lineages, sacred genealogies, cadet branches, mythic founders, and power transitions without pretending every tree is a modern household.",
+      "card_scale_title": "Built for lore at scale",
+      "card_scale_desc": "Organize complex relationship webs for houses, clans, pantheons, and alternate histories with a layout that stays legible as your canon expands."
+    },
+    "footer": {
+      "rights": "All rights reserved"
+    }
+  }
+}

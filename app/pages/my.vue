@@ -1,20 +1,23 @@
 <script setup lang="ts">
-import CreateAccountSuggestion from '~/components/common/CreateAccountSuggestion.vue'
-import CreateTreeSuggestion from '~/components/common/CreateTreeSuggestion.vue'
-import MyTreesActions from '~/components/common/MyTreesActions.vue'
-import SideBar from '~/components/common/SideBar.vue'
-import TreeCardGrid from '~/components/common/TreeCardGrid.vue'
-import sendListTreesRequest from '~/composables/scripts/familytree/listTrees'
-import useUserDataHandler from '~/composables/scripts/storages/get/userDataHandler'
-import type DataDTO from '~/composables/scripts/api/dtos/DataDTO'
-import type { ListTreesResponse } from '~/composables/scripts/familytree/dtos/responses/ListTreesResponse'
-import showApiErrorToast from '~/composables/scripts/ui/showApiErrorToast'
-import { loadTreeCardItems, revokeTreeCardItems } from '~/composables/scripts/ui/loadTreeCardItems'
-import type { TreeCardItem } from '~/composables/scripts/ui/mapTreeToTreeCardItem'
+import CreateAccountSuggestion from '~/components/common/suggestions/CreateAccountSuggestion.vue'
+import CreateTreeSuggestion from '~/components/common/suggestions/CreateTreeSuggestion.vue'
+import MyTreesActions from '~/components/my/MyTreesActions.vue'
+import SideBar from '~/components/common/sidebar/SideBar.vue'
+import TreeCardGrid from '~/components/common/cards/TreeCardGrid.vue'
+import sendListTreesRequest from '~/services/familytree/listTrees'
+import useUserDataHandler from '~/utils/scripts/storages/get/userDataHandler'
+import type DataDTO from '~/services/api/dtos/DataDTO'
+import type { ListTreesResponse } from '~/services/familytree/dtos/responses/ListTreesResponse'
+import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
+import { loadTreeCardItems, revokeTreeCardItems } from '~/utils/ui/tree/loadTreeCardItems'
+import type { TreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
+
+// Инициализация i18n
+const { t } = useI18n()
 
 const pending = ref(true)
 const items = ref<TreeCardItem[]>([])
-const { userData, initialized, ensureLoaded } = useUserDataHandler()
+const { userData, initialized} = useUserDataHandler()
 const isGuest = computed(() => initialized.value && !userData.value)
 
 function replaceItems(nextItems: TreeCardItem[]) {
@@ -50,31 +53,32 @@ onBeforeUnmount(() => {
   <div class="flex min-h-screen">
     <SideBar active-tab="trees" />
 
-    <UMain class="w-full p-4 lg:p-6">
+    <UMain class="w-full p-4 lg:p-8">
       <UContainer>
         <div class="mb-4">
           <div
             v-if="!isGuest"
-            class="flex items-center justify-between gap-3"
+            class="flex items-center justify-between gap-4"
           >
             <h1 class="text-2xl font-semibold">
-              My Trees
+              {{ t('my.title') }}
             </h1>
+
             <MyTreesActions @changed="loadTrees" />
           </div>
           <h1
             v-else
             class="text-2xl font-semibold"
           >
-            My Trees
+            {{ t('my.title') }}
           </h1>
         </div>
 
         <CreateAccountSuggestion
           v-if="isGuest"
-          title="Create an account to keep your trees"
-          description="Guest visitors can browse public pages, but your own trees require an account and saved session."
-          button-label="Create account"
+          class="mt-4"
+          :title="t('suggestions.create_account.title')"
+          :description="t('suggestions.create_account.description')"
         />
 
         <template v-else>
@@ -93,7 +97,3 @@ onBeforeUnmount(() => {
     </UMain>
   </div>
 </template>
-
-<style scoped>
-
-</style>

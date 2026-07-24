@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type RelationshipDTO from '~/composables/scripts/familytree/dtos/inner/RelationshipDTO'
-import type { TreeVisualConnection, TreeVisualNode } from '~/composables/scripts/tree/adaptTreeVisualisation'
+import type RelationshipDTO from '~/services/familytree/dtos/inner/RelationshipDTO'
+import type {TreeVisualNode} from "~/utils/ui/tree/coordinates/computeNodes";
+import type {TreeVisualConnection} from "~/utils/ui/tree/coordinates/computeConnections";
+import {getLayersGap} from "~/utils/ui/tree/coordinates/adaptTreeVisualisation";
 
 const props = defineProps<{
   fromNode: TreeVisualNode
@@ -89,7 +91,7 @@ const pathData = computed(() => {
   const endX = props.connection.toX ?? (props.toNode.x + props.toNode.width / 2)
   const endY = props.toNode.y
   const parentBottomY = props.fromNode.y + props.fromNode.height
-  const midY = parentBottomY + (endY - parentBottomY) / 2
+  const midY = parentBottomY + (getLayersGap() - props.fromNode.height) / 2
 
   if (partneredParentIds) {
     const [, secondParentId] = partneredParentIds
