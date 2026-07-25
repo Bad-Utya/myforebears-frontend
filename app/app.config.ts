@@ -12,7 +12,8 @@ export default defineAppConfig({
     }
   },
   api: {
-    // url: 'https://rooots.ru/api',
-    url: 'http://localhost:8081/api',
+    url: '159.194.202.125:8081/api',
+    // url: 'http://rooots.ru/api',
+    // url: 'http://localhost:8081/api',
   }
 })
