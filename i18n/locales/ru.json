@@ -354,7 +354,9 @@
     },
     "canvas": {
       "fallback_name": "Дерево",
-      "author_fallback": "Пользователь {id}"
+      "author_fallback": "Пользователь {id}",
+      "hide_actions": "Скрыть кнопки действий",
+      "show_actions": "Показать кнопки действий"
     },
     "navigation": {
       "settings": "Настройки",
@@ -388,6 +390,10 @@
         "unknown_date": "Дата неизвестна",
         "primary_people": "Основные участники",
         "additional_people": "Дополнительные участники",
+        "add_person": "Добавить человека",
+        "choose_person": "Выберите человека",
+        "search_person": "Поиск людей",
+        "no_people": "Участники не выбраны",
         "unnamed_person": "Человек без имени",
         "submit_create": "Создать событие",
         "submit_save": "Сохранить изменения",

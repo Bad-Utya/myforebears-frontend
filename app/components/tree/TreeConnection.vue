@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type RelationshipDTO from '~/services/familytree/dtos/inner/RelationshipDTO'
-import type {TreeVisualNode} from "~/utils/ui/tree/coordinates/computeNodes";
-import type {TreeVisualConnection} from "~/utils/ui/tree/coordinates/computeConnections";
-import {getLayersGap} from "~/utils/ui/tree/coordinates/adaptTreeVisualisation";
+import type { TreeVisualNode } from '~/utils/ui/tree/coordinates/computeNodes'
+import type { TreeVisualConnection } from '~/utils/ui/tree/coordinates/computeConnections'
+import { getLayersGap } from '~/utils/ui/tree/coordinates/adaptTreeVisualisation'
+import { routePartnerConnection } from '~/utils/ui/tree/connections/routePartnerConnection'
 
 const props = defineProps<{
   fromNode: TreeVisualNode
@@ -79,6 +80,18 @@ const pathData = computed(() => {
     const startY = leftNode.y + leftNode.height / 2
     const endX = rightNode.x
     const endY = rightNode.y + rightNode.height / 2
+
+    const routedPath = routePartnerConnection({
+      leftNode,
+      rightNode,
+      connections: props.connections,
+      nodeMap: props.nodeMap,
+      layerGap: getLayersGap()
+    })
+
+    if (routedPath) {
+      return routedPath
+    }
 
     return `M ${startX} ${startY} L ${endX} ${endY}`
   }

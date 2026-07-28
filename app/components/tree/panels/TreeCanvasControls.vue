@@ -1,21 +1,29 @@
 <script setup lang="ts">
-const props = defineProps<{
+const { t } = useI18n()
+
+withDefaults(defineProps<{
   scale: number
   pending?: boolean
   hasNodes: boolean
-}>()
+  actionsVisible?: boolean
+  canToggleActions?: boolean
+}>(), {
+  actionsVisible: true,
+  canToggleActions: false
+})
 
 const emit = defineEmits<{
   zoomIn: []
   zoomOut: []
   fitToView: []
+  toggleActions: []
   updateScale: [value: number]
 }>()
 </script>
 
 <template>
   <div
-    class="absolute bottom-4 right-4 z-10 flex items-center gap-2 border border-default rounded-2xl bg-neutral p-2 backdrop-blur-lg max-w-52"
+    class="absolute bottom-4 right-4 z-10 flex max-w-64 items-center gap-2 rounded-2xl border border-default bg-neutral p-2 backdrop-blur-lg"
   >
     <UButton
       color="neutral"
@@ -39,6 +47,17 @@ const emit = defineEmits<{
       icon="i-lucide-plus"
       :disabled="pending"
       @click="emit('zoomIn')"
+    />
+
+    <UButton
+      v-if="canToggleActions"
+      color="neutral"
+      variant="ghost"
+      :icon="actionsVisible ? 'i-lucide-eye' : 'i-lucide-eye-off'"
+      :aria-label="actionsVisible ? t('tree.canvas.hide_actions') : t('tree.canvas.show_actions')"
+      :title="actionsVisible ? t('tree.canvas.hide_actions') : t('tree.canvas.show_actions')"
+      :disabled="pending"
+      @click="emit('toggleActions')"
     />
 
     <UInputNumber

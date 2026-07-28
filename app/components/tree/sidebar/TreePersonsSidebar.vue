@@ -2,6 +2,7 @@
 import type PersonDTO from '~/services/familytree/dtos/inner/PersonDTO'
 import { useTreePersonsFilters } from '~/composables/trees/sidebar/useTreePersonsFilters'
 import TreeSidebarPersonItem from '~/components/tree/sidebar/persons/TreeSidebarPersonItem.vue'
+import { getTreePersonId } from '~/utils/ui/tree/resolveTreePersonId'
 
 const { t } = useI18n()
 
@@ -13,7 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updated: [person: PersonDTO]
-  structureChanged: []
+  structureChanged: [deletedPersonId?: string]
 }>()
 
 const filtersPopoverOpen = ref(false)
@@ -121,12 +122,12 @@ const {
     >
       <TreeSidebarPersonItem
         v-for="person in filteredPersons"
-        :key="person.id"
+        :key="getTreePersonId(person)"
         :tree-id="props.treeId"
         :person="person"
         :editable="props.editable"
         @updated="emit('updated', $event)"
-        @structure-changed="emit('structureChanged')"
+        @structure-changed="emit('structureChanged', $event)"
       />
     </div>
 

@@ -21,7 +21,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:open': [value: boolean]
   'updated': [person: PersonDTO]
-  'structureChanged': []
+  'structureChanged': [deletedPersonId?: string]
 }>()
 
 const {

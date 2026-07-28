@@ -3,6 +3,7 @@ import type { CSSProperties } from 'vue'
 
 defineProps<{
   sceneStyle: CSSProperties
+  gridStyle: CSSProperties
   isDragging: boolean
   pending?: boolean
 }>()
@@ -30,6 +31,7 @@ defineExpose({
   >
     <div
       class="tree-canvas__grid absolute inset-0"
+      :style="gridStyle"
       aria-hidden="true"
     />
 
@@ -71,12 +73,28 @@ defineExpose({
     linear-gradient(to right, var(--color-tree-grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--color-tree-grid-line) 1px, transparent 1px);
 
-  background-size: 32px 32px;
   opacity: 0.28;
+  transition:
+    background-position 180ms ease-out,
+    background-size 180ms ease-out;
+  will-change: background-position, background-size;
 }
 
 .tree-canvas__scene {
   transform-origin: top left;
+  transition: transform 180ms ease-out;
   will-change: transform;
+}
+
+.tree-canvas--dragging .tree-canvas__grid,
+.tree-canvas--dragging .tree-canvas__scene {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-canvas__grid,
+  .tree-canvas__scene {
+    transition: none;
+  }
 }
 </style>

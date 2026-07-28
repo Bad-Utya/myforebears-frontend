@@ -6,6 +6,7 @@ import sendAddChildRequest from '~/services/familytree/addChild'
 import AddChildRequest from '~/services/familytree/dtos/requests/AddChildRequest'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
 import PublicPersonImportModal from '~/components/publicPersons/PublicPersonImportModal.vue'
+import { getTreePersonId } from '~/utils/ui/tree/resolveTreePersonId'
 
 const { t } = useI18n()
 
@@ -47,14 +48,16 @@ function resetForm() {
   createPatronymic.value = ''
   selectedChildGender.value = 'MALE'
 
-  if (props.relatedPersonIds) {
+  const personId = getTreePersonId(props.person)
+
+  if (props.relatedPersonIds?.length) {
     createRelatedPersonIds.value = props.relatedPersonIds
-  } else if (!props.person.id) {
+  } else if (!personId) {
     createRelatedPersonIds.value = []
   } else if (props.partnerId) {
-    createRelatedPersonIds.value = [props.person.id, props.partnerId]
+    createRelatedPersonIds.value = [personId, props.partnerId]
   } else {
-    createRelatedPersonIds.value = [props.person.id]
+    createRelatedPersonIds.value = [personId]
   }
 }
 
@@ -67,7 +70,8 @@ function closeModal() {
 async function createChild() {
   isCreating.value = true
   try {
-    const [p1, p2] = createRelatedPersonIds.value
+    const [relatedParent1Id, relatedParent2Id] = createRelatedPersonIds.value
+    const parent1Id = relatedParent1Id || getTreePersonId(props.person)
 
     await sendAddChildRequest(
       props.treeId,
@@ -76,8 +80,8 @@ async function createChild() {
         createLastName.value,
         createPatronymic.value,
         selectedChildGender.value,
-        p1 ?? '',
-        p2 ?? ''
+        parent1Id,
+        relatedParent2Id || null
       )
     )
 
@@ -215,7 +219,7 @@ async function createChild() {
   <PublicPersonImportModal
     v-model:open="isBrowsePublicModalOpen"
     :tree-id="props.treeId"
-    :attach-to-person-id="props.person.id"
+    :attach-to-person-id="getTreePersonId(props.person)"
     attachment="CHILD"
     @imported="closeModal(); emit('created')"
   />

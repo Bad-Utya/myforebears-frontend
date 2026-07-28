@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { treeFieldUi, treeSelectUi, treeSelectMenuUi } from '~/utils/ui/theme/treeTheme'
+import { treeFieldUi, treeSelectUi } from '~/utils/ui/theme/treeTheme'
 import type EventDTO from '~/services/events/dtos/inner/EventDTO'
 import type EventTypeDTO from '~/services/eventTypes/dtos/inner/EventTypeDTO'
 import CreateEventRequest from '~/services/events/dtos/requests/CreateEventRequest'
@@ -8,6 +8,7 @@ import sendCreateEventRequest from '~/services/events/createEvent'
 import sendUpdateEventRequest from '~/services/events/updateEvent'
 import showApiErrorToast from '~/utils/ui/notifications/showApiErrorToast'
 import type { EventParticipant } from '~/utils/ui/events/eventParticipants'
+import EventPeoplePicker from '~/components/tree/modals/event/EventPeoplePicker.vue'
 
 const props = defineProps<{
   open: boolean
@@ -54,15 +55,6 @@ const boundOptions = computed(() => [
   { value: 'NOT_AFTER', label: t('tree.events.modal.bounds.not_after') }
 ])
 
-const personOptions = computed(() => props.participants.map(participant => ({
-  label: participant.name,
-  value: participant.id
-})))
-
-const additionalOptions = computed(() =>
-  personOptions.value.filter(p => !form.primaryIds.includes(p.value))
-)
-
 const selectedType = computed(() => props.eventTypes.find(t => t.id === form.eventTypeId))
 
 const primaryCountError = computed(() => {
@@ -71,10 +63,10 @@ const primaryCountError = computed(() => {
   const mode = selectedType.value.primary_persons_mode ?? ''
 
   if (mode.includes('EXACT') && form.primaryIds.length !== count) {
-    return `Choose exactly ${count} primary people.`
+    return t('tree.events.modal.errors.exactly_primary', { count })
   }
   if (mode.includes('AT_LEAST') && form.primaryIds.length < count) {
-    return `Choose at least ${count} primary people.`
+    return t('tree.events.modal.errors.at_least_primary', { count })
   }
   return undefined
 })
@@ -150,6 +142,10 @@ watch(() => props.open, (isOpen) => {
     }
   }
 })
+
+watch(() => form.primaryIds, (primaryIds) => {
+  form.additionalIds = form.additionalIds.filter(id => !primaryIds.includes(id))
+}, { deep: true })
 
 function close() {
   isModalVisible.value = false
@@ -227,29 +223,20 @@ function close() {
           </div>
         </div>
 
-        <div class="space-y-4">
-          <UFormField
+        <div class="space-y-3">
+          <EventPeoplePicker
+            v-model="form.primaryIds"
             :label="t('tree.events.modal.primary_people')"
+            :participants="participants"
             :error="primaryCountError"
-          >
-            <USelectMenu
-              v-model="form.primaryIds"
-              multiple
-              :items="personOptions"
-              value-key="value"
-              :ui="treeSelectMenuUi"
-            />
-          </UFormField>
+          />
 
-          <UFormField :label="t('tree.events.modal.additional_people')">
-            <USelectMenu
-              v-model="form.additionalIds"
-              multiple
-              :items="additionalOptions"
-              value-key="value"
-              :ui="treeSelectMenuUi"
-            />
-          </UFormField>
+          <EventPeoplePicker
+            v-model="form.additionalIds"
+            :label="t('tree.events.modal.additional_people')"
+            :participants="participants"
+            :excluded-ids="form.primaryIds"
+          />
         </div>
       </div>
     </template>

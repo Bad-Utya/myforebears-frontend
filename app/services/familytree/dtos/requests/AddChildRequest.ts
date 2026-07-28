@@ -6,7 +6,7 @@ export default class AddChildRequest implements IApiRequest {
   patronymic: string;
   gender: string;
   parent1_id: string;
-  parent2_id: string;
+  parent2_id: string | null;
 
   constructor(
     firstName: string,
@@ -14,7 +14,7 @@ export default class AddChildRequest implements IApiRequest {
     patronymic: string,
     gender: string,
     parent1Id: string,
-    parent2Id: string
+    parent2Id: string | null
   ) {
     this.first_name = firstName;
     this.last_name = lastName;

@@ -35,7 +35,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updated: [person: PersonDTO]
-  structureChanged: []
+  structureChanged: [deletedPersonId?: string]
 }>()
 
 const createModalOpen = ref(false)
@@ -44,6 +44,13 @@ const createRelatedPersonIds = ref<string[]>([])
 const partnerId = ref<string | null>(null)
 const availableParentRoles = ref<('FATHER' | 'MOTHER')[]>([])
 const person = ref<PersonDTO | null>(null)
+const actionButtonsVisible = ref(true)
+const highlightedNodeIds = ref<string[]>([])
+
+function toggleActionButtons() {
+  actionButtonsVisible.value = !actionButtonsVisible.value
+  highlightedNodeIds.value = []
+}
 
 function openCreateModal({
   nodeId,
@@ -83,6 +90,7 @@ const {
   viewportRef,
   scale,
   sceneStyle,
+  gridStyle,
   isDragging,
   fitToView,
   zoomIn,
@@ -104,6 +112,7 @@ const {
   getAvailableParentRoles
 } = useTreeRelationshipActions(
   computed(() => props.nodes),
+  visibleConnections,
   computed(() => props.relationships),
   computed(() => props.editable)
 )
@@ -122,6 +131,7 @@ defineExpose({
   >
     <TreeCanvasViewport
       :scene-style="sceneStyle"
+      :grid-style="gridStyle"
       :is-dragging="isDragging"
       :pending="props.pending"
       @pointerdown="startDragging"
@@ -137,9 +147,10 @@ defineExpose({
         />
 
         <TreeCanvasActionLayer
-          v-if="props.editable"
+          v-if="props.editable && actionButtonsVisible"
           :node-actions="nodeActions"
           :partner-child-actions="partnerChildActions"
+          @highlight-nodes="highlightedNodeIds = $event"
           @open-create-modal="openCreateModal"
         />
 
@@ -147,13 +158,14 @@ defineExpose({
           :nodes="props.nodes"
           :tree-id="props.treeId"
           :editable="props.editable"
+          :highlighted-node-ids="highlightedNodeIds"
           :node-actions="nodeActions"
           :partner-child-actions="partnerChildActions"
           :get-partner-id="getPartnerId"
           :get-person-role-label="getPersonRoleLabel"
           :get-available-parent-roles="getAvailableParentRoles"
           @updated="emit('updated', $event)"
-          @structure-changed="emit('structureChanged')"
+          @structure-changed="emit('structureChanged', $event)"
         />
       </template>
 
@@ -172,9 +184,12 @@ defineExpose({
           :scale="scale"
           :pending="props.pending"
           :has-nodes="props.nodes.length > 0"
+          :actions-visible="actionButtonsVisible"
+          :can-toggle-actions="Boolean(props.editable)"
           @zoom-in="zoomIn"
           @zoom-out="zoomOut"
           @fit-to-view="fitToView"
+          @toggle-actions="toggleActionButtons"
           @update-scale="setScale"
         />
       </template>

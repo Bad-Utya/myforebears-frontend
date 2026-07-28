@@ -55,6 +55,7 @@ const rootPerson = ref<PersonDTO>()
 const treeCreatorId = ref<string | number | null>(null)
 const persons = ref<PersonDTO[]>([])
 const relationships = ref<RelationshipDTO[]>([])
+const locallyDeletedPersonIds = new Set<string>()
 const sidebarPanelOpen = ref(false)
 const sidebarSection = ref<TreeSidebarSection>('settings')
 const layout = ref<TreeLayout>({
@@ -102,8 +103,20 @@ async function loadTreeData() {
   treeName.value = treeDto?.name ?? treeDto?.title ?? `${t('tree.canvas.fallback_name')} ${treeId.value}`
   treeDescription.value = treeDto?.description?.trim() ?? ''
   treeCreatorId.value = treeDto?.creator_id ?? null
-  persons.value = Array.isArray(treeContent?.persons) ? treeContent.persons : []
-  relationships.value = Array.isArray(treeContent?.relationships) ? treeContent.relationships : []
+  const serverPersons = Array.isArray(treeContent?.persons) ? treeContent.persons : []
+
+  for (const deletedPersonId of locallyDeletedPersonIds) {
+    if (!serverPersons.some(person => getTreePersonId(person) === deletedPersonId)) {
+      locallyDeletedPersonIds.delete(deletedPersonId)
+    }
+  }
+
+  persons.value = serverPersons.filter(person => !locallyDeletedPersonIds.has(getTreePersonId(person)))
+  relationships.value = (Array.isArray(treeContent?.relationships) ? treeContent.relationships : [])
+    .filter(relationship =>
+      !locallyDeletedPersonIds.has(relationship.person_id_from ?? '')
+      && !locallyDeletedPersonIds.has(relationship.person_id_to ?? '')
+    )
 
   await loadTreeAuthor()
 
@@ -171,7 +184,30 @@ async function openSidebarSection(section: TreeSidebarNavKey) {
   sidebarPanelOpen.value = true
 }
 
-async function handleStructureChanged() {
+function removePersonLocally(personId: string) {
+  locallyDeletedPersonIds.add(personId)
+  persons.value = persons.value.filter(person => getTreePersonId(person) !== personId)
+  relationships.value = relationships.value.filter(relationship =>
+    relationship.person_id_from !== personId && relationship.person_id_to !== personId
+  )
+  layout.value = {
+    ...layout.value,
+    nodes: layout.value.nodes.filter(node => node.id !== personId),
+    connections: layout.value.connections.filter(connection =>
+      connection.fromId !== personId && connection.toId !== personId
+    )
+  }
+
+  if (getTreePersonId(rootPerson.value ?? {}) === personId) {
+    rootPerson.value = undefined
+  }
+}
+
+async function handleStructureChanged(deletedPersonId?: string) {
+  if (deletedPersonId) {
+    removePersonLocally(deletedPersonId)
+  }
+
   pending.value = true
 
   try {

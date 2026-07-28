@@ -125,7 +125,7 @@ export function usePersonEditor(props: { person: PersonDTO; treeId: string }, em
     try {
       await sendDeletePersonRequest(props.treeId, personId.value)
       toast.add({title: 'Person deleted', color: 'success'})
-      emit('structureChanged')
+      emit('structureChanged', personId.value)
       return true
     } catch (e) {
       showApiErrorToast(e)

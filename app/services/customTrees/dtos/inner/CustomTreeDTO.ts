@@ -3,6 +3,7 @@ import type TagDTO from '~/services/tags/dtos/inner/TagDTO'
 export default interface CustomTreeDTO {
   id?: string
   creator_id?: number
+  creator_nickname?: string
   created_at_unix?: number
   name?: string
   description?: string

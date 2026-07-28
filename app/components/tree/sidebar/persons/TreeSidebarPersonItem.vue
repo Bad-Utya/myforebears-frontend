@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updated: [person: PersonDTO]
-  structureChanged: []
+  structureChanged: [deletedPersonId?: string]
 }>()
 
 const { avatarUrl, reload } = useTreePersonAvatar(
@@ -85,6 +85,6 @@ async function handleUpdated(updatedPerson: PersonDTO) {
     :avatar-url="avatarUrl ?? undefined"
     :editable="props.editable"
     @updated="handleUpdated"
-    @structure-changed="emit('structureChanged')"
+    @structure-changed="emit('structureChanged', $event)"
   />
 </template>

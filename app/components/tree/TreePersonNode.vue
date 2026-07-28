@@ -20,6 +20,7 @@ const props = defineProps<{
   height: number
   isRoot?: boolean
   editable?: boolean
+  highlighted?: boolean
   partnerId?: string
   roleLabel?: string
   availableParentRoles?: ParentRole[]
@@ -27,7 +28,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updated: [person: PersonDTO]
-  structureChanged: []
+  structureChanged: [deletedPersonId?: string]
 }>()
 
 const {
@@ -82,7 +83,7 @@ async function handleUpdated(updatedPerson: PersonDTO) {
 }
 
 onMounted(() => {
-  reload().then();
+  void reload()
 })
 </script>
 
@@ -90,7 +91,7 @@ onMounted(() => {
   <article
     data-tree-node="true"
     class="tree-node absolute overflow-visible select-none"
-    :class="toneClass"
+    :class="[toneClass, { 'tree-node--action-highlighted': highlighted }]"
     :style="cardStyle"
   >
     <div
@@ -124,7 +125,7 @@ onMounted(() => {
     :is-root="isRoot"
     :role-label="roleLabel"
     @updated="handleUpdated"
-    @structure-changed="emit('structureChanged')"
+    @structure-changed="emit('structureChanged', $event)"
   />
 </template>
 
@@ -135,10 +136,21 @@ onMounted(() => {
 
 .tree-node__card {
   background: var(--tree-node-bg);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .tree-node__card:hover {
   background: var(--tree-node-bg-hover);
+}
+
+.tree-node--action-highlighted {
+  z-index: 3;
+}
+
+.tree-node--action-highlighted .tree-node__card {
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--ui-primary) 18%, transparent 82%),
+    0 0 28px color-mix(in srgb, var(--ui-primary) 9%, transparent 91%);
 }
 
 .tree-node--male {

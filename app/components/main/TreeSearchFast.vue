@@ -119,8 +119,9 @@ watch(searchTerm, () => {
         :label="t('main.search.button_label')"
         color="neutral"
         variant="subtle"
+        size="md"
         icon="i-lucide-search"
-        class="w-full justify-center lg:w-auto"
+        class="w-full justify-start bg-elevated text-muted hover:bg-accented hover:text-toned lg:w-80"
         @click="openSearch"
       />
 

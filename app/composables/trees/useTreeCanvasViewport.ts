@@ -4,6 +4,7 @@ export type TreeCanvasViewportApi = {
   translateY: Ref<number>
   scale: Ref<number>
   sceneStyle: ComputedRef<Record<string, string>>
+  gridStyle: ComputedRef<Record<string, string>>
   isDragging: Ref<boolean>
   fitToView: () => void
   zoomIn: () => void
@@ -18,6 +19,8 @@ export type TreeCanvasViewportApi = {
 const MIN_SCALE = 0.3
 const MAX_SCALE = 1.6
 const SCALE_STEP = 0.1
+const GRID_BASE_SIZE = 32
+const GRID_PARALLAX_FACTOR = 0.35
 
 export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, nodesLength: Ref<number>) {
   const viewportRef = ref<HTMLElement | null>(null)
@@ -25,10 +28,14 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
   const translateY = ref(0)
   const scale = ref(1)
   const isDragging = ref(false)
+  const gridTranslateX = ref(0)
+  const gridTranslateY = ref(0)
   const dragStartX = ref(0)
   const dragStartY = ref(0)
   const dragOriginX = ref(0)
   const dragOriginY = ref(0)
+  const gridDragOriginX = ref(0)
+  const gridDragOriginY = ref(0)
   let resizeObserver: ResizeObserver | undefined
 
   const sceneStyle = computed(() => ({
@@ -36,6 +43,18 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
     height: `${height.value}px`,
     transform: `translate3d(${translateX.value}px, ${translateY.value}px, 0) scale(${scale.value})`
   }))
+
+  const gridStyle = computed(() => ({
+    backgroundPosition: `${gridTranslateX.value}px ${gridTranslateY.value}px`,
+    backgroundSize: `${GRID_BASE_SIZE * scale.value}px ${GRID_BASE_SIZE * scale.value}px`
+  }))
+
+  function scaleGridAround(nextScale: number, anchorX: number, anchorY: number) {
+    const scaleRatio = nextScale / scale.value
+
+    gridTranslateX.value = anchorX - (anchorX - gridTranslateX.value) * scaleRatio
+    gridTranslateY.value = anchorY - (anchorY - gridTranslateY.value) * scaleRatio
+  }
 
   function fitToView() {
     const viewport = viewportRef.value
@@ -50,9 +69,13 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
     const verticalPadding = 96
     const availableWidth = Math.max(240, viewportWidth - horizontalPadding * 2)
     const availableHeight = Math.max(240, viewportHeight - verticalPadding * 2)
-    const nextScale = Math.min(1, availableWidth / width.value, availableHeight / height.value)
+    const nextScale = Math.max(
+      MIN_SCALE,
+      Math.min(MAX_SCALE, 1, availableWidth / width.value, availableHeight / height.value)
+    )
 
-    scale.value = Math.max(MIN_SCALE, Math.min(MAX_SCALE, nextScale))
+    scaleGridAround(nextScale, viewportWidth / 2, viewportHeight / 2)
+    scale.value = nextScale
     translateX.value = (viewportWidth - width.value * scale.value) / 2
     translateY.value = (viewportHeight - height.value * scale.value) / 2
   }
@@ -70,6 +93,7 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
     const sceneCenterX = (anchorX - translateX.value) / scale.value
     const sceneCenterY = (anchorY - translateY.value) / scale.value
 
+    scaleGridAround(clampedScale, anchorX, anchorY)
     translateX.value = anchorX - sceneCenterX * clampedScale
     translateY.value = anchorY - sceneCenterY * clampedScale
     scale.value = clampedScale
@@ -95,6 +119,8 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
     dragStartY.value = event.clientY
     dragOriginX.value = translateX.value
     dragOriginY.value = translateY.value
+    gridDragOriginX.value = gridTranslateX.value
+    gridDragOriginY.value = gridTranslateY.value
   }
 
   function handlePointerMove(event: PointerEvent) {
@@ -102,8 +128,13 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
       return
     }
 
-    translateX.value = dragOriginX.value + event.clientX - dragStartX.value
-    translateY.value = dragOriginY.value + event.clientY - dragStartY.value
+    const deltaX = event.clientX - dragStartX.value
+    const deltaY = event.clientY - dragStartY.value
+
+    translateX.value = dragOriginX.value + deltaX
+    translateY.value = dragOriginY.value + deltaY
+    gridTranslateX.value = gridDragOriginX.value + deltaX * GRID_PARALLAX_FACTOR
+    gridTranslateY.value = gridDragOriginY.value + deltaY * GRID_PARALLAX_FACTOR
   }
 
   function stopDragging() {
@@ -163,6 +194,7 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
     translateY,
     scale,
     sceneStyle,
+    gridStyle,
     isDragging,
     fitToView,
     zoomIn,
@@ -174,4 +206,3 @@ export function useTreeCanvasViewport(width: Ref<number>, height: Ref<number>, n
     handleWheel
   }
 }
-

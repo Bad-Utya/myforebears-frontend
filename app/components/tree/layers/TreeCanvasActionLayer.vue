@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type {NodeAction, PartnerChildAction} from "~/composables/trees/useTreeRelationshipActions";
+import type { NodeAction, PartnerChildAction } from '~/composables/trees/useTreeRelationshipActions'
 
-const {t} = useI18n();
+const { t } = useI18n()
 
-const props = defineProps<{
+defineProps<{
   nodeActions: NodeAction[]
   partnerChildActions: PartnerChildAction[]
 }>()
@@ -17,6 +17,7 @@ const emit = defineEmits<{
       event: MouseEvent
     }
   ]
+  'highlight-nodes': [nodeIds: string[]]
 }>()
 
 function openNodeActionModal(
@@ -25,7 +26,8 @@ function openNodeActionModal(
   event: MouseEvent
 ) {
   event.stopPropagation()
-  emit('open-create-modal', {nodeId, action, event})
+  emit('highlight-nodes', [])
+  emit('open-create-modal', { nodeId, action, event })
 }
 
 function openPartnerChildModal(
@@ -34,6 +36,7 @@ function openPartnerChildModal(
   event: MouseEvent
 ) {
   event.stopPropagation()
+  emit('highlight-nodes', [])
   emit('open-create-modal', {
     nodeId,
     action: 'child',
@@ -58,6 +61,10 @@ function openPartnerChildModal(
         color="neutral"
         variant="soft"
         :icon="action.icon"
+        @mouseenter="emit('highlight-nodes', [action.nodeId])"
+        @mouseleave="emit('highlight-nodes', [])"
+        @focus="emit('highlight-nodes', [action.nodeId])"
+        @blur="emit('highlight-nodes', [])"
         @click="openNodeActionModal(action.nodeId, action.action, $event)"
       >
         {{ action.label }}
@@ -75,16 +82,18 @@ function openPartnerChildModal(
         size="xs"
         color="neutral"
         variant="soft"
-        icon="i-lucide-baby"zzzzzzzz
+        icon="i-lucide-baby"
+        @mouseenter="emit('highlight-nodes', action.relatedPersonIds)"
+        @mouseleave="emit('highlight-nodes', [])"
+        @focus="emit('highlight-nodes', action.relatedPersonIds)"
+        @blur="emit('highlight-nodes', [])"
         @click="openPartnerChildModal(action.nodeId, action.relatedPersonIds, $event)"
       >
         {{ t('tree.actions.child') }}
       </UButton>
     </div>
   </div>
-  <!--  TODO: KOSTYL V STILYAX-->
 </template>
-
 
 <style scoped>
 .tree-canvas__action-layer {

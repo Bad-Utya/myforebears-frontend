@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import TreeTimelinePage from '~/components/timeline/TreeTimelinePage.vue'
+
 const route = useRoute()
 const treeId = computed(() => {
   const id = route.params.id

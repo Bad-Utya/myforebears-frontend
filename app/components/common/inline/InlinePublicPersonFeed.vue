@@ -11,6 +11,10 @@ import {
 } from '~/utils/ui/publicPersons/loadPublicPersonCardItems'
 import type { PublicPersonCardItem } from '~/utils/ui/publicPersons/mapPublicPersonToCardItem'
 
+type PublicPersonCarouselItem = PublicPersonCardItem & {
+  isSkeleton?: boolean
+}
+
 const props = withDefaults(defineProps<{
   title?: string
   limit?: number
@@ -25,13 +29,17 @@ const items = ref<PublicPersonCardItem[]>([])
 const selectedItem = ref<PublicPersonCardItem | null>(null)
 const isModalOpen = ref(false)
 
-const skeletonItems = computed<PublicPersonCardItem[]>(() => (
+const skeletonItems = computed<PublicPersonCarouselItem[]>(() => (
   Array.from({ length: props.limit }, (_, index) => ({
     id: `skeleton-${index}`,
     person: {},
     fullName: '',
-    avatarUrl: null
+    avatarUrl: null,
+    isSkeleton: true
   }))
+))
+const carouselItems = computed<PublicPersonCarouselItem[]>(() => (
+  pending.value ? skeletonItems.value : items.value
 ))
 
 function replaceItems(nextItems: PublicPersonCardItem[]) {
@@ -77,8 +85,8 @@ onBeforeUnmount(() => {
     </div>
 
     <UCarousel
-      v-if="skeletonItems.length > 0"
-      :items="pending ? skeletonItems : items"
+      v-if="pending || carouselItems.length > 0"
+      :items="carouselItems"
       arrows
       :loop="false"
       :ui="{
@@ -90,14 +98,14 @@ onBeforeUnmount(() => {
     >
       <template #default="{ item }">
         <PublicPersonCardCompact
-          :pending="pending"
+          :pending="item.isSkeleton === true"
           :full-name="item.fullName"
           :birth-year="item.birthYear"
           :gender="item.gender"
           :biography="item.biography"
           :tags-text="item.tagsText"
           :avatar-url="item.avatarUrl"
-          @click="openItem(item)"
+          @click="!item.isSkeleton && openItem(item)"
         />
       </template>
     </UCarousel>

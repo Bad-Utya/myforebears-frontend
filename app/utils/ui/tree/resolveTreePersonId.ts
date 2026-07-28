@@ -8,7 +8,7 @@ export function getTreePersonId(person: PersonDTO) {
 export default function resolveTreeRootPersonId(tree: TreeDTO | undefined, persons: PersonDTO[]) {
   const rootPersonId = tree?.root_person_id
 
-  if (rootPersonId) {
+  if (rootPersonId && persons.some(person => getTreePersonId(person) === rootPersonId)) {
     return rootPersonId
   }
 

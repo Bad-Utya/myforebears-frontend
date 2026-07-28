@@ -3,6 +3,24 @@ import sendGetTreeAvatarRequest from '~/services/photos/getTreeAvatar'
 import mapTreeToTreeCardItem, { getTreeCardId, type TreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
 import type CustomTreeDTO from '~/services/customTrees/dtos/inner/CustomTreeDTO'
 import { mapCustomTreeToTreeCardItem } from '~/utils/ui/tree/mapTreeToTreeCardItem'
+import sendGetUserInfoRequest from '~/services/users/getUserInfo'
+
+const customTreeAuthorRequests = new Map<number, Promise<string | undefined>>()
+
+function loadCustomTreeAuthor(creatorId: number) {
+  const cachedRequest = customTreeAuthorRequests.get(creatorId)
+  if (cachedRequest) return cachedRequest
+
+  const request = sendGetUserInfoRequest(creatorId)
+    .then(response => response.data?.user?.nickname?.trim() || undefined)
+    .catch(() => {
+      customTreeAuthorRequests.delete(creatorId)
+      return undefined
+    })
+
+  customTreeAuthorRequests.set(creatorId, request)
+  return request
+}
 
 export async function mapTreeToTreeCardItemWithAvatar(tree: TreeDTO, index: number): Promise<TreeCardItem> {
   const item = mapTreeToTreeCardItem(tree, index)
@@ -34,5 +52,13 @@ export function revokeTreeCardItems(items: TreeCardItem[]) {
 }
 
 export async function loadCustomTreeCardItems(trees: CustomTreeDTO[]): Promise<TreeCardItem[]> {
-  return trees.map(mapCustomTreeToTreeCardItem)
+  return await Promise.all(trees.map(async (tree, index) => {
+    const item = mapCustomTreeToTreeCardItem(tree, index)
+
+    if (!item.author && tree.creator_id) {
+      item.author = await loadCustomTreeAuthor(tree.creator_id)
+    }
+
+    return item
+  }))
 }

@@ -3,11 +3,23 @@ import type { CustomTreeVisualNode } from '~/utils/ui/customTrees/customTreeLayo
 import CustomEntityModal from '~/components/customTree/CustomEntityModal.vue'
 import CustomEntityAvatar from '~/components/customTree/CustomEntityAvatar.vue'
 
-const props = defineProps<{ treeId: string, node: CustomTreeVisualNode, editable: boolean, hasParent: boolean }>()
+const props = withDefaults(defineProps<{
+  treeId: string
+  node: CustomTreeVisualNode
+  editable: boolean
+  hasParent: boolean
+  actionsVisible?: boolean
+  highlighted?: boolean
+}>(), {
+  actionsVisible: true,
+  highlighted: false
+})
+
 const emit = defineEmits<{
   updated: [entity: typeof props.node.entity]
   structureChanged: []
   add: [payload: { nodeId: string, direction: 'parent' | 'child' }]
+  highlight: [nodeId: string | null]
 }>()
 const modalOpen = ref(false)
 const style = computed(() => ({
@@ -18,20 +30,26 @@ const style = computed(() => ({
 
 <template>
   <article
+    data-tree-node="true"
     class="custom-tree-node absolute z-2 select-none"
     :style="style"
   >
     <UButton
-      v-if="editable && !hasParent"
+      v-if="editable && actionsVisible && !hasParent"
       class="absolute right-0 top-0 z-4 -translate-y-full"
       size="xs"
       color="neutral"
       variant="soft"
       icon="i-lucide-plus"
+      @mouseenter="emit('highlight', node.id)"
+      @mouseleave="emit('highlight', null)"
+      @focus="emit('highlight', node.id)"
+      @blur="emit('highlight', null)"
       @click.stop="emit('add', { nodeId: node.id, direction: 'parent' })"
     />
     <div
-      class="h-full cursor-pointer rounded-xl border border-custom-tree-node-border bg-custom-tree-node-bg p-3 transition hover:bg-custom-tree-node-bg-hover"
+      class="custom-tree-node__card h-full cursor-pointer rounded-xl border border-custom-tree-node-border bg-custom-tree-node-bg p-3 transition hover:bg-custom-tree-node-bg-hover"
+      :class="{ 'custom-tree-node__card--highlighted': highlighted }"
       @click="modalOpen = true"
     >
       <div class="flex h-full items-center gap-2">
@@ -55,12 +73,16 @@ const style = computed(() => ({
       </div>
     </div>
     <UButton
-      v-if="editable"
+      v-if="editable && actionsVisible"
       class="absolute bottom-0 left-0 z-4 translate-y-full"
       size="xs"
       color="neutral"
       variant="soft"
       icon="i-lucide-plus"
+      @mouseenter="emit('highlight', node.id)"
+      @mouseleave="emit('highlight', null)"
+      @focus="emit('highlight', node.id)"
+      @blur="emit('highlight', null)"
       @click.stop="emit('add', { nodeId: node.id, direction: 'child' })"
     />
   </article>
@@ -75,3 +97,17 @@ const style = computed(() => ({
     @structure-changed="emit('structureChanged')"
   />
 </template>
+
+<style scoped>
+.custom-tree-node__card {
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.custom-tree-node__card--highlighted {
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--ui-primary) 18%, transparent 82%),
+    0 0 28px color-mix(in srgb, var(--ui-primary) 9%, transparent 91%);
+}
+</style>

@@ -7,7 +7,10 @@ import {
   getRelationshipPairKey,
   findPartnerRelationship
 } from '~/utils/ui/tree/treeRelationshipHelpers'
-import type { TreeVisualNode } from "~/utils/ui/tree/coordinates/computeNodes";
+import type { TreeVisualNode } from '~/utils/ui/tree/coordinates/computeNodes'
+import type { TreeVisualConnection } from '~/utils/ui/tree/coordinates/computeConnections'
+import { getPartnerConnectionRoute } from '~/utils/ui/tree/connections/routePartnerConnection'
+import { getLayersGap } from '~/utils/ui/tree/coordinates/adaptTreeVisualisation'
 
 export type NodeAction = {
   id: string
@@ -30,6 +33,7 @@ export type PartnerChildAction = {
 
 export function useTreeRelationshipActions(
   nodes: Ref<TreeVisualNode[]>,
+  connections: Ref<TreeVisualConnection[]>,
   relationships: Ref<RelationshipDTO[]>,
   editable: Ref<boolean>
 ) {
@@ -44,8 +48,8 @@ export function useTreeRelationshipActions(
 
   function getAvailableParentRoles(nodeId: string): ('FATHER' | 'MOTHER')[] {
     const parentConnections = relationships.value.filter(rel =>
-      isParentChildRelationshipType(rel.type) &&
-      rel.person_id_to === nodeId
+      isParentChildRelationshipType(rel.type)
+      && rel.person_id_to === nodeId
     )
 
     const hasFather = parentConnections.some(connection =>
@@ -66,8 +70,8 @@ export function useTreeRelationshipActions(
    */
   function getPersonRoleLabel(nodeId: string) {
     const hasChildren = relationships.value.some(rel =>
-      isParentChildRelationshipType(rel.type) &&
-      rel.person_id_from === nodeId
+      isParentChildRelationshipType(rel.type)
+      && rel.person_id_from === nodeId
     )
 
     if (!hasChildren) return t('tree.roles.member')
@@ -81,7 +85,7 @@ export function useTreeRelationshipActions(
   const nodeActions = computed<NodeAction[]>(() => {
     if (!editable.value) return []
 
-    return nodes.value.flatMap(node => {
+    return nodes.value.flatMap((node) => {
       const actions: NodeAction[] = []
       const availableParentRoles = getAvailableParentRoles(node.id)
       const hasPartner = Boolean(getPartnerId(node.id))
@@ -136,7 +140,7 @@ export function useTreeRelationshipActions(
 
     const seenPairs = new Set<string>()
 
-    return relationships.value.flatMap(rel => {
+    return relationships.value.flatMap((rel) => {
       if (!isPartnerRelationshipType(rel.type)) return []
 
       const fromId = rel.person_id_from
@@ -159,13 +163,20 @@ export function useTreeRelationshipActions(
       const startY = leftNode.y + leftNode.height / 2
       const endX = rightNode.x
       const endY = rightNode.y + rightNode.height / 2
+      const routedPartner = getPartnerConnectionRoute({
+        leftNode,
+        rightNode,
+        connections: connections.value,
+        nodeMap: nodeMap.value,
+        layerGap: getLayersGap()
+      })
 
       return [{
         id: `child-action-${pairKey}`,
         nodeId: leftNode.id,
         relatedPersonIds: [leftNode.id, rightNode.id],
-        x: (startX + endX) / 2,
-        y: (startY + endY) / 2 - 2
+        x: routedPartner?.actionX ?? (startX + endX) / 2,
+        y: (routedPartner?.actionY ?? (startY + endY) / 2) - 2
       }]
     })
   })

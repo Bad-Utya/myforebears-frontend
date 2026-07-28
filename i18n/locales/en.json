@@ -354,7 +354,9 @@
     },
     "canvas": {
       "fallback_name": "Tree",
-      "author_fallback": "User {id}"
+      "author_fallback": "User {id}",
+      "hide_actions": "Hide action buttons",
+      "show_actions": "Show action buttons"
     },
     "navigation": {
       "settings": "Tree settings",
@@ -388,6 +390,10 @@
         "unknown_date": "Unknown date",
         "primary_people": "Primary People",
         "additional_people": "Additional People",
+        "add_person": "Add person",
+        "choose_person": "Choose a person",
+        "search_person": "Search people",
+        "no_people": "No people selected",
         "unnamed_person": "Unnamed person",
         "submit_create": "Create Event",
         "submit_save": "Save Changes",

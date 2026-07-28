@@ -69,11 +69,11 @@ async function sendRequest() {
             {{ t('common.submit') }}
           </UButton>
 
-          <div class="flex flex-col items-start gap-1 sm:ml-auto sm:items-end">
+          <div class="flex flex-col items-start gap-1 sm:ml-auto sm:flex-row sm:items-center sm:gap-2">
             <UButton
               variant="link"
               color="neutral"
-              class="px-0"
+              class="px-0 whitespace-nowrap"
               to="./register"
             >
               {{ t('auth.login.no_account') }}
@@ -81,7 +81,7 @@ async function sendRequest() {
             <UButton
               variant="link"
               color="neutral"
-              class="px-0"
+              class="px-0 whitespace-nowrap"
               to="./forgot"
             >
               {{ t('auth.login.forgot_password') }}

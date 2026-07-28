@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type {PropType} from 'vue'
+import type { PropType } from 'vue'
 import TreePersonNode from '../TreePersonNode.vue'
-import type {TreeVisualNode} from "~/utils/ui/tree/coordinates/computeNodes";
+import type { TreeVisualNode } from '~/utils/ui/tree/coordinates/computeNodes'
 
-const props = defineProps({
+defineProps({
   nodes: {
     type: Array as PropType<TreeVisualNode[]>,
     required: true
@@ -15,6 +15,10 @@ const props = defineProps({
   editable: {
     type: Boolean,
     default: false
+  },
+  highlightedNodeIds: {
+    type: Array as PropType<string[]>,
+    default: () => []
   },
   getPartnerId: {
     type: Function as PropType<(nodeId: string) => string | undefined>,
@@ -29,6 +33,11 @@ const props = defineProps({
     required: true
   }
 })
+
+defineEmits<{
+  updated: [person: TreeVisualNode['person']]
+  structureChanged: [deletedPersonId?: string]
+}>()
 </script>
 
 <template>
@@ -44,11 +53,12 @@ const props = defineProps({
       :height="node.height"
       :is-root="node.isRoot"
       :editable="editable"
+      :highlighted="highlightedNodeIds.includes(node.id)"
       :partner-id="getPartnerId(node.id)"
       :role-label="getPersonRoleLabel(node.id)"
       :available-parent-roles="getAvailableParentRoles(node.id)"
       @updated="$emit('updated', $event)"
-      @structure-changed="$emit('structureChanged')"
+      @structure-changed="$emit('structureChanged', $event)"
     />
   </div>
 </template>

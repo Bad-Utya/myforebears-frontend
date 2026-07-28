@@ -51,6 +51,7 @@ export default function mapTreeToTreeCardItem(tree: TreeDTO, index: number): Tre
 
 export function mapCustomTreeToTreeCardItem(tree: CustomTreeDTO, index: number): TreeCardItem {
   const id = String(tree.id ?? index + 1)
+  const author = tree.creator_nickname?.trim()
   const tagsText = Array.isArray(tree.tags)
     ? tree.tags.map(tag => tag.name?.trim() || tag.code?.trim()).filter(Boolean).join(' • ') || undefined
     : undefined
@@ -58,6 +59,7 @@ export function mapCustomTreeToTreeCardItem(tree: CustomTreeDTO, index: number):
   return {
     id,
     title: tree.name ?? `Custom tree ${index + 1}`,
+    author: author || undefined,
     tagsText,
     description: tree.description?.trim() || undefined,
     avatar: '',

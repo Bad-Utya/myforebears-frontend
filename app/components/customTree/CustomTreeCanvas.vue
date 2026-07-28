@@ -26,19 +26,28 @@ const emit = defineEmits<{ updated: [entity: CustomEntityDTO], structureChanged:
 const createOpen = ref(false)
 const relativeId = ref('')
 const direction = ref<'parent' | 'child'>('child')
+const actionButtonsVisible = ref(true)
+const highlightedNodeId = ref<string | null>(null)
 const nodeMap = computed(() => new Map(props.nodes.map(node => [node.id, node])))
 const visibleEdges = computed(() => props.edges.filter(edge => nodeMap.value.has(edge.parentId) && nodeMap.value.has(edge.childId)))
 const childNodeIds = computed(() => new Set(visibleEdges.value.map(edge => edge.childId)))
 const {
-  viewportRef, scale, sceneStyle, isDragging, fitToView, zoomIn, zoomOut,
+  viewportRef, scale, sceneStyle, gridStyle, isDragging, fitToView, zoomIn, zoomOut,
   setScale, startDragging, handleWheel
 } = useTreeCanvasViewport(toRef(props, 'width'), toRef(props, 'height'), computed(() => props.nodes.length))
 
 function openCreate(payload: { nodeId: string, direction: 'parent' | 'child' }) {
+  highlightedNodeId.value = null
   relativeId.value = payload.nodeId
   direction.value = payload.direction
   createOpen.value = true
 }
+
+function toggleActionButtons() {
+  actionButtonsVisible.value = !actionButtonsVisible.value
+  highlightedNodeId.value = null
+}
+
 defineExpose({ fitToView, zoomIn, zoomOut })
 </script>
 
@@ -49,6 +58,7 @@ defineExpose({ fitToView, zoomIn, zoomOut })
   >
     <TreeCanvasViewport
       :scene-style="sceneStyle"
+      :grid-style="gridStyle"
       :is-dragging="isDragging"
       :pending="pending"
       @pointerdown="startDragging"
@@ -72,8 +82,11 @@ defineExpose({ fitToView, zoomIn, zoomOut })
           :tree-id="treeId"
           :node="node"
           :editable="editable"
+          :actions-visible="actionButtonsVisible"
+          :highlighted="highlightedNodeId === node.id"
           :has-parent="childNodeIds.has(node.id)"
           @add="openCreate"
+          @highlight="highlightedNodeId = $event"
           @updated="emit('updated', $event)"
           @structure-changed="emit('structureChanged')"
         />
@@ -91,9 +104,12 @@ defineExpose({ fitToView, zoomIn, zoomOut })
           :scale="scale"
           :pending="pending"
           :has-nodes="nodes.length > 0"
+          :actions-visible="actionButtonsVisible"
+          :can-toggle-actions="editable"
           @zoom-in="zoomIn"
           @zoom-out="zoomOut"
           @fit-to-view="fitToView"
+          @toggle-actions="toggleActionButtons"
           @update-scale="setScale"
         />
       </template>
